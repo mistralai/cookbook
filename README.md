@@ -1,4 +1,4 @@
-# Mistral Community/Partner Examples
+# Mistral Cookbook
 
 
 ## Submission Guidelines:
