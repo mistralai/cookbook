@@ -1,13 +1,18 @@
 # Mistral Cookbook
 
+The Mistral Cookbook features examples contributed by our community and partners. If you have cool examples showcasing Mistral models, feel free to share them by submitting a PR to this repo.
+
 ## Submission Guidelines:
-- File Format: Please submit your example in the .ipynb format.
+- File Format: Please submit your example in the .md or .ipynb format.
 - Runnable on Colab: If you're sharing a notebook example, try to make sure it's runnable on Google Colab.
+- Authorship: Kindly include your name and affiliation at the begining of the file.
 - Descriptions: Please include your notebook along with its category and descriptions in the table below. 
+- Tone: Kindly maintain a neural tone and minimize any excessive marketing materials.
 - Reproducibility: To ensure others can reproduce your work, kindly tag package versions in your code.
 - Image size: If you have images, please make sure each image's size is below 500KB.
 - Copyright: Always respect copyright and intellectual property laws. 
 
+Disclaimer: Examples contributed by the community and partners do not represent Mistral's views and opinions. 
 
 
 ## Content Guidelines: 
