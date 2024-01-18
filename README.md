@@ -23,4 +23,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 ## Notebook list
 Notebook |Category| Description
 :- | :-| :-
-[your notebook file.ipynb]() | RAG, fine-tuning, chatbot, etc.| description of your notebook
+[mistral_rag_langchain.ipynb](mistral_rag_langchain.ipynb) | RAG | RAG on the Mixtral paper using Mistral embeddings and Chroma for indexing, and Mixtral-8x7b for generation.
