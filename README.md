@@ -23,4 +23,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 ## Notebook list
 Notebook |Category| Description
 :- | :-| :-
-[llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Using Mistral AI with LlamaIndex and ReAct agent
+[prompting_capabilities.ipynb](https://github.com/mistralai/cookbook/blob/main/prompting_capabilities.ipynb) | prompting| Write prompts for classification, summarization, personalization, and evaluation
+[basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb.ipynb) | RAG| RAG from scratch with Mistral AI API
+[embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb.ipynb) | embeddings| Use Mistral embeddings API for classification and clustering
+[llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Use Mistral AI with LlamaIndex and ReAct agent
