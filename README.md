@@ -23,4 +23,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 ## Notebook list
 Notebook |Category| Description
 :- | :-| :-
-[your notebook file.ipynb]() | RAG, fine-tuning, chatbot, etc.| description of your notebook
+[llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Using Mistral AI with LlamaIndex and ReAct agent
