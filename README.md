@@ -23,4 +23,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 ## Notebook list
 Notebook |Category| Description
 :- | :-| :-
-[mistral_langgraph_crag.ipynb](mistral_langgraph_crag.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral, with option to run locally (Ollama).
+[langgraph_crag_mistral.ipynb](langgraph_crag_mistral.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral with option to run locally (with Ollama).
