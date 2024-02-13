@@ -25,6 +25,6 @@ Notebook |Category| Description
 :- | :-| :-
 [langgraph_crag_mistral.ipynb](langgraph_crag_mistral.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral with option to run locally (with Ollama).
 [prompting_capabilities.ipynb](https://github.com/mistralai/cookbook/blob/main/prompting_capabilities.ipynb) | prompting| Write prompts for classification, summarization, personalization, and evaluation
-[basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb.ipynb) | RAG| RAG from scratch with Mistral AI API
-[embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb.ipynb) | embeddings| Use Mistral embeddings API for classification and clustering
+[basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb) | RAG| RAG from scratch with Mistral AI API
+[embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb) | embeddings| Use Mistral embeddings API for classification and clustering
 [llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Use Mistral AI with LlamaIndex and ReAct agent
