@@ -23,9 +23,10 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 ## Notebook list
 Notebook |Category| Description
 :- | :-| :-
-[langgraph_crag_mistral.ipynb](langgraph_crag_mistral.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral with option to run locally (with Ollama).
 [prompting_capabilities.ipynb](https://github.com/mistralai/cookbook/blob/main/prompting_capabilities.ipynb) | prompting| Write prompts for classification, summarization, personalization, and evaluation
 [basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb) | RAG| RAG from scratch with Mistral AI API
 [embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb) | embeddings| Use Mistral embeddings API for classification and clustering
+[function_calling.ipynb](https://github.com/mistralai/cookbook/blob/main/function_calling.ipynb) | function calling| Use Mistral API for function calling
+[langgraph_crag_mistral.ipynb](langgraph_crag_mistral.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral with option to run locally (with Ollama).
 [llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Use Mistral AI with LlamaIndex and ReAct agent
 [haystack_chat_with_docs.ipynb](https://github.com/mistralai/cookbook/blob/main/haystack_chat_with_docs.ipynb) | RAG, embeddings | Use Mistral AI with Haystack indexing and RAG pipelines
