@@ -29,4 +29,5 @@ Notebook |Category| Description
 [function_calling.ipynb](https://github.com/mistralai/cookbook/blob/main/function_calling.ipynb) | function calling| Use Mistral API for function calling
 [langgraph_crag_mistral.ipynb](langgraph_crag_mistral.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral with option to run locally (with Ollama).
 [llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Use Mistral AI with LlamaIndex and ReAct agent
+[autogen_agenchat_planning.ipynb](https://github.com/mistralai/cookbook/blob/main/mixtral_agenchat_planning.ipynb) | Agent, Planner, Code execution| Use Mistral AI with Autogen, Docker and Ollama to Plan a Coding problem and execute the Generated code in Docker container for verification.
 [haystack_chat_with_docs.ipynb](https://github.com/mistralai/cookbook/blob/main/haystack_chat_with_docs.ipynb) | RAG, embeddings | Use Mistral AI with Haystack indexing and RAG pipelines
