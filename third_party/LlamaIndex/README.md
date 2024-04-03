@@ -1,5 +1,7 @@
 # LlamaIndex <> MistralAI Cookbooks
 
+[LlamaIndex](https://github.com/run-llama/llama_index) is a data framework for LLM-based applications which benefit from context augmentation. LlamaIndex provides the essential abstractions to more easily ingest, structure, and access private or domain-specific data in order to inject these safely and reliably into LLMs for more accurate text generation. 
+
 Here we offer some cookbooks for utilizing LlamaIndex with MistralAI's LLM's and Embedding models.
 
 1. `RAG.ipynb` - Notebook to help you build quick RAG and Retriever Pipeline with Mistral.
@@ -8,8 +10,7 @@ Here we offer some cookbooks for utilizing LlamaIndex with MistralAI's LLM's and
 4. `Agents_Tools.ipynb` - Notebook to help you to use `FunctionCallingAgent` and `ReActAgent` for using Tools and RAG QueryEngine Tools.
 5. `Adaptive_RAG.ipynb` - Notebook to implement [AdapativeRAG](https://arxiv.org/abs/2403.14403) paper to route user queries based on query complexity using `FunctionCallingAgent` with Mistral LLM.
 
-
-
-
-
-
+[Documentation](https://docs.llamaindex.ai/en/stable/)
+[Discord](https://discord.gg/dGcwcsnxhU)
+[Twitter](https://twitter.com/llama_index)
+[Linkedin](https://www.linkedin.com/company/llamaindex/)
