@@ -30,3 +30,4 @@ Notebook |Category| Description
 [langgraph_crag_mistral.ipynb](langgraph_crag_mistral.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral with option to run locally (with Ollama).
 [llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Use Mistral AI with LlamaIndex and ReAct agent
 [haystack_chat_with_docs.ipynb](https://github.com/mistralai/cookbook/blob/main/haystack_chat_with_docs.ipynb) | RAG, embeddings | Use Mistral AI with Haystack indexing and RAG pipelines
+[document_clustering.ipynb](https://github.com/mistralai/cookbook/blob/main/document_clustering.ipynb) | embeddings | Use Mistral embeddings AI to visualise and cluster text documents.
