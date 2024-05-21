@@ -23,6 +23,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 ## Notebook list
 Notebook |Category| Description
 :- | :-| :-
+[distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb) | synthetic data| Easily create a mathematical synthetic preference dataset with distilabel
 [prompting_capabilities.ipynb](https://github.com/mistralai/cookbook/blob/main/prompting_capabilities.ipynb) | prompting| Write prompts for classification, summarization, personalization, and evaluation
 [basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb) | RAG| RAG from scratch with Mistral AI API
 [embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb) | embeddings| Use Mistral embeddings API for classification and clustering
