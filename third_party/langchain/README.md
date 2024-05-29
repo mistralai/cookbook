@@ -8,6 +8,8 @@ We'll combine the code generation capabilities of Codestral the self-correction 
 
 We will implement some of these ideas from scratch using [LangGraph](https://python.langchain.com/docs/langgraph) to 1) produce structured code generation output from Codestral-instruct, 2) perform inline unit tests to confirm imports and code execution work, 3) feed back any errors for Codestral for self-correction.
 
+<img width="1029" alt="Screenshot 2024-05-29 at 7 03 29 AM" src="https://github.com/rlancemartin/mistral-cookbook/assets/122662504/4ad2c6f3-2fe5-4a0a-b33c-02f489170c0a">
+
 Video overview:
 
 * https://youtu.be/zXFxmI9f06M
