@@ -1,15 +1,22 @@
 # LangChain <> MistralAI Cookbooks
 
-LLM agents use [planning, memory, and tools](https://lilianweng.github.io/posts/2023-06-23-agent/) to accomplish tasks.
+LLM agents use [planning, memory, and tools](https://lilianweng.github.io/posts/2023-06-23-agent/) to accomplish tasks. [LangGraph](https://python.langchain.com/docs/langgraph) is a library from LangChain that can be used to build reliable agents and workflows.
 
-[LangGraph](https://python.langchain.com/docs/langgraph) is a library from LangChain that can be used to build reliable agents.
+### Code generation
 
-LangGraph can be used to build agents with a few pieces:
-- **Planning:** Define a control flow of steps that you want the agent to take (a graph)
-- **Memory:** Persist information (graph state) across these steps
-- **Tool use:** Tools can be used at any step to modify state
+We'll combine the code generation capabilities of Codestral the self-correction approach presented in the [AlphaCodium](https://github.com/Codium-ai/AlphaCodium) paper, [constructing an answer to a coding question iteratively](https://x.com/karpathy/status/1748043513156272416?s=20).  
 
-To make this concrete, we will apply LangGraph to build RAG agents that use ideas from 3 papers:
+We will implement some of these ideas from scratch using [LangGraph](https://python.langchain.com/docs/langgraph) to 1) produce structured code generation output from Codestral-instruct, 2) perform inline unit tests to confirm imports and code execution work, 3) feed back any errors for Codestral for self-correction.
+
+Video overview:
+
+* https://youtu.be/zXFxmI9f06M
+
+--- 
+
+### RAG
+
+We'll apply LangGraph to build RAG agents that use ideas from 3 papers:
 
 * Corrective-RAG (CRAG) [paper](https://arxiv.org/pdf/2401.15884.pdf) uses self-grading on retrieved documents and web-search fallback if documents are not relevant.
 * Self-RAG [paper](https://arxiv.org/abs/2310.11511) adds self-grading on generations for hallucinations and for ability to answer the question.
