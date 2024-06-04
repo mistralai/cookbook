@@ -5,7 +5,7 @@ The Mistral Cookbook features examples contributed by our community and partners
 ## Submission Guidelines:
 - File Format: Please submit your example in the .md or .ipynb format.
 - Runnable on Colab: If you're sharing a notebook example, try to make sure it's runnable on Google Colab.
-- Authorship: Kindly include your name and affiliation at the begining of the file.
+- Authorship: Kindly include your name and affiliation at the beginning of the file.
 - Descriptions: Please include your notebook along with its category and descriptions in the table below. 
 - Tone: Kindly maintain a neural tone and minimize any excessive marketing materials.
 - Reproducibility: To ensure others can reproduce your work, kindly tag package versions in your code.
