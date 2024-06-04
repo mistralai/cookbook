@@ -20,13 +20,31 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 - Clear: Is your content well-structured and clearly written?
 - Value: Is your content valuable to the community? Does the community need it? 
 
-## Notebook list
+## Main Notebooks
 Notebook |Category| Description
 :- | :-| :-
+[quickstart.ipynb](https://github.com/mistralai/cookbook/blob/main/quickstart.ipynb) | chat, embeddings| Basic quickstart with chat and embeddings with Mistral AI API
 [prompting_capabilities.ipynb](https://github.com/mistralai/cookbook/blob/main/prompting_capabilities.ipynb) | prompting| Write prompts for classification, summarization, personalization, and evaluation
 [basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb) | RAG| RAG from scratch with Mistral AI API
 [embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb) | embeddings| Use Mistral embeddings API for classification and clustering
 [function_calling.ipynb](https://github.com/mistralai/cookbook/blob/main/function_calling.ipynb) | function calling| Use Mistral API for function calling
-[langgraph_crag_mistral.ipynb](langgraph_crag_mistral.ipynb) | RAG | Corrective RAG using self-reflection with LangGraph and Mistral with option to run locally (with Ollama).
-[llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/llamaindex_agentic_rag.ipynb) | RAG, agent| Use Mistral AI with LlamaIndex and ReAct agent
-[haystack_chat_with_docs.ipynb](https://github.com/mistralai/cookbook/blob/main/haystack_chat_with_docs.ipynb) | RAG, embeddings | Use Mistral AI with Haystack indexing and RAG pipelines
+
+## Third Party Tools
+Tools |Category| Party
+:- | :-| :-
+[haystack_chat_with_docs.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Haystack/haystack_chat_with_docs.ipynb) | RAG, embeddings | Haystack
+[adaptive_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/adaptive_rag_mistral.ipynb) | RAG | Langchain
+[corrective_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/adaptive_rag_mistral.ipynb) | RAG | Langchain
+[langgraph_code_assistant.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/langgraph_code_assistant.ipynb) | code generation | Langchain
+[langgraph_crag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/langgraph_crag_mistral.ipynb) | RAG | Langchain
+[self_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/self_rag_mistral.ipynb) | RAG | Langchain
+[Adaptive_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/LlamaIndex/Adaptive_RAG.ipynb) | RAG| LLamaIndex
+[Agents_Tools.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/LlamaIndex/Agents_Tools.ipynb) | agent| LLamaIndex
+[llamaindex_agentic_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/LlamaIndex/llamaindex_agentic_rag.ipynb) | RAG, agent| LLamaIndex
+[RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/LlamaIndex/RAG.ipynb) | RAG| LLamaIndex
+[RouterQueryEngine.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/LlamaIndex/RouterQueryEngine.ipynb) | agent| LLamaIndex
+[SubQuestionQueryEngine.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/LlamaIndex/RouterQueryEngine.ipynb) | agent| LLamaIndex
+[neon_text_to_sql.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Neon/neon_text_to_sql.ipynb) | code| Neon
+[Ollama Meetup Demo](https://github.com/mistralai/cookbook/blob/main/third_party/Ollama/20240321_ollama_meetup) | demo| Ollama
+[arize_phoenix_tracing.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Phoenix/arize_phoenix_tracing.ipynb) | tracing data| Phoenix
+[pinecone_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Pinecone/pinecone_rag.ipynb) | RAG| Pinecone
