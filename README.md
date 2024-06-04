@@ -35,7 +35,7 @@ Tools |Category| Party
 [haystack_chat_with_docs.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Haystack/haystack_chat_with_docs.ipynb) | RAG, embeddings | Haystack
 [adaptive_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/adaptive_rag_mistral.ipynb) | RAG | Langchain
 [corrective_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/adaptive_rag_mistral.ipynb) | RAG | Langchain
-[langgraph_code_assistant.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/langgraph_code_assistant.ipynb) | code generation | Langchain
+[langgraph_code_assistant.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/langgraph_code_assistant.ipynb) | code| Langchain
 [langgraph_crag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/langgraph_crag_mistral.ipynb) | RAG | Langchain
 [self_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Langchain/self_rag_mistral.ipynb) | RAG | Langchain
 [Adaptive_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/LlamaIndex/Adaptive_RAG.ipynb) | RAG| LLamaIndex
