@@ -28,6 +28,8 @@ Notebook |Category| Description
 [basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb) | RAG| RAG from scratch with Mistral AI API
 [embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb) | embeddings| Use Mistral embeddings API for classification and clustering
 [function_calling.ipynb](https://github.com/mistralai/cookbook/blob/main/function_calling.ipynb) | function calling| Use Mistral API for function calling
+[evaluation.ipynb](https://github.com/mistralai/cookbook/blob/main/evaluation.ipynb) | evaluation| Evaluate models with Mistral API
+[mistral_finetune_api.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral_finetune_api.ipynb) | fine-tuning| Finetune a model with Mistral fine-tuning API
 
 ## Third Party Tools
 Tools |Category| Party
@@ -48,3 +50,6 @@ Tools |Category| Party
 [Ollama Meetup Demo](https://github.com/mistralai/cookbook/blob/main/third_party/Ollama/20240321_ollama_meetup) | demo| Ollama
 [arize_phoenix_tracing.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Phoenix/arize_phoenix_tracing.ipynb) | tracing data| Phoenix
 [pinecone_rag.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/Pinecone/pinecone_rag.ipynb) | RAG| Pinecone
+[Gradio Integration - Chat with PDF](https://github.com/mistralai/cookbook/blob/main/third_party/gradio/README.md) | demo, RAG| Gradio
+[Panel Integration - Chat with PDF](https://github.com/mistralai/cookbook/blob/main/third_party/panel/README.md) | demo, RAG| Panel
+[Streamlit Integration - Chat with PDF](https://github.com/mistralai/cookbook/blob/main/third_party/streamlit/README.md) | demo, RAG| Streamlit
