@@ -2,7 +2,7 @@
 
 In this guide, we will introduce the basics of building a chatbot with chat and PDF reading capabilities using `streamlit`!
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/VGSAA-d_Sqo?si=AgZzI_UrWIXByoPj" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![Panel Demo](https://img.youtube.com/vi/VGSAA-d_Sqo/0.jpg)](https://www.youtube.com/watch?v=VGSAA-d_Sqo)
 
 ## Chat Interface
 
