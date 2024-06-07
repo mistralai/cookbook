@@ -2,6 +2,7 @@
 
 In this guide, we will introduce the basics of building a chatbot with chat and PDF reading capabilities using `gradio`!
 
+**Watch our demo here:**
 [![Gradio Demo](https://img.youtube.com/vi/mrHgm7MOipw/0.jpg)](https://www.youtube.com/watch?v=mrHgm7MOipw)
 
 ## Chat Interface
