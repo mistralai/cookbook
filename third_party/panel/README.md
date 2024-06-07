@@ -2,7 +2,7 @@
 
 In this guide, we will introduce the basics of building a chatbot with chat and PDF reading capabilities using `panel`!
 
-![Panel Demo](https://www.youtube.com/embed/UpNxJ6wvS2A?si=6KTjPyljaRPLHi-A)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/UpNxJ6wvS2A?si=6KTjPyljaRPLHi-A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Basic Chat Interface
 
