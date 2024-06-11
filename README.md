@@ -59,3 +59,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                               | demo, RAG       | Gradio     |
 | [Panel Integration - Chat with PDF](third_party/panel/README.md)                                 | demo, RAG       | Panel      |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                         | demo, RAG       | Streamlit  |
+| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                 | synthetic data  | Argilla    |
