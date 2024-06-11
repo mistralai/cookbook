@@ -26,13 +26,14 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 | Notebook                                                                                                     | Category         | Description                                                                      |
 | :----------------------------------------------------------------------------------------------------------- | :--------------- | :------------------------------------------------------------------------------- |
-| [quickstart.ipynb](quickstart.ipynb)                         | chat, embeddings | Basic quickstart with chat and embeddings with Mistral AI API                    |
-| [prompting_capabilities.ipynb](prompting_capabilities.ipynb) | prompting        | Write prompts for classification, summarization, personalization, and evaluation |
-| [basic_RAG.ipynb](basic_RAG.ipynb)                           | RAG              | RAG from scratch with Mistral AI API                                             |
-| [embeddings.ipynb](embeddings.ipynb)                         | embeddings       | Use Mistral embeddings API for classification and clustering                     |
-| [function_calling.ipynb](function_calling.ipynb)             | function calling | Use Mistral API for function calling                                             |
-| [evaluation.ipynb](evaluation.ipynb)                         | evaluation       | Evaluate models with Mistral API                                                 |
-| [mistral_finetune_api.ipynb](mistral_finetune_api.ipynb)     | fine-tuning      | Finetune a model with Mistral fine-tuning API                                    |
+| [quickstart.ipynb](https://github.com/mistralai/cookbook/blob/main/quickstart.ipynb)                         | chat, embeddings | Basic quickstart with chat and embeddings with Mistral AI API                    |
+| [prompting_capabilities.ipynb](https://github.com/mistralai/cookbook/blob/main/prompting_capabilities.ipynb) | prompting        | Write prompts for classification, summarization, personalization, and evaluation |
+| [basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb)                           | RAG              | RAG from scratch with Mistral AI API                                             |
+| [embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb)                         | embeddings       | Use Mistral embeddings API for classification and clustering                     |
+| [function_calling.ipynb](https://github.com/mistralai/cookbook/blob/main/function_calling.ipynb)             | function calling | Use Mistral API for function calling                                             |
+| [evaluation.ipynb](https://github.com/mistralai/cookbook/blob/main/evaluation.ipynb)                         | evaluation       | Evaluate models with Mistral API                                                 |
+| [mistral_finetune_api.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral_finetune_api.ipynb)     | fine-tuning      | Finetune a model with Mistral fine-tuning API                                    |
+| [mistral-search-engine.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral-search-engine.ipynb)     | RAG, function calling      | Search engine  built with Mistral API, function calling and RAG 
 
 ## Third Party Tools
 
