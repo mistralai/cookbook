@@ -32,7 +32,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [function_calling.ipynb](https://github.com/mistralai/cookbook/blob/main/function_calling.ipynb)             | function calling | Use Mistral API for function calling                                             |
 | [evaluation.ipynb](https://github.com/mistralai/cookbook/blob/main/evaluation.ipynb)                         | evaluation       | Evaluate models with Mistral API                                                 |
 | [mistral_finetune_api.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral_finetune_api.ipynb)     | fine-tuning      | Finetune a model with Mistral fine-tuning API                                    |
-
+| [mistral-search-engine.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral-search-engine.ipynb)     | RAG, function calling      | Search engine  built with Mistral API, function calling and RAG 
 ## Third Party Tools
 
 | Tools                                                                                                                                            | Category        | Party      |
