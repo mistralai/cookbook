@@ -19,7 +19,6 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 - Originality: Is your content original and offering a fresh perspective?
 - Clear: Is your content well-structured and clearly written?
-
 - Value: Is your content valuable to the community? Does the community need it?
 
 ## Main Notebooks
@@ -61,3 +60,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                               | demo, RAG       | Gradio     |
 | [Panel Integration - Chat with PDF](third_party/panel/README.md)                                 | demo, RAG       | Panel      |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                         | demo, RAG       | Streamlit  |
+| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                 | synthetic data  | Argilla    |
