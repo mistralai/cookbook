@@ -1,0 +1,25 @@
+{
+    "name": "codestral-code-interpreter",
+    "version": "1.0.0",
+    "description": "This is an example of running LLM-generated code tasks in a secure and isolated cloud environment using the E2B Code Interpreter SDK.",
+    "main": "app.ts",
+    "scripts": {
+        "start": "tsx app.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^20.12.11",
+        "globals": "^15.3.0",
+        "ts-node": "^10.9.2",
+        "tsx": "^4.9.3",
+        "typescript": "^5.4.5",
+        "typescript-eslint": "^7.12.0"
+    },
+    "dependencies": {
+        "@e2b/code-interpreter": "^0.0.5",
+        "@mistralai/mistralai": "^0.4.0",
+        "dotenv": "^16.4.5"
+    }
+}
