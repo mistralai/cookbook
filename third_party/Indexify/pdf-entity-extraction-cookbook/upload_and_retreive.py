@@ -32,7 +32,6 @@ def extract_entities_from_pdf(pdf_path):
 
 # Example usage
 if __name__ == "__main__":
-    pdf_path = "/path/to/your/document.pdf"
     pdf_url = "https://arxiv.org/pdf/2310.06825.pdf"
     pdf_path = "reference_document.pdf"
 
