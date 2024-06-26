@@ -39,8 +39,12 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 | Tools                                                                                                                                            | Category        | Party      |
 | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------- | :--------- |
+| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                 | synthetic data  | Argilla    |
 | [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb) | RAG, embeddings | Azure      |
+| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                               | demo, RAG       | Gradio     |
 | [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)              | RAG, embeddings | Haystack   |
+| [pdf-entity-extraction-cookbook](third_party/Indexify/pdf-entity-extraction-cookbook)            | entity extraction, PDF | Indexify   |
+| [pdf-summarization-cookbook](third_party/Indexify/pdf-summarization-cookbook)                    | summarization, PDF    | Indexify   |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                   | RAG             | Langchain  |
 | [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                 | RAG             | Langchain  |
 | [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)           | code            | Langchain  |
@@ -55,9 +59,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                | code            | Neon       |
 | [Ollama Meetup Demo](https://github.com/mistralai/cookbook/blob/main/third_party/Ollama/20240321_ollama_meetup)                                  | demo            | Ollama     |
 | [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                  | tool call       | Ollama     | 
+| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                 | demo, RAG       | Panel      |
 | [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                   | tracing data    | Phoenix    |
 | [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                    | RAG             | Pinecone   |
-| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                               | demo, RAG       | Gradio     |
-| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                 | demo, RAG       | Panel      |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                         | demo, RAG       | Streamlit  |
-| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                 | synthetic data  | Argilla    |
