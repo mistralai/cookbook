@@ -40,7 +40,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | Tools                                                                                                                                            | Category        | Party      |
 | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------- | :--------- |
 | [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb) | RAG, embeddings | Azure      |
-| [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreter)              | tool, agent | E2B   |
+| [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)              | tool, agent | E2B   |
 | [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)              | RAG, embeddings | Haystack   |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                   | RAG             | Langchain  |
 | [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                 | RAG             | Langchain  |
