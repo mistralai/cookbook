@@ -39,12 +39,12 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 | Tools                                                                                                                                            | Category        | Party      |
 | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------- | :--------- |
-| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                 | synthetic data  | Argilla    |
 | [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb) | RAG, embeddings | Azure      |
+| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                 | synthetic data  | Argilla    |
 | [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                               | demo, RAG       | Gradio     |
 | [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)              | RAG, embeddings | Haystack   |
-| [pdf-entity-extraction-cookbook](third_party/Indexify/pdf-entity-extraction-cookbook)            | entity extraction, PDF | Indexify   |
-| [pdf-summarization-cookbook](third_party/Indexify/pdf-summarization-cookbook)                    | summarization, PDF    | Indexify   |
+| [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction-cookbook)            | entity extraction, PDF | Indexify   |
+| [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization-cookbook)                    | summarization, PDF    | Indexify   |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                   | RAG             | Langchain  |
 | [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                 | RAG             | Langchain  |
 | [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)           | code            | Langchain  |

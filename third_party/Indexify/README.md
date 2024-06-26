@@ -19,7 +19,7 @@ These cookbooks showcase the integration of Indexify's structured data extractio
 
 ### PDF Entity Extraction Cookbook
 
-Learn how to build a robust entity extraction pipeline for PDF documents. This cookbook covers:
+Learn how to build a robust entity [extraction pipeline for PDF](pdf-entity-extraction-cookbook/README.md) documents. This cookbook covers:
 
 - Setting up Indexify and required extractors
 - Creating an extraction graph for entity recognition
@@ -28,7 +28,7 @@ Learn how to build a robust entity extraction pipeline for PDF documents. This c
 
 ### PDF Summarization Cookbook
 
-Explore how to create an efficient PDF summarization pipeline. This cookbook includes:
+Explore how to create an efficient [PDF summarization pipeline](pdf-summarization-cookbook/README.md). This cookbook includes:
 
 - Installation and setup of necessary components
 - Defining an extraction graph for document summarization
