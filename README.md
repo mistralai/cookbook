@@ -37,31 +37,30 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 ## Third Party Tools
 
-| Tools                                                                                                           | Category              | Party      |
-| :-------------------------------------------------------------------------------------------------------------- | :-------------------- | :--------- |
-| [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                              | RAG, embeddings       | Azure      |
-| [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)                             | RAG, embeddings       | Haystack   |
-| [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)            | entity extraction, PDF | Indexify   |
-| [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                    | summarization, PDF    | Indexify   |
-| [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                  | RAG                   | Langchain  |
-| [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                              | RAG                   | Langchain  |
-| [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)          | code                  | Langchain  |
-| [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                              | RAG                   | Langchain  |
-| [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                          | RAG                   | Langchain  |
-| [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                 | RAG                   | LLamaIndex |
-| [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                 | agent                 | LLamaIndex |
-| [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                             | RAG, agent            | LLamaIndex |
-| [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                   | LLamaIndex |
-| [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                       | agent                 | LLamaIndex |
-| [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                 | LLamaIndex |
-| [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                               | code                  | Neon       |
-| [Ollama Meetup Demo](https://github.com/mistralai/cookbook/blob/main/third_party/Ollama/20240321_ollama_meetup) | demo                  | Ollama     |
-| [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                 | tool call             | Ollama     |
-| [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                  | tracing data          | Phoenix    |
-| [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                   | RAG                   | Pinecone   |
-| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                              | demo, RAG             | Gradio     |
-| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | demo, RAG             | Panel      |
-| [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | demo, RAG             | Streamlit  |
-| [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                     | UI chat, tool calling | Chainlit   |
-| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                                | synthetic data        | Argilla    |
-
+| Tools                                                                                                           | Category               | Party      |
+| :-------------------------------------------------------------------------------------------------------------- | :--------------------- | :--------- |
+| [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                              | RAG, embeddings        | Azure      |
+| [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)                             | RAG, embeddings        | Haystack   |
+| [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)                      | entity extraction, PDF | Indexify   |
+| [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                              | summarization, PDF     | Indexify   |
+| [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                  | RAG                    | Langchain  |
+| [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                              | RAG                    | Langchain  |
+| [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)          | code                   | Langchain  |
+| [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                              | RAG                    | Langchain  |
+| [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                          | RAG                    | Langchain  |
+| [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                 | RAG                    | LLamaIndex |
+| [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                 | agent                  | LLamaIndex |
+| [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                             | RAG, agent             | LLamaIndex |
+| [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                    | LLamaIndex |
+| [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                       | agent                  | LLamaIndex |
+| [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                  | LLamaIndex |
+| [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                               | code                   | Neon       |
+| [Ollama Meetup Demo](https://github.com/mistralai/cookbook/blob/main/third_party/Ollama/20240321_ollama_meetup) | demo                   | Ollama     |
+| [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                 | tool call              | Ollama     |
+| [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                  | tracing data           | Phoenix    |
+| [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                   | RAG                    | Pinecone   |
+| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                              | demo, RAG              | Gradio     |
+| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | demo, RAG              | Panel      |
+| [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | demo, RAG              | Streamlit  |
+| [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                     | UI chat, tool calling  | Chainlit   |
+| [distilabel_synthetic_dpo_dataset.ipynb](distilabel_synthetic_dpo_dataset.ipynb)                                | synthetic data         | Argilla    |
