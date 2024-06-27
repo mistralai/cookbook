@@ -133,7 +133,6 @@ async def run_agent(user_query: str):
 
         number_iterations += 1
 
-    await cl.Message(content=answer_message_content).send()
     return answer_message_content
 
 
@@ -163,4 +162,5 @@ async def main(message: cl.Message):
     """
     Main message handler for incoming user messages.
     """
-    await run_agent(message.content)
+    answer_message = await run_agent(message.content)
+    await cl.Message(content=answer_message).send()

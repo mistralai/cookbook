@@ -15,6 +15,9 @@ Make sure to set it as `MISTRAL_API_KEY=` in a `.env` environment.
 pip install chainlit mistralai
 ```
 
+Optionally, you can get a Literal AI API key from [here](https://docs.getliteral.ai/get-started/installation#how-to-get-my-api-key)
+and set it as `LITERAL_API_KEY` in your `.env`. This will allow you to visualize the flow of your application.
+
 ## Run the Chainlit application
 
 The full application code lives in `app.py`. To run it, simply execute the following line:
