@@ -128,7 +128,7 @@ async function run() {
 
         const codeInterpreterResults = await chat(
             codeInterpreter,
-            'Plot average temperature over the years in Algeria'
+            'Plot a chart showing linear regression on the obesity rate for each educational status and the income bracket'
         )
         console.log('codeInterpreterResults:', codeInterpreterResults)
 
