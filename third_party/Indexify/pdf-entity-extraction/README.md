@@ -23,7 +23,11 @@ Entity extraction, also known as named entity recognition (NER) involves identif
 
 Before we begin, ensure you have the following:
 
-- Python 3.7 or later
+- Create a virtual env with Python 3.9 or later
+  ```shell
+  python3.9 -m venv ve
+  source ve/bin/activate
+  ```
 - `pip` (Python package manager)
 - A Mistral API key
 - Basic familiarity with Python and command-line interfaces
@@ -46,7 +50,7 @@ This starts a long running server that exposes ingestion and retrieval APIs to a
 
 ### Install Required Extractors
 
-Next, we'll install the necessary extractors on another terminal:
+Next, we'll install the necessary extractors in a new terminal:
 
 ```bash
 pip install indexify-extractor-sdk
@@ -54,7 +58,7 @@ indexify-extractor download tensorlake/pdfextractor
 indexify-extractor download tensorlake/mistral
 ```
 
-Once the extractors are downloaded, you can strart them in a new terminal:
+Once the extractors are downloaded, you can start them:
 ```bash
 indexify-extractor join-server
 ```

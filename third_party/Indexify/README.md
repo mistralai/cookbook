@@ -10,16 +10,16 @@ This folder contains cookbooks demonstrating how to leverage Indexify and Mistra
 
 ## Contents
 
-1. [PDF Entity Extraction Cookbook](pdf-entity-extraction-cookbook)
-2. [PDF Summarization Cookbook](pdf-summarization-cookbook)
+1. [PDF Entity Extraction Cookbook](pdf-entity-extraction)
+2. [PDF Summarization Cookbook](pdf-summarization)
 
 ## Overview
 
-These cookbooks showcase the integration of Indexify's structured data extraction capabilities with Mistral's advanced language models. They offer practical, hands-on guides for developers and data scientists looking to implement sophisticated document analysis pipelines.
+These cookbooks showcase the integration of Indexify's structured data extraction capabilities with Mistral's advanced language models.
 
 ### PDF Entity Extraction Cookbook
 
-Learn how to build a robust entity [extraction pipeline for PDF](pdf-entity-extraction-cookbook/README.md) documents. This cookbook covers:
+Learn how to build a robust entity [extraction pipeline for PDF](pdf-entity-extraction/README.md) documents. This cookbook covers:
 
 - Setting up Indexify and required extractors
 - Creating an extraction graph for entity recognition
@@ -28,7 +28,7 @@ Learn how to build a robust entity [extraction pipeline for PDF](pdf-entity-extr
 
 ### PDF Summarization Cookbook
 
-Explore how to create an efficient [PDF summarization pipeline](pdf-summarization-cookbook/README.md). This cookbook includes:
+Explore how to create an efficient [PDF summarization pipeline](pdf-summarization/README.md). This cookbook includes:
 
 - Installation and setup of necessary components
 - Defining an extraction graph for document summarization
@@ -39,7 +39,11 @@ Explore how to create an efficient [PDF summarization pipeline](pdf-summarizatio
 
 Before using these cookbooks, ensure you have:
 
-- Python 3.7 or later
+- Create a virtual env with Python 3.9 or later
+  ```shell
+  python3.9 -m venv ve
+  source ve/bin/activate
+  ```
 - pip (Python package manager)
 - A Mistral API key
 - Basic familiarity with Python and command-line interfaces

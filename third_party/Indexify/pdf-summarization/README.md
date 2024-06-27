@@ -26,7 +26,11 @@ The summarization pipeline is going to be composed of two steps -
 
 Before we begin, ensure you have the following:
 
-- Python 3.7 or later
+- Create a virtual env with Python 3.9 or later
+  ```shell
+  python3.9 -m venv ve
+  source ve/bin/activate
+  ```
 - `pip` (Python package manager)
 - A Mistral API key
 - Basic familiarity with Python and command-line interfaces
@@ -49,7 +53,7 @@ This starts a long running server that exposes ingestion and retrieval APIs to a
 
 ### Install Required Extractors
 
-Next, we'll install the necessary extractors:
+Next, we'll install the necessary extractors in a new terminal:
 
 ```bash
 pip install indexify-extractor-sdk
@@ -57,7 +61,7 @@ indexify-extractor download tensorlake/pdfextractor
 indexify-extractor download tensorlake/mistral
 ```
 
-Once the extractors are downloaded, you can strart them in a new terminal:
+Once the extractors are downloaded, you can start them:
 ```bash
 indexify-extractor join-server
 ```
@@ -166,7 +170,7 @@ You can customize the summarization process by modifying the `system_prompt` in 
   system_prompt: 'Summarize the main arguments and supporting evidence from the following text:'
   ```
 
-You can also experiment with different Mistral models by changing the `model_name` parameter.
+You can also experiment with different Mistral models by changing the `model_name` parameter to find the best balance between speed and accuracy for your specific use case.
 
 ## Conclusion
 
