@@ -14,20 +14,36 @@ console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
 
 const MODEL_NAME = 'codestral-latest'
 const SYSTEM_PROMPT = `
-You're a python data scientist that is analyzing daily temperature of major cities. You are given tasks to complete and you run Python code to solve them.
+You're a python data scientist that is analyzing historical mathematicians. You are given tasks to complete and you run Python code to solve them.
 
-Information about the temperature dataset:
-- It's in the \`/home/user/city_temperature.csv\` file
-- The CSV file is using \`,\` as the delimiter
-- It has following columns (examples included):
-  - \`Region\`: "North America", "Europe"
-  - \`Country\`: "Iceland"
-  - \`State\`: for example "Texas" but can also be null
-  - \`City\`: "Prague"
-  - \`Month\`: "June"
-  - \`Day\`: 1-31
-  - \`Year\`: 2002
-  - \`AvgTemperature\`: temperature in Celsius, for example 24
+Information about the mathematicians dataset:
+- It's in the \`/home/user/mathematicians.csv\` file
+- The CSV file is using , as the delimiter
+- It has the following columns (examples included):
+    - Unnamed: 0: 0, 1, 2
+    - name: "Asger Hartvig Aaboe", "Ernst Abbe", "Edwin Abbott Abbott"
+    - gender: "M", "F"
+    - born_date: "26 April 1922", "23 January 1840", "20 December 1838"
+    - born_year: 1922, 1840, 1838
+    - born_place: "Copenhagen, Denmark", "Eisenach, Grand Duchy of Saxe-Weimar-Eisenach (now in Germany)", "Marylebone, Middlesex, England"
+    - born_country: "Denmark", "Germany", "United Kingdom"
+    - died_date: "19 January 2007", "14 January 1905", "12 October 1926"
+    - died_year: 2007, 1905, 1926
+    - died_place: "North Haven, Connecticut, USA", "Jena, Germany", "Hampstead, London, England"
+    - died_country: "United States", "Germany", "United Kingdom"
+    - degree: "Ph.D.", "Dr. phil.", "Dr. rer. nat."
+    - degree_generalized: "Ph.D.", "M.A.", "Other"
+    - university: "Brown University", "Georg-August-Universität Göttingen", "Universitetet i Oslo"
+    - university_country: "United States", "Germany", "Norway"
+    - graduate_year: 1957, 1861, 1822
+    - main_classification: 1, 14, 12
+    - classification_indices: "['01']", "['01', '15']", "['14', '48', '00', '32', '09', '01', '69', '58', '55', '52', '50', '46', '20', '18', '16', '15', '04']"
+    - earliest_publication: 1954, 1991, 1826
+    - publication_count: 19, 7, 25
+    - advisor_count: 1, 0, 2
+    - student_count: 4, 2, 0
+    - descendant_count: 5, 10, 0
+    - summary: "Asger Aaboe was a Danish mathematician who is known for his contributions to the history of ancient Babylonian astronomy.", "Ernst Abbe was a German instrument maker who made important improvements in lens design.", "Edwin Abbott was an English schoolmaster who wrote the popular book Flatland as an introduction to higher dimensions."
 
 Generally, you follow these rules:
 - ALWAYS FORMAT YOUR RESPONSE IN MARKDOWN
@@ -97,7 +113,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
 
 async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> {
     console.log('Uploading dataset to Code Interpreter sandbox...')
-    const datasetPath = './city_temperature.csv'
+    const datasetPath = './mathematicians.csv'
 
     if (!fs.existsSync(datasetPath)) {
         throw new Error('Dataset file not found')
@@ -107,7 +123,7 @@ async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> 
     const fileBuffer = fs.readFileSync(datasetPath)
 
     try {
-        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'city_temperature.csv') // Pass the buffer and filename
+        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'mathematicians.csv') // Pass the buffer and filename
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }
@@ -128,7 +144,16 @@ async function run() {
 
         const codeInterpreterResults = await chat(
             codeInterpreter,
-            'Plot a chart showing linear regression on the obesity rate for each educational status and the income bracket'
+            'Make a chart showing linear regression of the relationship between the year a mathematician was born and number of publications. Filter out any missing values or values in wrong format.'
+            // 'Make a chart showing average life length of mathematicians in time.'
+            // 'Make a doughnut chart showing the 20 most frequent universities where mathematicians studied.'
+            // 'Make a pie chart showing 10 most frequent countries where mathematicians were born.'
+            // 'Make a scatter plot chart showing showing number of mathematics' publications throughot the history'
+            // 'Make a timeline showing points in time when Russian mathematicians were born. On the x axis is the time, the y axis is just constant 1 if a mathematician was born, 0 if not.'
+            // 'Make a stacked bar chart showing for 5 random mathematicians the number of publications, and number of descendants they had.'
+            // 'Make an area chart with two variables of your choice.'
+            // 'Make a bubble chart with two variables of your choice.'
+            // 'Make a chart showing dummy regression of the relationship between whether a mathematician has (1) or doesnt have (0) a degree and number of publications. Filter out any missing values or values in wrong format.'
         )
         console.log('codeInterpreterResults:', codeInterpreterResults)
 
