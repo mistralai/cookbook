@@ -34,6 +34,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [mistral_finetune_api.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral_finetune_api.ipynb)     | fine-tuning           | Finetune a model with Mistral fine-tuning API                                    |
 | [mistral-search-engine.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral-search-engine.ipynb)   | RAG, function calling | Search engine built with Mistral API, function calling and RAG                   |
 | [prefix_use_cases.ipynb](https://github.com/mistralai/cookbook/blob/main/prefix_use_cases.ipynb)             | prefix, prompting     | Cool examples with Mistral's prefix feature                                      |
+| [synthetic_data_gen_and_finetune.ipynb](https://github.com/mistralai/cookbook/blob/main/synthetic_data_gen_and_finetune.ipynb)             | data generation, fine-tuning| Simple data generation and fine-tuning guide     |
 
 ## Third Party Tools
 
