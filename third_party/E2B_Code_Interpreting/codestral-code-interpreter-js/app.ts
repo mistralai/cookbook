@@ -17,33 +17,56 @@ const SYSTEM_PROMPT = `
 You're a python data scientist that is analyzing historical mathematicians. You are given tasks to complete and you run Python code to solve them.
 
 Information about the mathematicians dataset:
-- It's in the \`/home/user/mathematicians.csv\` file
+- It's in the \`/home/user/global_economy_indicators.csv\` file
 - The CSV file is using , as the delimiter
 - It has the following columns (examples included):
-    - Unnamed: 0: 0, 1, 2
-    - name: "Asger Hartvig Aaboe", "Ernst Abbe", "Edwin Abbott Abbott"
-    - gender: "M", "F"
-    - born_date: "26 April 1922", "23 January 1840", "20 December 1838"
-    - born_year: 1922, 1840, 1838
-    - born_place: "Copenhagen, Denmark", "Eisenach, Grand Duchy of Saxe-Weimar-Eisenach (now in Germany)", "Marylebone, Middlesex, England"
-    - born_country: "Denmark", "Germany", "United Kingdom"
-    - died_date: "19 January 2007", "14 January 1905", "12 October 1926"
-    - died_year: 2007, 1905, 1926
-    - died_place: "North Haven, Connecticut, USA", "Jena, Germany", "Hampstead, London, England"
-    - died_country: "United States", "Germany", "United Kingdom"
-    - degree: "Ph.D.", "Dr. phil.", "Dr. rer. nat."
-    - degree_generalized: "Ph.D.", "M.A.", "Other"
-    - university: "Brown University", "Georg-August-Universität Göttingen", "Universitetet i Oslo"
-    - university_country: "United States", "Germany", "Norway"
-    - graduate_year: 1957, 1861, 1822
-    - main_classification: 1, 14, 12
-    - classification_indices: "['01']", "['01', '15']", "['14', '48', '00', '32', '09', '01', '69', '58', '55', '52', '50', '46', '20', '18', '16', '15', '04']"
-    - earliest_publication: 1954, 1991, 1826
-    - publication_count: 19, 7, 25
-    - advisor_count: 1, 0, 2
-    - student_count: 4, 2, 0
-    - descendant_count: 5, 10, 0
-    - summary: "Asger Aaboe was a Danish mathematician who is known for his contributions to the history of ancient Babylonian astronomy.", "Ernst Abbe was a German instrument maker who made important improvements in lens design.", "Edwin Abbott was an English schoolmaster who wrote the popular book Flatland as an introduction to higher dimensions."
+    - country: "Argentina", "Australia"
+    - Region: "SouthAmerica", "Oceania"
+    - Surface area (km2): for example, 2780400
+    - Population in thousands (2017): for example, 44271
+    - Population density (per km2, 2017): for example, 16.2
+    - Sex ratio (m per 100 f, 2017): for example, 95.9
+    - GDP: Gross domestic product (million current US$): for example, 632343
+    - GDP growth rate (annual %, const. 2005 prices): for example, 2.4
+    - GDP per capita (current US$): for example, 14564.5
+    - Economy: Agriculture (% of GVA): for example, 10.0
+    - Economy: Industry (% of GVA): for example, 28.1
+    - Economy: Services and other activity (% of GVA): for example, 61.9
+    - Employment: Agriculture (% of employed): for example, 4.8
+    - Employment: Industry (% of employed): for example, 20.6
+    - Employment: Services (% of employed): for example, 74.7
+    - Unemployment (% of labour force): for example, 8.5
+    - Employment: Female (% of employed): for example, 43.7
+    - Employment: Male (% of employed): for example, 56.3
+    - Labour force participation (female %): for example, 48.5
+    - Labour force participation (male %): for example, 71.1
+    - International trade: Imports (million US$): for example, 59253
+    - International trade: Exports (million US$): for example, 57802
+    - International trade: Balance (million US$): for example, -1451
+    - Education: Government expenditure (% of GDP): for example, 5.3
+    - Health: Total expenditure (% of GDP): for example, 8.1
+    - Health: Government expenditure (% of total health expenditure): for example, 69.2
+    - Health: Private expenditure (% of total health expenditure): for example, 30.8
+    - Health: Out-of-pocket expenditure (% of total health expenditure): for example, 20.2
+    - Health: External health expenditure (% of total health expenditure): for example, 0.2
+    - Education: Primary gross enrollment ratio (f/m per 100 pop): for example, 111.5/107.6
+    - Education: Secondary gross enrollment ratio (f/m per 100 pop): for example, 104.7/98.9
+    - Education: Tertiary gross enrollment ratio (f/m per 100 pop): for example, 90.5/72.3
+    - Education: Mean years of schooling (female): for example, 10.4
+    - Education: Mean years of schooling (male): for example, 9.7
+    - Urban population (% of total population): for example, 91.7
+    - Population growth rate (annual %): for example, 0.9
+    - Fertility rate (births per woman): for example, 2.3
+    - Infant mortality rate (per 1,000 live births): for example, 8.9
+    - Life expectancy at birth, female (years): for example, 79.7
+    - Life expectancy at birth, male (years): for example, 72.9
+    - Life expectancy at birth, total (years): for example, 76.4
+    - Military expenditure (% of GDP): for example, 0.9
+    - Population, female: for example, 22572521
+    - Population, male: for example, 21472290
+    - Tax revenue (% of GDP): for example, 11.0
+    - Taxes on income, profits and capital gains (% of revenue): for example, 12.9
+    - Urban population (% of total population): for example, 91.7
 
 Generally, you follow these rules:
 - ALWAYS FORMAT YOUR RESPONSE IN MARKDOWN
@@ -113,7 +136,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
 
 async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> {
     console.log('Uploading dataset to Code Interpreter sandbox...')
-    const datasetPath = './mathematicians.csv'
+    const datasetPath = './global_economy_indicators.csv'
 
     if (!fs.existsSync(datasetPath)) {
         throw new Error('Dataset file not found')
@@ -123,7 +146,7 @@ async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> 
     const fileBuffer = fs.readFileSync(datasetPath)
 
     try {
-        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'mathematicians.csv') // Pass the buffer and filename
+        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'global_economy_indicators.csv') // Pass the buffer and filename
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }
@@ -144,16 +167,7 @@ async function run() {
 
         const codeInterpreterResults = await chat(
             codeInterpreter,
-            'Make a chart showing linear regression of the relationship between the year a mathematician was born and number of publications. Filter out any missing values or values in wrong format.'
-            // 'Make a chart showing average life length of mathematicians in time.'
-            // 'Make a doughnut chart showing the 20 most frequent universities where mathematicians studied.'
-            // 'Make a pie chart showing 10 most frequent countries where mathematicians were born.'
-            // 'Make a scatter plot chart showing showing number of mathematics' publications throughot the history'
-            // 'Make a timeline showing points in time when Russian mathematicians were born. On the x axis is the time, the y axis is just constant 1 if a mathematician was born, 0 if not.'
-            // 'Make a stacked bar chart showing for 5 random mathematicians the number of publications, and number of descendants they had.'
-            // 'Make an area chart with two variables of your choice.'
-            // 'Make a bubble chart with two variables of your choice.'
-            // 'Make a chart showing dummy regression of the relationship between whether a mathematician has (1) or doesnt have (0) a degree and number of publications. Filter out any missing values or values in wrong format.'
+            'Make a chart showing linear regression of the relationship between GDP per capita and life expectancy from the global_economy_indicators. Filter out any missing values or values in wrong format.'
         )
         console.log('codeInterpreterResults:', codeInterpreterResults)
 
