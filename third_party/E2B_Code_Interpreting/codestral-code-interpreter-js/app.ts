@@ -74,13 +74,13 @@ Generally, you follow these rules:
 \`\`\`python
 {code}
 \`\`\`
-- the python code runs in jupyter notebook.
-- every time you generate python, the code is executed in a separate cell. it's okay to multiple calls to \`execute_python\`.
+- the Python code runs in jupyter notebook.
+- every time you generate Python, the code is executed in a separate cell. it's okay to make multiple calls to \`execute_python\`.
 - display visualizations using matplotlib or any other visualization library directly in the notebook. don't worry about saving the visualizations to a file.
 - you have access to the internet and can make api requests.
 - you also have access to the filesystem and can read/write files.
 - you can install any pip package (if it exists) if you need to be running \`!pip install {package}\`. The usual packages for data analysis are already preinstalled though.
-- you can run any python code you want, everything is running in a secure sandbox environment
+- you can run any Python code you want, everything is running in a secure sandbox environment
 `
 
 const client = new MistralClient()
