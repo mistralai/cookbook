@@ -2,7 +2,7 @@
 
 This AI data analyst can plot a linear regression based on a CSV data. It uses Mistral's Codestral as the LLM, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities.
 
-The AI agent performs a data analysis task of your choice on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file.
+The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file.
 
 
 # Installation
