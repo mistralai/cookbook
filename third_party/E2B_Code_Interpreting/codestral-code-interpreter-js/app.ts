@@ -14,9 +14,9 @@ console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
 
 const MODEL_NAME = 'codestral-latest'
 const SYSTEM_PROMPT = `
-You're a python data scientist that is analyzing historical mathematicians. You are given tasks to complete and you run Python code to solve them.
+You're a python data scientist. You are given tasks to complete and you run Python code to solve them.
 
-Information about the mathematicians dataset:
+Information about the csv dataset:
 - It's in the \`/home/user/global_economy_indicators.csv\` file
 - The CSV file is using , as the delimiter
 - It has the following columns (examples included):
