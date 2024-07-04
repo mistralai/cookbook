@@ -1,6 +1,8 @@
 # AI Code Execution with Mistral's Codestral
 
-This AI data analyst can plot a linear regression based on a CSV data. It uses Mistral's Codestral as the LLM, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities.
+This AI data analyst can plot a linear regression chart based on CSV data. It uses Mistral's Codestral as the LLM, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
+
+Read more about Mistral's new Codestral model [here](https://mistral.ai/news/codestral/).
 
 The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file.
 

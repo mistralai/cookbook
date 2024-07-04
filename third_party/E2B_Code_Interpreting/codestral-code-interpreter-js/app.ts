@@ -8,7 +8,6 @@ dotenv.config()
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || ''
 const E2B_API_KEY = process.env.E2B_API_KEY || ''
 
-// Remove this later, it's just for my debugging
 console.log('MISTRAL_API_KEY:', MISTRAL_API_KEY ? 'Loaded' : 'Not Loaded')
 console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
 
@@ -90,7 +89,7 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
 
     const exec = await codeInterpreter.notebook.execCell(code, {
         onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
-        onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout),
+        onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout)
     })
 
     if (exec.error) {
@@ -112,7 +111,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
     try {
         const response = await client.chat({
             model: MODEL_NAME,
-            messages: messages,
+            messages: messages
         })
 
         const responseMessage = response.choices[0].message.content
@@ -167,6 +166,7 @@ async function run() {
 
         const codeInterpreterResults = await chat(
             codeInterpreter,
+            // Task for the model
             'Make a chart showing linear regression of the relationship between GDP per capita and life expectancy from the global_economy_indicators. Filter out any missing values or values in wrong format.'
         )
         console.log('codeInterpreterResults:', codeInterpreterResults)
