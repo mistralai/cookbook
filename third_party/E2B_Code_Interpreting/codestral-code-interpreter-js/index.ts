@@ -8,6 +8,16 @@ dotenv.config()
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || ''
 const E2B_API_KEY = process.env.E2B_API_KEY || ''
 
+if (!MISTRAL_API_KEY) {
+    console.error('Error: MISTRAL_API_KEY is not provided. Please set the MISTRAL_API_KEY in your environment variables.')
+    process.exit(1)
+}
+
+if (!E2B_API_KEY) {
+    console.error('Error: E2B_API_KEY is not provided. Please set the E2B_API_KEY in your environment variables.')
+    process.exit(1)
+}
+
 console.log('MISTRAL_API_KEY:', MISTRAL_API_KEY ? 'Loaded' : 'Not Loaded')
 console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
 
@@ -93,7 +103,7 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
     })
 
     if (exec.error) {
-        console.log('[Code Interpreter ERROR]', exec.error)
+        console.error('[Code Interpreter ERROR]', exec.error)
         throw new Error(exec.error.value)
     }
 
@@ -124,7 +134,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
             const codeInterpreterResults = await codeInterpret(codeInterpreter, pythonCode)
             return codeInterpreterResults
         } else {
-            console.log('Failed to match any Python code in model\'s response')
+            console.error('Failed to match any Python code in model\'s response')
             return []
         }
     } catch (error) {
@@ -178,7 +188,7 @@ async function run() {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
             console.log('Success: Image generated and saved as image_1.png')
         } else {
-            console.log('Error: No PNG data available.')
+            console.error('Error: No PNG data available.')
         }
 
     } catch (error) {
