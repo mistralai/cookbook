@@ -23,8 +23,6 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 ## Main Notebooks
 
-Sure, here's the table with correct indentation:
-
 | Notebook                                                                       | Category                     | Description                                                                      |
 |--------------------------------------------------------------------------------|-----------------------------|----------------------------------------------------------------------------------|
 | [quickstart.ipynb](quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
