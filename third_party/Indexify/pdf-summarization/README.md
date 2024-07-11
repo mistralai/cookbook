@@ -182,4 +182,4 @@ While the example might look simple, there are some unique advantages of using I
 ## Next Steps
 
 - Learn more about Indexify on our docs - https://docs.getindexify.ai
-- Learn how to use Indexify and Mistral for [entity extraction from PDF documents](https://github.com/tensorlakeai/indexify/blob/main/docs/docs/examples/mistral/pdf-entity-extraction-cookbook.md) 
+- Learn how to use Indexify and Mistral for [entity extraction from PDF documents](../pdf-entity-extraction/) 

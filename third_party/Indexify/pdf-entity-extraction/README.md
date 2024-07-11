@@ -185,4 +185,4 @@ While the example might look simple, there are some unique advantages of using I
 ## Next Steps
 
 - Learn more about Indexify on our docs - https://docs.getindexify.ai
-- Go over an example, which uses Mistral for [building summarization at scale](https://github.com/tensorlakeai/indexify/blob/main/docs/docs/examples/mistral/pdf-summarization-cookbook.md)
+- Go over an example, which uses Mistral for [building summarization at scale](../pdf-summarization/)
