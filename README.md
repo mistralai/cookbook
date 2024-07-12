@@ -1,6 +1,6 @@
 # Mistral Cookbook
 
-The Mistral Cookbook features examples contributed by our community and partners. If you have cool examples showcasing Mistral models, feel free to share them by submitting a PR to this repo.
+The Mistral Cookbook features examples contributed by Mistralers and our community, as well as our partners. If you have cool examples showcasing Mistral models, feel free to share them by submitting a PR to this repo.
 
 ## Submission Guidelines:
 
