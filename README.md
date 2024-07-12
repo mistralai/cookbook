@@ -23,18 +23,19 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 ## Main Notebooks
 
-| Notebook                                                                                                                       | Category                     | Description                                                                      |
-| :----------------------------------------------------------------------------------------------------------------------------- | :--------------------------- | :------------------------------------------------------------------------------- |
-| [quickstart.ipynb](https://github.com/mistralai/cookbook/blob/main/quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
-| [prompting_capabilities.ipynb](https://github.com/mistralai/cookbook/blob/main/prompting_capabilities.ipynb)                   | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
-| [basic_RAG.ipynb](https://github.com/mistralai/cookbook/blob/main/basic_RAG.ipynb)                                             | RAG                          | RAG from scratch with Mistral AI API                                             |
-| [embeddings.ipynb](https://github.com/mistralai/cookbook/blob/main/embeddings.ipynb)                                           | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
-| [function_calling.ipynb](https://github.com/mistralai/cookbook/blob/main/function_calling.ipynb)                               | function calling             | Use Mistral API for function calling                                             |
-| [evaluation.ipynb](https://github.com/mistralai/cookbook/blob/main/evaluation.ipynb)                                           | evaluation                   | Evaluate models with Mistral API                                                 |
-| [mistral_finetune_api.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral_finetune_api.ipynb)                       | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
-| [mistral-search-engine.ipynb](https://github.com/mistralai/cookbook/blob/main/mistral-search-engine.ipynb)                     | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
-| [prefix_use_cases.ipynb](https://github.com/mistralai/cookbook/blob/main/prefix_use_cases.ipynb)                               | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
-| [synthetic_data_gen_and_finetune.ipynb](https://github.com/mistralai/cookbook/blob/main/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide                                     |
+| Notebook                                                                       | Category                     | Description                                                                      |
+|--------------------------------------------------------------------------------|-----------------------------|----------------------------------------------------------------------------------|
+| [quickstart.ipynb](quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
+| [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb) | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
+| [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                 | RAG                          | RAG from scratch with Mistral AI API                                             |
+| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
+| [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
+| [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
+| [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)     | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
+| [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)         | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
+| [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)             | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
+| [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide        |
+| [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb) | data generation | Simple data generation to refine news articles                                |
 
 ## Third Party Tools
 
@@ -57,8 +58,9 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)          | code                   | Langchain  |
 | [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                              | RAG                    | Langchain  |
 | [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                             | RAG, agent             | LLamaIndex |
+| [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                | demo, RAG              | Mesop      |
 | [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                               | code                   | Neon       |
-| [Ollama Meetup Demo](https://github.com/mistralai/cookbook/blob/main/third_party/Ollama/20240321_ollama_meetup) | demo                   | Ollama     |
+| [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup)                                                 | demo                   | Ollama     |
 | [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | demo, RAG              | Panel      |
 | [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                   | RAG                    | Pinecone   |
 | [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                    | LLamaIndex |
