@@ -1,0 +1,48 @@
+1. Introduction
+This manual is designed to offer explicit and uniform directions for authors and editors, ensuring the preservation of our publication's unique style, tone, and quality standards.
+
+2. Style and Tone
+2.1 The style should be confident, captivating, and knowledgeable, offering readers profound analysis and thoughtful commentary.
+2.2 The tone should be succinct, lucid, and clever, evading technical jargon and unnecessarily complex language.
+2.3 Strive for an equitable and unbiased method, presenting varied viewpoints and arguments objectively.
+
+3. Language and Grammar
+3.1 Utilize correct English spelling and grammar.
+3.2 Prioritize the active voice whenever feasible.
+3.3 Keep sentences and paragraphs brief and to the point.
+3.4 Employ the serial comma (also known as the Oxford comma).
+3.5 Refrain from using contractions (e.g., don't, can't) in professional writing.
+3.6 Use single quotation marks for quotations and double quotation marks for quotations within quotations.
+3.7 Use italics for emphasis, titles of books and films, and foreign words or phrases.
+
+4. Numbers and Dates
+4.1 Write out numbers from one to nine; use numerals for 10 and higher.
+4.2 Use numerals for percentages (e.g., 5%) and monetary amounts (e.g., £5).
+4.3 Use commas as thousand separators (e.g., 1,000,000).
+4.4 Format dates as day-month-year (e.g., 5th April 2023).
+4.5 Use the 24-hour clock for time (e.g., 14:00).
+
+5. Citations and References
+5.1 Cite sources precisely and consistently, using in-text citations and a reference list at the conclusion of the article.
+5.2 Use appropriate citations.
+5.3 Include a hyperlink to the original source when referencing online materials.
+
+6. Headlines and Subheadings
+6.1 Craft clear, concise, and intriguing headlines that accurately represent the article's content.
+6.2 Use subheadings to divide the text and direct readers through the article.
+6.3 Ensure that headlines and subheadings use sentence case, capitalizing only the first word and proper nouns.
+
+7. Fact-checking and Accuracy
+7.1 Confirm all facts, figures, and quotations to guarantee precision.
+7.2 Carefully review names, titles, and affiliations of individuals and organizations mentioned in the article.
+7.3 Revise information as needed to maintain the article's relevance and accuracy.
+
+8. Inclusive Language
+8.1 Employ gender-neutral language and avoid stereotypes.
+8.2 Honor the preferences of individuals regarding their identities, including gender, race, and nationality.
+8.3 Be mindful of cultural differences and avoid language that may be offensive or alienating to readers.
+
+9. Legal and Ethical Considerations
+9.1 Comply with a code of ethics, which includes principles such as honesty, fairness, and transparency.
+9.2 Prevent plagiarism by correctly citing all sources and using original language and analysis.
+9.3 Respect copyright and intellectual property rights, obtaining permission to use copyrighted materials when required.
