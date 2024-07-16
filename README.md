@@ -51,7 +51,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)            | synthetic data         | Argilla    |
 | [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)                                    | tool, agent            | E2B        |
 | [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                 | tool call              | Ollama     |
-| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                              | demo, RAG              | Gradio     |
+| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                              | UI chat, demo, RAG     | Gradio     |
 | [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)                             | RAG, embeddings        | Haystack   |
 | [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)                      | entity extraction, PDF | Indexify   |
 | [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                              | summarization, PDF     | Indexify   |
@@ -59,14 +59,14 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                              | RAG                    | Langchain  |
 | [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                             | RAG, agent             | LLamaIndex |
 | [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)           | fine-tuning            | LLamaIndex |
-| [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                | demo, RAG              | Mesop      |
+| [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                | UI chat, demo, RAG     | Mesop      |
 | [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                               | code                   | Neon       |
 | [ollama_mistral_llamaindex.ipynb](third_party/LlamaIndex/ollama_mistral_llamaindex.ipynb)                       | RAG                    | LLamaIndex |
 | [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup)                                                 | demo                   | Ollama     |
-| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | demo, RAG              | Panel      |
+| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | UI chat, demo, RAG     | Panel      |
 | [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                   | RAG                    | Pinecone   |
 | [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                    | LLamaIndex |
 | [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                       | agent                  | LLamaIndex |
 | [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                          | RAG                    | Langchain  |
-| [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | demo, RAG              | Streamlit  |
+| [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | UI chat, demo, RAG     | Streamlit  |
 | [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                  | LLamaIndex |
