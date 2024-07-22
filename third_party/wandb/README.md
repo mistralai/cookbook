@@ -42,7 +42,7 @@ All the results and evaluation are logged to [this Weave Project](https://wandb.
 
 The finetuning process is logged to Weights & Biases as well, living together on the [same project](https://wandb.ai/capecape/llm-judge-webinar?nw=nwusercapecape) as the model evals.
 
-![](static/ft_dashboard.png)
+[![](static/ft_dashboard.png)](https://wandb.ai/capecape/llm-judge-webinar/workspace)
 
 ## Docs
 
