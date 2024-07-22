@@ -1,10 +1,12 @@
 # Chat with Your PDF using Mistral and Solara
 
-In this guide, we introduce the basics of building a chatbot with chat and PDF reading capabilities using `solara`!
+*Author: Alonso Silva Allende (Nokia Bell Labs), GitHub handle: [alonsosilvaallende](https://github.com/alonsosilvaallende/)*
+
+In this guide, we introduce the basics of building a chatbot with chat and PDF reading capabilities using `solara`
 
 ## Chat Interface
 
-First, let's implement a simple chat interface. To do this, we need to import `solara` and `mistralai` libraries.
+Let's implement a simple chat interface. To do this, we need to import `solara` and `mistralai` libraries.
 
 ```shell
 pip install solara mistralai
@@ -17,14 +19,14 @@ import solara as sl
 from mistralai.client import MistralClient
 ```
 
-Next, create your `MistralClient` instance using your Mistral API key.
+Create your `MistralClient` instance using your Mistral API key.
 
 ```py
 mistral_api_key = "your_api_key"
 client = MistralClient(api_key = mistral_api_key)
 ```
 
-Now, we initialize a reactive variable where all messages will be stored.
+Let's initialize a reactive variable where all messages will be stored.
 
 ```py
 from typing import List
@@ -37,7 +39,7 @@ class MessageDict(TypedDict):
 messages: sl.Reactive[List[MessageDict]] = sl.reactive([])
 ```
 
-Given a list of messages (for the moment empty but not for long), we query Mistral and retrieve the response. To make the interaction smooth, we handle it by streaming the response. For this, we define a generator!
+Given a list of messages (for the moment empty but not for long), we query Mistral and retrieve the response. To make the interaction smooth, we handle it by streaming the response. For this, we define a generator.
 
 ```py
 def response_generator(messages):
@@ -46,7 +48,7 @@ def response_generator(messages):
         yield chunk.choices[0].delta.content
 ```
 
-We stream the response by displaying each chunk as it is received:
+We stream the response by displaying each chunk as it is received.
 
 ```py
 def add_chunk_to_ai_message(chunk: str):
@@ -61,7 +63,7 @@ def add_chunk_to_ai_message(chunk: str):
 
 Given a list of messages, we display them on the screen:
 
-```
+```py
 @sl.component
 def Page():
     with sl.lab.ChatBox():
@@ -73,7 +75,7 @@ def Page():
                 sl.Markdown(item["content"])
 ```
 
-The following step is to retrieve the input from the user and store it in the list of messages. For this, we will use `ChatInput` from `solara`!
+The following step is to retrieve the input from the user and store it in the list of messages. For this, we will use `ChatInput` from `solara`
 
 ```py
         def send(user_message):
@@ -94,9 +96,9 @@ We need to handle a streamed response. Therefore we create a task which will be 
         result = sl.lab.use_task(result, dependencies=[user_message_count])
 ```
 
-That's it! An interface where you can chat with Mistral's models.
+That's it! An interface where you can chat with Mistral's models. I added some optional styling below.
 
-To run this code, enter solara run chat.py in the console.
+To run this code, enter `solara run chat.py` in the console.
 
 <details>
 <summary><b>chat.py</b></summary>
@@ -181,6 +183,8 @@ import faiss
 Now, we need to add the possibility to upload PDF files. For this, let's use `FileDropMultiple` from `solara`. The PDFs will then be stored in a new reactive variable:
 
 ```py
+from solara.components.file_drop import FileInfo
+
 content, set_content = sl.use_state(cast(List[bytes], []))
 
 def on_file(files: List[FileInfo]):
