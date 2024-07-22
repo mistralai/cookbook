@@ -2,6 +2,9 @@
 
 # LLM Judge: Detecting hallucinations in language models
 
+[![Mistral and W&B webinar](https://img.youtube.com/vi/VBbq7NPWzlo/0.jpg)](https://www.youtube.com/watch?v=VBbq7NPWzlo)
+
+
 [![](./static/compare.png)](https://wandb.ai/capecape/llm-judge-webinar/weave/compare-evaluations?evaluationCallIds=%5B%224e6f6a62-c592-40de-bfce-2ac7d19707e6%22%2C%22af3ef7a1-2f80-4786-bdce-988454f278ad%22%2C%2248a173f9-ceff-46f7-b213-a1462706c966%22%2C%222bed90db-93cf-4cb2-8fd3-999bdd0600e5%22%5D)
 
 This project demonstrates how to fine-tune and evaluate a Mistral AI language model to detect factual inconsistencies and hallucinations in text summaries. It is based on [this amazing blog post](https://eugeneyan.com/writing/finetuning/) by Eugene Yan.
