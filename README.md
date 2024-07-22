@@ -70,3 +70,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                          | RAG                    | Langchain  |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | UI chat, demo, RAG     | Streamlit  |
 | [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                  | LLamaIndex |
+| [Finetune and Model Evaluation](third_party/wandb/README.md)                                                    | fine-tuning, evaluation | Weights & Biases |
