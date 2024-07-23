@@ -1,8 +1,10 @@
 [![Weave](https://raw.githubusercontent.com/wandb/weave/master/docs/static/img/logo.svg)](https://wandb.ai/capecape/llm-judge-webinar/weave)
 
-# LLM Judge: Detecting hallucinations in language models
+This repo is a companion to the [Mistral and W&B webinar](https://www.youtube.com/watch?v=VBbq7NPWzlo).
 
-[![](./static/compare.png)](https://wandb.ai/capecape/llm-judge-webinar/weave/compare-evaluations?evaluationCallIds=%5B%224e6f6a62-c592-40de-bfce-2ac7d19707e6%22%2C%22af3ef7a1-2f80-4786-bdce-988454f278ad%22%2C%2248a173f9-ceff-46f7-b213-a1462706c966%22%2C%222bed90db-93cf-4cb2-8fd3-999bdd0600e5%22%5D)
+[![Mistral and W&B webinar](./static/yt_banner.png)](https://www.youtube.com/watch?v=VBbq7NPWzlo)
+
+# LLM Judge: Detecting hallucinations in language models
 
 This project demonstrates how to fine-tune and evaluate a Mistral AI language model to detect factual inconsistencies and hallucinations in text summaries. It is based on [this amazing blog post](https://eugeneyan.com/writing/finetuning/) by Eugene Yan.
 
@@ -36,13 +38,13 @@ In this project we make extensive use of [Weave](https://wandb.github.io/weave) 
 
 The notebook demonstrates improvements in hallucination detection after fine-tuning, with detailed metrics and comparisons between model versions.
 
-All the results and evaluation are logged to [this Weave Project](https://wandb.ai/capecape/llm-judge-webinar/weave)
+[![](./static/compare.png)](https://wandb.ai/capecape/llm-judge-webinar/weave/compare-evaluations?evaluationCallIds=%5B%224e6f6a62-c592-40de-bfce-2ac7d19707e6%22%2C%22af3ef7a1-2f80-4786-bdce-988454f278ad%22%2C%2248a173f9-ceff-46f7-b213-a1462706c966%22%2C%222bed90db-93cf-4cb2-8fd3-999bdd0600e5%22%5D)
 
-![](static/eval_7b.png)
+All the results and evaluation are logged to [this Weave Project](https://wandb.ai/capecape/llm-judge-webinar/weave)
 
 The finetuning process is logged to Weights & Biases as well, living together on the [same project](https://wandb.ai/capecape/llm-judge-webinar?nw=nwusercapecape) as the model evals.
 
-![](static/ft_dashboard.png)
+[![](static/ft_dashboard.png)](https://wandb.ai/capecape/llm-judge-webinar/workspace)
 
 ## Docs
 
