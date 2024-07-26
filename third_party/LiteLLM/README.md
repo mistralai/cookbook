@@ -66,6 +66,7 @@ print(chat_response.choices[0].message.content)
 
 ```
 
+## Tool Use
 ```python
 import os
 
