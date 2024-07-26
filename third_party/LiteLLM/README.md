@@ -42,31 +42,40 @@ docker run \
 
 [Use with Langchain, LlamaIndex, Instructor, etc.](https://docs.litellm.ai/docs/proxy/user_keys)
 
-```bash
-import openai
-client = openai.OpenAI(
-    api_key="anything",
-    base_url="http://0.0.0.0:4000"
-)
 
-response = client.chat.completions.create(
-    model="mistral-small-latest",
-    messages = [
-        {
-            "role": "user",
-            "content": "this is a test request, write a short poem"
-        }
-    ]
-)
 
-print(response)
-```
-
-## Tool Calling 
+## Basic Chat Completion
 
 ```python
-from openai import OpenAI
-client = OpenAI(api_key="anything", base_url="http://0.0.0.0:4000") # set base_url to litellm proxy endpoint
+import os
+
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
+
+client = MistralClient(
+  api_key="sk-1234",             # set api_key to litellm proxy virtual key
+  endpoint="http://0.0.0.0:4000" # set endpoint to litellm proxy endpoint
+)
+chat_response = client.chat(
+    model="mistral-small-latest",
+    messages=[
+        {"role": "user", "content": "this is a test request, write a short poem"}
+    ],
+)
+print(chat_response.choices[0].message.content)
+
+```
+
+```python
+import os
+
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
+
+client = MistralClient(
+  api_key="sk-1234",             # set api_key to litellm proxy virtual key
+  endpoint="http://0.0.0.0:4000" # set endpoint to litellm proxy endpoint
+)
 
 tools = [
   {
@@ -104,9 +113,15 @@ print(completion)
 
 ```python
 
-from openai import OpenAI
+import os
 
-client = OpenAI(api_key="anything", base_url="http://0.0.0.0:4000") # set base_url to litellm proxy endpoint
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
+
+client = MistralClient(
+  api_key="sk-1234",             # set api_key to litellm proxy virtual key
+  endpoint="http://0.0.0.0:4000" # set endpoint to litellm proxy endpoint
+)
 
 response = client.chat.completions.create(
     model="mistral-small-latest",
