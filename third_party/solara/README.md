@@ -363,13 +363,10 @@ def Page():
             lazy=True,
         )
 
-        if content:
+        sl.ProgressLinear(get_text.pending)
+        if get_text.value:
             sl.Info("File(s) has been uploaded. Showing the beginning of the file(s)...")
-            result: Task[List[str]] = use_task(get_text, dependencies=[content])
-            if result.finished:
-                txt.value = result.value
-            sl.ProgressLinear(result.pending)
-            for text in txt.value:
+            for text in get_text.value:
                 sl.Markdown(f"{text[:100]}")
 
     user_message_count = len([m for m in messages.value if m["role"] == "user"])
