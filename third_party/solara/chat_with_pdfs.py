@@ -64,11 +64,9 @@ def add_chunk_to_ai_message(chunk: str):
 def Page():
     with sl.Sidebar():
         content, set_content = sl.use_state(cast(List[bytes], []))
-        filename, set_filename = sl.use_state(cast(List[str], []))
         txt = sl.use_reactive(cast(List[str], []))
 
         def on_file(files: List[FileInfo]):
-            set_filename([file["name"] for file in files])
             set_content([file["file_obj"].read() for file in files])
 
         def get_text():
