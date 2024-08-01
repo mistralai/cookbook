@@ -343,8 +343,7 @@ def Page():
         txt = sl.use_reactive(cast(List[str], []))
 
         def on_file(files: List[FileInfo]):
-            set_filename([file["name"] for file in files])
-            set_content([file["file_obj"].read() for file in files])
+            get_text([file["data"] for file in files])
 
         @solara.task
         def get_text(pdf_content):
