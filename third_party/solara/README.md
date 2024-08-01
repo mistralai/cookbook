@@ -346,9 +346,10 @@ def Page():
             set_filename([file["name"] for file in files])
             set_content([file["file_obj"].read() for file in files])
 
-        def get_text():
+        @solara.task
+        def get_text(pdf_content):
             txt_all = []
-            for _content in content:
+            for _content in pdf_content:
                 bytes_io = io.BytesIO(_content)
                 reader = PyPDF2.PdfReader(bytes_io)
                 txt_aux = ""
