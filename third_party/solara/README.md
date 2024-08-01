@@ -338,7 +338,6 @@ def add_chunk_to_ai_message(chunk: str):
 @sl.component
 def Page():
     with sl.Sidebar():
-        content, set_content = sl.use_state(cast(List[bytes], []))
         filename, set_filename = sl.use_state(cast(List[str], []))
         txt = sl.use_reactive(cast(List[str], []))
 
