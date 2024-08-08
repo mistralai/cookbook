@@ -57,6 +57,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                              | summarization, PDF     | Indexify   |
 | [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)          | code                   | Langchain  |
 | [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                              | RAG                    | Langchain  |
+| [Use 🚅 LiteLLM Proxy to Call Mistral AI API](third_party/LiteLLM/README.md)                                    | LLM Gateway/Proxy      | LiteLLM |
 | [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                             | RAG, agent             | LLamaIndex |
 | [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)           | fine-tuning            | LLamaIndex |
 | [Microsoft Autogen - Function calling a pgsql db ](third_party/MS_Autogen_pgsql/mistral_pgsql_function_calling.ipynb) | Tool call, agent, RAG  | Ms Autogen |
