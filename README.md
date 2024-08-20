@@ -41,6 +41,8 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 | Tools                                                                                                           | Category               | Party      |
 | :-------------------------------------------------------------------------------------------------------------- | :--------------------- | :--------- |
+| [CAMEL Graph RAG with Mistral Models](third_party/CAMEL_AI/camel_graph_rag.ipynb)                               | multi-agent, tool, data gen| CAMEL-AI.org|
+| [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                              | multi-agent, tool, data gen| CAMEL-AI.org|
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                  | RAG                    | Langchain  |
 | [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                 | RAG                    | LLamaIndex |
 | [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                 | agent                  | LLamaIndex |
