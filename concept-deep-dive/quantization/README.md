@@ -118,6 +118,8 @@ Among these formats, the most popular and widely used precisions are between 4 b
 ## Inference & Quantized Models
 
 Not all inference engines support all possible formats; some are highly specialized and optimized for specific formats, while others aim to generalize and support all kinds.  
+
+
 Among these engines, we have:
 - **[VLLM](https://github.com/vllm-project/vllm)**: One of the oldest and most standard engines, supporting GPTQ, AWQ, INT4, INT8, and FP8.
 - **[Exllamav2](https://github.com/turboderp/exllamav2)**: Mostly for GPTQ and EXLV2 formats.
