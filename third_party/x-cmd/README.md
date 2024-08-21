@@ -31,6 +31,7 @@ The **mistral module** is a command-line client tool built by the x-cmd team usi
 
 3. Having a conversation in an interactive mode.
     ```sh
+    # The command `x jina r` uses Jina.ai to extract content from web pages
     x jina r "https://www.x-cmd.com/start/guide" | @mistral
     ```
     ![mistral repl](static/x.mistral.png)
@@ -38,6 +39,7 @@ The **mistral module** is a command-line client tool built by the x-cmd team usi
 ## Command Line Options
 
 We offer the `x mistral` and `@mistral` commands, where `x mistral` focuses on model configuration and download management, while `@mistral` emphasizes model applications. Their command-line options are as follows: 
+
 1. `x mistral`:
     ```sh
     SUBCOMMANDS:
