@@ -1,9 +1,3 @@
----
-id: deep_dive_quantization
-title: Quantization
-sidebar_position: 1.1
----
-
 # Quantization
 
 **Quantization** is a process that plays a crucial role in Large Language Models. These vast neural networks are primarily composed of raw values, known as `weights` or parameters. The higher the number of parameters, the larger the model, and the more knowledge it can extract and retain, but also the more **resources** it requires to run them. These big models can range from a few million parameters to billions.
