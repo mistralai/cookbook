@@ -16,7 +16,7 @@ The **mistral module** is a command-line client tool built by the x-cmd team usi
 
 ### Configuring `x mistral`
 
-- Obtaining a Mistral AI API Key: https://console.mistral.ai/api-keys/ 
+Obtaining a **Mistral AI API Key**: https://console.mistral.ai/api-keys/ 
 
 ```sh
 x mistral init
