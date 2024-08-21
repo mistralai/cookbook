@@ -121,5 +121,5 @@ Not all inference engines support all possible formats; some are highly speciali
 Among these engines, we have:
 - **[VLLM](https://github.com/vllm-project/vllm)**: One of the oldest and most standard engines, supporting GPTQ, AWQ, INT4, INT8, and FP8.
 - **[Exllamav2](https://github.com/turboderp/exllamav2)**: Mostly for GPTQ and EXLV2 formats.
-- **[llama.cpp](https://github.com/ggerganov/llama.cpp)**/**ollama**: Good options for GGUF inference.
+- **[llama.cpp](https://github.com/ggerganov/llama.cpp)**/**[ollama](https://github.com/ollama/ollama)**: Good options for GGUF inference.
 - **[Aphrodite](https://github.com/PygmalionAI/aphrodite-engine)**: A big generalized engine for production with support for AWQ, Bitsandbytes, EXL2, GGUF, GPTQ, and many others.
