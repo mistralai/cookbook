@@ -2,38 +2,49 @@
 
 The **mistral module** is a command-line client tool built by the x-cmd team using the Mistral AI API.  Written in posix shell and awk, it uses `curl` to send API requests. 
 
-- [Installing](https://x-cmd.com/start/) x-cmd:
+## Getting started
+
+### Installing x-cmd
+
+- x-cmd is compatible with **Windows**, **Linux**, and **macOS**, making installation easy and straightforward
     ```sh
     eval "$(curl https://get.x-cmd.com)"
     # or
     eval "$(wget -O- https://get.x-cmd.com)"
     ```
+- For more installation methods and instructions, please refer to the [official documentation](https://www.x-cmd.com/start/).
 
-## Getting started
+### Configuring `x mistral`
 
-1. Configuring `x mistral`:
-    ```sh
-    x mistral init
-    # or
-    x mistral --cfg apikey=<Mistral AI API Key>
-    x mistral --cfg model=<Mistral Model>
-    ```
-    ![x mistral init](static/mistral.init.png)
+- Obtaining a Mistral AI API Key: https://console.mistral.ai/api-keys/ 
 
-2. Having a conversation with Mistral AI：
+```sh
+x mistral init
+# or
+x mistral --cfg apikey=<Mistral AI API Key>
+x mistral --cfg model=<Mistral Model>
+```
+![x mistral init](static/mistral.init.png)
+
+### Use Mistral AI
+
+- `x mistral` allows you to **send messages or files to Mistral AI**. And to make things easier for users, x-cmd also provides the `@mistral` command as an alias for the `x mistral` command. 
+
     ```sh
     x mistral chat request "hello"
-    # The command alias is @mistral
     @mistral "hello"
     @mistral --file <file_path> "Translate to French"
     ```
     ![@mistral file](static/mistral.chat.1.png)
 
-3. Having a conversation in an interactive mode.
+
+- `x mistral` can help analyze command results and supports **opening a dialogue in interactive mode**.
+    
     ```sh
-    # The command `x jina r` uses Jina.ai to extract content from web pages
     x jina r "https://www.x-cmd.com/start/guide" | @mistral
     ```
+    **[`x jina r`](https://www.x-cmd.com/mod/jina):** Uses **Jina.ai** to extract content from web pages.
+
     ![mistral repl](static/x.mistral.png)
 
 ## Command Line Options
