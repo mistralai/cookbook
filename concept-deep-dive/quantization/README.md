@@ -70,7 +70,7 @@ Among them we have:
 <details>
 <summary><b>Bits-and-bytes</b></summary>
 
-<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/">
+<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/concept-deep-dive/quantization/bnb.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
@@ -80,7 +80,7 @@ Bits-and-bytes is a very fast and straightforward approach to quantization, quan
 <details>
 <summary><b>GGUF</b></summary>
 
-<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/">
+<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/concept-deep-dive/quantization/gguf.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
@@ -90,7 +90,7 @@ Previously GGML, GGUF is favored by a lot of the community for its ability to ru
 <details>
 <summary><b>GPTQ</b></summary>
 
-<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/">
+<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/concept-deep-dive/quantization/gptq.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
@@ -100,7 +100,7 @@ While GGUF focuses on CPU, GPTQ is oriented towards GPU inference performance by
 <details>
 <summary><b>AWQ</b></summary>
 
-<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/">
+<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/concept-deep-dive/quantization/awq.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
@@ -110,7 +110,7 @@ AWQ is also oriented towards GPU, it bases itself on the fact that ~1% of weight
 <details>
 <summary><b>EXL2</b></summary>
 
-<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/">
+<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/concept-deep-dive/quantization/exl2.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
