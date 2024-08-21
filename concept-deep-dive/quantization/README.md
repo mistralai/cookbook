@@ -110,7 +110,7 @@ AWQ is also oriented towards GPU, it bases itself on the fact that ~1% of weight
 <details>
 <summary><b>EXL2</b></summary>
 
-<a target="_blank" href="https://colab.research.google.com/github/mistralai/cookbook/blob/main/concept-deep-dive/quantization/methods/exl2.ipynb">
+<a target="_blank" href="https://colab.research.google.com/github/pandora-s-git/cookbook/blob/main/concept-deep-dive/quantization/methods/exl2.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
