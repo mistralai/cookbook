@@ -114,3 +114,13 @@ A more recent format based on the GPTQ optimization method but with mixed quanti
 *Other formats: HQQ, AQLM, EETQ, Marlin...*
 
 Among these formats, the most popular and widely used precisions are between 4 bits and 8 bits. While 8 bits has the best accuracy, 6 bits still keeps a lot of the smarts of the model without degrading the quality too much. And only below 4 bits of precision do we start to see a very high impact on most models, degrading their abilities considerably. While there are still use cases for models with lower bitrates than 4 bits, their quality can vary immensely on the models, optimization methods, and formats.
+
+## Inference & Quantized Models
+
+Not all inference engines support all possible formats; some are highly specialized and optimized for specific formats, while others aim to generalize and support all kinds.
+
+Among these engines, we have:
+- VLLM: One of the oldest and most standard engines, supporting GPTQ, AWQ, INT4, INT8, and FP8.
+- Exllamav2: Mostly for GPTQ and EXLV2 formats.
+- llama.cpp/ollama: A good option for GGUF inference.
+- Aphrodite: A big generalized engine for production with support for AWQ, Bitsandbytes, EXL2, GGUF, GPTQ, and many others.
