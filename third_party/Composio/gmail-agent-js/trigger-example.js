@@ -21,9 +21,9 @@ await userEntity.setupTrigger("gmail", "gmail_new_gmail_message", {
 toolset.client.triggers.subscribe(async (data) => {
   try {
     console.log("data received", data);
-    const from = data.payload.sender;
-    const message = data.payload.messageText;
-    const id = data.payload.threadId;
+    const from = data.originalPayload.payload.headers[16].value;
+    const message = data.originalPayload.snippet;
+    const id = data.originalPayload.threadId;
     executeAgent("default", { from, message, id });
   } catch (error) {
     console.log("Error: ", error);
