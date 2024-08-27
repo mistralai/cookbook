@@ -28,7 +28,7 @@ To better understand the underlying principle and impact it has on the probabili
     *"What is the best mythical creature? Answer with a single word."*
 
 <div style="text-align: center;">
-  <img src="temperature_barplot.png" alt="Example Image" width="800">
+  <img src="barplot.png" alt="Example Image" width="800">
 
   <sub><sup>Barplot comparing the distribution with different `temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
 </div>
