@@ -27,7 +27,7 @@ This formula normalizes the logits into a probability distribution over the voca
 To better understand the underlying principle and impact it has on the probability distribution, here is a visualisation of the temperature with a simple prompt:
     *"What is the best mythical creature? Answer with a single word."*
 
-<div style="text-align: center;">
+<div style="text-align: center;" align="center">
   <img src="barplot.png" alt="Example Image" width="800">
 
   <sub><sup>Barplot comparing the distribution with different `temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
