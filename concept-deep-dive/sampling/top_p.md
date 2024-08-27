@@ -13,27 +13,30 @@ The order of events is as follows:
 
 The distribution would change as follows:
 
-<div style="display: flex; justify-content: center; align-items: center;">
+<div style="justify-content: center; align-items: center;">
   <div style="margin-right: 20px; text-align: center;">
-    <img src="top_barplot.png" alt="Example Image" width="100%">
-    <sub><sup>Different `temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
+    <img src="top_barplot.png" alt="Example Image" width="50%">
+
+<sub><sup>Different `temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
   </div>
 
   <div style="margin-right: 20px; text-align: center;">
-    <span style="font-size: 24px;">&rarr;</span>
+    <span style="font-size: 24px;">&darr;</span>
   </div>
 
   <div style="margin-right: 20px; text-align: center;">
-    <img src="top_barplot_black.png" alt="Example Image" width="100%">
-    <sub><sup>Top P will only consider the topmost tokens until hitting the 50% target.</sup></sub>
+    <img src="top_barplot_black.png" alt="Example Image" width="50%">
+
+<sub><sup>Top P will only consider the topmost tokens until hitting the 50% target.</sup></sub>
   </div>
 
   <div style="margin-right: 20px; text-align: center;">
-    <span style="font-size: 24px;">&rarr;</span>
+    <span style="font-size: 24px;">&darr;</span>
   </div>
 
   <div style="text-align: center;">
-    <img src="top_barplot_final.png" alt="Example Image" width="100%">
-    <sub><sup>The other tokens are removed, and the probabilities are updated.</sup></sub>
+    <img src="top_barplot_final.png" alt="Example Image" width="50%">
+
+<sub><sup>The other tokens are removed, and the probabilities are updated.</sup></sub>
   </div>
 </div>
