@@ -12,7 +12,7 @@ When an LLM is making a prediction, it's not actually simply picking a token. It
     </td>
   </tr>
   <tr>
-    <td style="font-weight:bold">Top P</td>
+    <td style="font-weight:bold"><a href="top_p.md">Top P</a></td>
     <td>
     Top P adds up the probabilities of the topmost tokens until hitting a target percentage and will only take into consideration those tokens to pick from.
     </td>
