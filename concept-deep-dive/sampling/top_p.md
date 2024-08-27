@@ -20,21 +20,21 @@ The distribution would change as follows:
 <sub><sup>Different `temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
   </div>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <span style="font-size: 24px;">&darr;</span>
   </div>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <img src="top_barplot_black.png" alt="Example Image" width="50%">
 
 <sub><sup>Top P will only consider the topmost tokens until hitting the 50% target.</sup></sub>
   </div>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <span style="font-size: 24px;">&darr;</span>
   </div>
 
-  <div style="text-align: center;">
+  <div style="text-align: center;" align="center">
     <img src="top_barplot_final.png" alt="Example Image" width="50%">
 
 <sub><sup>The other tokens are removed, and the probabilities are updated.</sup></sub>
