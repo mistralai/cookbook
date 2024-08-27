@@ -37,7 +37,7 @@ The distribution would change as follows:
   <div style="text-align: center;" align="center">
     <img src="top_barplot_final.png" alt="Example Image" width="50%">
 
-<sub><sup>The other tokens probability is now 0, and the probabilities for the other tokens are adjusted.</sup></sub>
+<sub><sup>The other tokens probabilities are now 0, and the probabilities for the other tokens are adjusted.</sup></sub>
   </div>
 </div>
 
