@@ -86,7 +86,7 @@ print(apply_jinja_template(messages))
 
 ### Instruct Tokenization Logic
 
-Now let's dig into the original logic behind the tokenization process that you can see in `mistral_common`. You often would not simply provide the text to the tokenizer and encode the entire string as it is. The way it is actually done for the tokenization process is closer to the following logic:
+Now let's dig into the original logic behind the tokenization process that you can see in `mistral_common`. You often would not simply provide the text to the tokenizer and encode the entire string as it is, `mistral-common` actually goes directly from `request` -> `int`, while other approaches such as the one used by `transformers` is closer to `request` -> `str` -> `int`. The way it is actually done for the tokenization process is closer to the following logic:
 
 - **Tokenize each message:**  
   You would have user messages and assistant messages. You would take them separately as individual strings, with the user message encapsulated with the special strings, and encode them. In the previous example, this would be something like:  
