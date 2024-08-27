@@ -179,7 +179,7 @@ user message [/INST] assistant message</s> [INST] new user message [/INST]
 
 ## Tokenizer V2
 
-Following the previous tokenizer, and mostly used by the proprietary models, the second version of the tokenizer powered models such as the now deprecated Mistral Small and Mistral Large. This new tokenizer introduced control tokens, specifically for the previous special strings `[INST]` and `[/INST]`, which became control tokens with the corresponding IDs being `3` and `4`, but also new control tokens for function calling.
+Following the previous tokenizer, and mostly used by the proprietary models, the second version of the tokenizer powered models such as the now old Mistral Small and Mistral Large. This new tokenizer introduced control tokens, specifically for the previous special strings `[INST]` and `[/INST]`, which became control tokens with the corresponding IDs being `3` and `4`, but also new control tokens for function calling.
 
 ### Instruct Chat Template
 
