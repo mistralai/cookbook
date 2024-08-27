@@ -14,7 +14,7 @@ The order of events is as follows:
 The distribution would change as follows:
 
 <div style="justify-content: center; align-items: center;">
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <img src="top_barplot.png" alt="Example Image" width="50%">
 
 <sub><sup>Different `temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
