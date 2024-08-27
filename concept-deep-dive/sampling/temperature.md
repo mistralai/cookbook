@@ -2,7 +2,7 @@
 
 **Temperature**, often highly correlated with randomness, is a fundamental parameter in Language Learning Models (LLMs) and is widely used as the most popular sampler setting. This concept plays a crucial role in exploring diversity to achieve a diverse range of outputs from the same input. Lower temperature values are associated with deterministic behaviors, making the model predict the more likely responses, focusing on accuracy. In contrast, higher temperature values are associated with creativity, making the model output more diverse and creative responses.
 
-When an LLM is trained with large amounts of data, it learns patterns from that corpus of text to predict and build a set of possible tokens when completing text. To be more specific, when an LLM is asked a question, it starts by outputting a set of tokens, not just a single one, it responds with a set of tokens, each with an associated probability. That probability is computed through a softmax function that takes what we call logits, which are associated with each token depending on how likely they are, and transforms them into probabilities that sum to 1. What the temperature does in this softmax function is impact how the softmax function scales these logits. The higher the temperature, the more the differences between the logits are softened, making the distribution of probabilities flatter. In contrast, lower temperatures prioritize and impact higher logits more significantly while reducing those of lower logits, it amplifies the difference between logits.
+When an LLM is trained with large amounts of data, it learns patterns from that corpus of text to predict and build a set of possible tokens when completing text. To be more specific, when an LLM is asked a question, it starts by outputting a set of tokens, not just a single one. It responds with a set of tokens, each with an associated probability. That probability is computed through a softmax function that takes what we call logits, which are associated with each token depending on how likely they are, and transforms them into probabilities that sum to 1. What the temperature does in this softmax function is impact how the softmax function scales these logits. The higher the temperature, the more the differences between the logits are softened, making the distribution of probabilities flatter. In contrast, lower temperatures prioritize and impact higher logits more significantly while reducing those of lower logits, amplifying the difference between logits.
 
 ## Softmax Formula
 The softmax function for a given candidate token `i` with logits `yi` is defined as:
@@ -29,29 +29,39 @@ To better understand the underlying principle and impact it has on the probabili
 
 <div style="text-align: center;">
   <img src="temperature_barplot.png" alt="Example Image" width="800">
-  
+
   <sub><sup>Barplot comparing the distribution with different `temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
 </div>
 
-As seen, the temperature has a considerable impact on the probability distribution.
-While with a temperature null the answer will always be "**Dragon**", by increasing the temperature we can make it possible to answer with different tokens, in this case, simply increasing to 0.2 makes it possible to get "Un" as the next token, possibly to predict a creature such as an "**Un**icorn"! While the 3rd token seems to be "Drag" to again answer "**Drag**on", the 4th is the start of "**Peg**asus" while the 5th "**Phoenix**"! By changing the temperature values we can make tokens originally less statistically likely to be chosen more likely, giving them more chances and making the output of the LLM more diverse!
+As seen, the temperature has a considerable impact on the probability distribution. While with a temperature of null the answer will always be "**Dragon**", by increasing the temperature we can make it possible to answer with different tokens. In this case, simply increasing to 0.2 makes it possible to get "Un" as the next token, possibly to predict a creature such as an "**Un**icorn"! While the 3rd token seems to be "Drag" to again answer "**Drag**on", the 4th is the start of "**Peg**asus" while the 5th is "**Phoenix**"! By changing the temperature values, we can make tokens originally less statistically likely to be chosen more likely, giving them more chances and making the output of the LLM more diverse!
 
 You can experiment yourself with sampler settings, temperature included, on [artefact2](https://artefact2.github.io/llm-sampling/index.xhtml), a nice playground to visualise and understand LLM samplers and their settings.
 
 ## The Best Temperature
-There is no "**fit all**" temperature that would work for all use cases, however there are some hints that can help you decide and experiment to find the best for your applications.
+There is no "**one-size-fits-all**" temperature that would work for all use cases, however, there are some hints that can help you decide and experiment to find the best for your applications.
 
 ### Determinism
-Wonder if your application requires a model to be **deterministic**, is your task specific enough to always require the same response for the same input? Is it crucial to always have the best and **most accurate response** at all times? Such applications might invole Mathematics, Classification tasks, Healthcare or Reasoning. Fields that would **require high level of accuracy** and a deterministic model is a must! For those cases very **low temperature** values are the way to go. Sometimes not null to add a bit of uniqueness to each generation if you need it.
+Wonder if your application requires a model to be **deterministic**. Is your task specific enough to always require the same response for the same input? Is it crucial to always have the best and **most accurate response** at all times? Such applications might involve Mathematics, Classification tasks, Healthcare, or Reasoning. Fields that would **require a high level of accuracy** and a deterministic model is a must! For those cases, very **low temperature** values are the way to go. Sometimes not null to add a bit of uniqueness to each generation if you need it.
 
-Lets say you want to make a classification agent to classify accurately articles. It makes the most sense to have a null temperature and always pick the best token.
+Let's say you want to make a classification agent to classify accurately articles. It makes the most sense to have a null temperature and always pick the best token.
 
-However, if your task is to have a chat assistant on mathematics for example, you would indeed require a deterministic model for very high accurate responses, but you would also want it to not be too repetitive every time you ask similar questions or you want to be able to regenerate the response a bit differently, for this you would keep very low temperature values but avoiding a null value since you still want a little bit of randomness.
+However, if your task is to have a chat assistant on mathematics, for example, you would indeed require a deterministic model for very high accurate responses, but you would also want it to not be too repetitive every time you ask similar questions or you want to be able to regenerate the response a bit differently. For this, you would keep very low temperature values but avoid a null value since you still want a little bit of randomness.
 
 ### Creativity
-Do you need **diverse** outputs? A creative model to generate different and unique text? Usually these requirements are linked to tasks such as brainstorming ideas, assisting writing novels, come up with original slogans, or roleplaying. Usually its about use cases where **accuracy is considerably less important** and what you require is something more **creative**. For these it makes sense to have **high temperature** values, but the question for this ones is what should be the high limit?
+Do you need **diverse** outputs? A creative model to generate different and unique text? Usually, these requirements are linked to tasks such as brainstorming ideas, assisting writing novels, coming up with original slogans, or roleplaying. Usually, it's about use cases where **accuracy is considerably less important** and what you require is something more **creative**. For these, it makes sense to have **high temperature** values, but the question for these is what should be the high limit?
 
-Usually you do not want to overdo it and put a too high temperatures, what happens is that the model can become too random, it will struggle to follow instructions, saying nonsense and not helping you in the slightest! Its important to always take these tradeofs in consideration, that by increasing the uniqueness of the output to get more originality and creativeness, it can also damage the quality and accuracy, often not priority for these use cases.
+Usually, you do not want to overdo it and put too high temperatures, as what happens is that the model can become too random. It will struggle to follow instructions, saying nonsense and not helping you in the slightest! It's important to always take these trade-offs into consideration, that by increasing the uniqueness of the output to get more originality and creativeness, it can also damage the quality and accuracy, often not a priority for these use cases.
 
-## What have we learnt?
+## What Have We Learnt?
 
+1. **Role of Temperature**: Temperature is a critical parameter that influences the diversity and creativity of the outputs generated by LLMs. Lower temperatures lead to more deterministic and accurate responses, while higher temperatures introduce more randomness and creativity.
+
+2. **Softmax Function**: The temperature parameter directly affects the softmax function, which normalizes logits into a probability distribution. Higher temperatures flatten the distribution, making less likely tokens more probable, while lower temperatures sharpen the distribution, favoring the most likely tokens.
+
+3. **Impact on Outputs**: By adjusting the temperature, we can control the model's behavior to suit different applications. For tasks requiring high accuracy and determinism, such as mathematics or classification, lower temperatures are preferred. Conversely, for creative tasks like brainstorming or writing novels, higher temperatures are more suitable.
+
+4. **Trade-offs**: Increasing the temperature to enhance creativity can also introduce more inaccuracy, potentially leading to less coherent or relevant outputs. Balancing creativity and coherence is crucial for effective use of LLMs.
+
+5. **Experimentation**: There is no one-size-fits-all temperature value. Experimentation is extremely important to find the optimal temperature for specific applications. Tools like [artefact2](https://artefact2.github.io/llm-sampling/index.xhtml) can be useful for visualizing and understanding the effects of different temperature settings.
+
+Visit other sampler settings here -> <a href="README.md">Sampling</a>
