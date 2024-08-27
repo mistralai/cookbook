@@ -37,4 +37,4 @@ When an LLM is making a prediction, it's not actually simply picking a token. It
   </tr>
 </table>
 
-> ⚠️ You can stack samplers one after the other. For example, you can use Top K to gather the best tokens and then apply the Temperature, or vice versa. The order of each sampler will impact how the final distribution looks.
+> ⚠️ You can stack samplers one after the other. For example, you can use Top K to gather the top tokens and then apply Top P, or vice versa. The order of each sampler will impact how the final distribution looks.
