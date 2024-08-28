@@ -15,9 +15,9 @@ The distribution would change as follows:
 
 <div style="justify-content: center; align-items: center;">
   <div style="margin-right: 20px; text-align: center;" align="center">
-    <img src="top_barplot.png" alt="Example Image" width="50%">
+    <img src="top_barplot.png" alt="Example Image" width="60%">
 
-<sub><sup>Different `Temperature` values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
+<sub><sup>Different Temperature values and the top 5 tokens using Mistral 7B at 4 bits precision.</sup></sub>
   </div>
 
   <div style="margin-right: 20px; text-align: center;" align="center">
@@ -25,7 +25,7 @@ The distribution would change as follows:
   </div>
 
   <div style="margin-right: 20px; text-align: center;" align="center">
-    <img src="top_barplot_black.png" alt="Example Image" width="50%">
+    <img src="top_barplot_black.png" alt="Example Image" width="60%">
 
 <sub><sup>Top P will only consider the topmost tokens until hitting the 50% target.</sup></sub>
   </div>
@@ -35,7 +35,7 @@ The distribution would change as follows:
   </div>
 
   <div style="text-align: center;" align="center">
-    <img src="top_barplot_final.png" alt="Example Image" width="50%">
+    <img src="top_barplot_final.png" alt="Example Image" width="60%">
 
 <sub><sup>The other tokens probabilities are now 0, and the probabilities for the other tokens are adjusted.</sup></sub>
   </div>
