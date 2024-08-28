@@ -166,7 +166,7 @@ Finally, token per token it will give the following:
     <td>28793</td>
   </tr>
 </table>
-</div>div>
+</div>
 
 <sub><sup>"_" represents any whitespace</sup></sub>
 
