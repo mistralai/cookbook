@@ -34,7 +34,7 @@ A nice playground to experiment with and visualize different sampling settings: 
   <tr>
     <td style="font-weight:bold">Repetition Penalty</td>
     <td>
-    Repetition Penalty applies a very small negative bias to all tokens that have appeared to avoid repetition.
+    Repetition Penalty applies a very small negative bias to all tokens that have appeared in the past to avoid repetition.
     </td>
   </tr>
 </table>
