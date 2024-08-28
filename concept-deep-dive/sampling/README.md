@@ -20,7 +20,7 @@ A nice playground to experiment with and visualize different sampling settings: 
     </td>
   </tr>
   <tr>
-    <td style="font-weight:bold">Top K</td>
+    <td style="font-weight:bold"><a href="top_k.md">Top K</a></td>
     <td>
     Top K sets a limit on the number of top tokens that can be selected to pick from.
     </td>
