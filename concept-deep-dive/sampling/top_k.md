@@ -13,7 +13,7 @@ The order of events is as follows:
 
 The distribution would change as follows for the following question: *"What is the best mythical creature? Answer with a single word."*
 
-<table style="border-collapse: collapse; width: 100%; text-align: center;">
+<table style="border-collapse: collapse; width: 100%; text-align: center;" align="center">
   <tr>
     <td style="white-space: nowrap;">Tokens</td>
     <td style="white-space: nowrap;">Dragon</td>
@@ -64,15 +64,15 @@ The distribution would change as follows for the following question: *"What is t
   </tr>
 </table>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <sub><sup>Top 5 tokens using Mistral 7B at 4 bits precision for different Temperature values.</sup></sub>
   </div>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <span style="font-size: 24px;">&darr;</span>
   </div>
 
-<table style="border-collapse: collapse; width: 100%; text-align: center;">
+<table style="border-collapse: collapse; width: 100%; text-align: center;" align="center">
   <tr>
     <td style="white-space: nowrap;">Tokens</td>
     <td style="white-space: nowrap;">Dragon</td>
@@ -123,15 +123,15 @@ The distribution would change as follows for the following question: *"What is t
   </tr>
 </table>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <sub><sup>Top K will only consider the top 3 tokens.</sup></sub>
   </div>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <span style="font-size: 24px;">&darr;</span>
   </div>
 
-<table style="border-collapse: collapse; width: 100%; text-align: center;">
+<table style="border-collapse: collapse; width: 100%; text-align: center;" align="center">
   <tr>
     <td style="white-space: nowrap;">Tokens</td>
     <td style="white-space: nowrap;">Dragon</td>
@@ -182,7 +182,7 @@ The distribution would change as follows for the following question: *"What is t
   </tr>
 </table>
 
-  <div style="margin-right: 20px; text-align: center;">
+  <div style="margin-right: 20px; text-align: center;" align="center">
     <sub><sup>The other tokens are removed, and the probabilities are updated.</sup></sub>
   </div>
 
