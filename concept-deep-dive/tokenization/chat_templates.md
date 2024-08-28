@@ -113,6 +113,7 @@ This adds the leading whitespaces, making the final string look more like:
 
 Finally, token per token it will give the following:
 
+<div>
 <table style="border-collapse: collapse; width: 100%; text-align: center;">
   <tr>
     <td style="white-space: nowrap;">&lt;s&gt;</td>
@@ -127,7 +128,7 @@ Finally, token per token it will give the following:
     <td style="white-space: nowrap;">]</td>
     <td style="white-space: nowrap;">_assistant</td>
     <td style="white-space: nowrap;">_message</td>
-    <td style="white-space: nowrap;">&lt;&#47;s&gt;</td>
+    <td style="white-space: nowrap;">&lt;/s&gt;</td>
     <td style="white-space: nowrap;">_[</td>
     <td style="white-space: nowrap;">INST</td>
     <td style="white-space: nowrap;">]</td>
@@ -165,6 +166,7 @@ Finally, token per token it will give the following:
     <td>28793</td>
   </tr>
 </table>
+</div>div>
 
 <sub><sup>"_" represents any whitespace</sup></sub>
 
