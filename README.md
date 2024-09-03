@@ -75,3 +75,6 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                  | LLamaIndex |
 | [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.md)                           | fine-tuning, evaluation | Weights & Biases |
 | [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                       | CLI, TUI APP, Chat     | x-cmd |
+| [Evaluation of Mistral Instruct using HuggingFace](shivayapandey/cookbook/third_party/BeyondLLM/Evaluation_of_Mistral_Instruct_using_HuggingFace.ipynb) | RAG, evaluation | BeyondLLM |
+| [Fine Tune Embeddings Advanced RAG](shivayapandey/cookbook/third_party/BeyondLLM/Fine_Tune_Embeddings_using_Mistral_AI_LLM.ipynb)                | fine-tuning, RAG | BeyondLLM |
+| [LlamaIndex x Mistral AI x BeyondLLM Evaluation](shivayapandey/cookbook/third_party/BeyondLLM/Evaluating_llamaindex_with_beyondllm(1).ipynb)   | RAG, evaluation | BeyondLLM |
