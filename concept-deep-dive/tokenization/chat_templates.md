@@ -181,7 +181,7 @@ user message [/INST] assistant message</s> [INST] new user message [/INST]
 
 ## Tokenizer V2
 
-Following the previous tokenizer, and mostly used by the proprietary models, the second version of the tokenizer powered models such as the now old Mistral Small and Mistral Large. This new tokenizer introduced control tokens, specifically for the previous special strings `[INST]` and `[/INST]`, which became control tokens with the corresponding IDs being `3` and `4`, but also new control tokens for function calling.
+Following the previous tokenizer, and mostly used by the proprietary models, the second version of the tokenizer powered models such as the now old Mistral Small 2402 and Mistral Large 2402. This new tokenizer introduced control tokens, specifically for the previous special strings `[INST]` and `[/INST]`, which became control tokens with the corresponding IDs being `3` and `4`, but also new control tokens for function calling.
 
 ### Instruct Chat Template
 
@@ -327,7 +327,7 @@ new user message[/INST]
 > ⚠️ This is how `mistral_common` and the templates implement system prompts, but this can easily be customized. Feel free to use system prompts in different places, such as the second from the last or simply as the first user message, as before.
 
 ## Tokenizer V3
-This tokenizer powers models such as Mixtral 8x22B, Codestral 22B, Mathstral 7B, Mamba Codestral 7B, and Large 2 (Large 2407). It is highly similar to the second version, with only tool use being slightly different.
+This tokenizer powers models such as Mixtral 8x22B, Codestral 22B, Mathstral 7B, Mamba Codestral 7B, Small 2409 and Large 2 (Large 2407). It is highly similar to the second version, with only tool use being slightly different.
 
 The chat template, tokenization, and system prompt for basic instruct are the same as the previous one.
 
