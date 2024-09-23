@@ -46,7 +46,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                  | RAG                    | Langchain  |
 | [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                 | RAG                    | LLamaIndex |
 | [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                 | agent                  | LLamaIndex |
-| [langfuse_llm_monitoring.ipynb](third_party/Langfuse/langfuse_llm_monitoring.ipynb)                             | LLM Observability      | Langfuse    |
+| [Open-source LLM engineering](third_party/Langfuse)                                                             | LLM Observability      | Langfuse   |
 | [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                  | tracing data           | Phoenix    |
 | [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                              | RAG, embeddings        | Azure      |
 | [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                     | UI chat, tool calling  | Chainlit   |
