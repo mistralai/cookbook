@@ -41,14 +41,14 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 | Tools                                                                                                           | Category               | Party      |
 | :-------------------------------------------------------------------------------------------------------------- | :--------------------- | :--------- |
-| [CAMEL Graph RAG with Mistral Models](third_party/CAMEL_AI/camel_graph_rag.ipynb)                               | multi-agent, tool, data gen| CAMEL-AI.org|
-| [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                              | multi-agent, tool, data gen| CAMEL-AI.org|
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                  | RAG                    | Langchain  |
 | [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                 | RAG                    | LLamaIndex |
 | [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                 | agent                  | LLamaIndex |
-| [Open-source LLM engineering](third_party/Langfuse)                                                             | LLM Observability      | Langfuse   |
-| [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                  | tracing data           | Phoenix    |
+| [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                  | tracing data           | Arize Phoenix    |
+| [arize_phoenix_evaluate_rag.ipynb](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)                          | evaluation             | Arize Phoenix    |
 | [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                              | RAG, embeddings        | Azure      |
+| [CAMEL Graph RAG with Mistral Models](third_party/CAMEL_AI/camel_graph_rag.ipynb)                               | multi-agent, tool, data gen| CAMEL-AI.org|
+| [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                              | multi-agent, tool, data gen| CAMEL-AI.org|
 | [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                     | UI chat, tool calling  | Chainlit   |
 | [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                              | RAG                    | Langchain  |
 | [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)            | synthetic data         | Argilla    |
@@ -67,6 +67,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                               | code                   | Neon       |
 | [ollama_mistral_llamaindex.ipynb](third_party/LlamaIndex/ollama_mistral_llamaindex.ipynb)                       | RAG                    | LLamaIndex |
 | [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup)                                                 | demo                   | Ollama     |
+| [Open-source LLM engineering](third_party/Langfuse)                                                             | LLM Observability      | Langfuse   |
 | [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | UI chat, demo, RAG     | Panel      |
 | [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                   | RAG                    | Pinecone   |
 | [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                    | LLamaIndex |
