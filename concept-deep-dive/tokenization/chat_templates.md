@@ -6,6 +6,38 @@ In this article, we will mostly delve into instruction tokenization and chat tem
 
 The ground truth for all the information available here can be found by exploring the repos on hugging face as well as on github, specifically [mistral_common](https://github.com/mistralai/mistral-common).
 
+<details>
+
+<summary><b>TL;DR</b></summary>
+
+### Tokenizer V1:
+```
+"<s> [INST] user message [/INST] assistant message</s> [INST] new user message [/INST]"
+```
+<sub><sup>With mistral-common, the system prompt is prepended to the first user message by default (feel free to customise it)</sup></sub>
+
+### Tokenizer V2:
+```
+"<s>[INST] user message[/INST] assistant message</s>[INST] new user message[/INST]"
+```
+<sub><sup>With mistral-common, the system prompt is prepended to the last user message by default (feel free to customise it)</sup></sub>
+
+### Tokenizer V3:
+```
+"<s>[INST] user message[/INST] assistant message</s>[INST] new user message[/INST]"
+```
+<sub><sup>V3 is highly similar to V2, the only difference concerns function calling.</sup></sub>
+
+### Tokenizer V3 - Tekken (Nemo):
+```
+"<s>[INST]user message[/INST]assistant message</s>[INST]new user message[/INST]"
+```
+<sub><sup>With mistral-common, the system prompt is prepended to the last user message by default (feel free to customise it)</sup></sub>
+
+EDIT: New document explaining can be found in our [cookbooks](https://github.com/mistralai/cookbook/blob/main/concept-deep-dive/tokenization/chat_templates.md)
+
+</details>
+
 ## Tokenizer V1
 
 The very first releases, Mistral 7B V1 and V2 as well as Mixtral 8x7B V1, were met with a lot of appreciation and love from the community. However, this did not prevent some disagreements and debates within the community regarding the correct chat templates for the instruct tokenizers. Today, you can reliably rely on `mistral_common` as the ground truth for the tokenization process, but back then, most of the community relied on the available Jinja chat templates!
