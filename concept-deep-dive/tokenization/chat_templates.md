@@ -364,7 +364,7 @@ This tokenizer powers models such as Mixtral 8x22B, Codestral 22B, Mathstral 7B,
 The chat template, tokenization, and system prompt for basic instruct are the same as the previous one.
 
 ### Tekken
-Tekken is a different version of the V3 tokenizer and powers Mistral Nemo. While the original one and previous tokenizers were based on `sentencepiece`, Tekken is based on `tiktoken`. With a considerably larger vocabulary size, it also deals with encoding differently. The main difference for the chat template is that it does not prepend a whitespace like `sentencepiece`.
+Tekken is a different version of the V3 tokenizer and powers Mistral Nemo 12B and Pixtral 12B. While the original one and previous tokenizers were based on `sentencepiece`, Tekken is based on `tiktoken`. With a considerably larger vocabulary size, it also deals with encoding differently. The main difference for the chat template is that it does not prepend a whitespace like `sentencepiece`.
 
 This results in a simpler chat template and more intuitive tokenization.
 
