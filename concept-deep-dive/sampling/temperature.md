@@ -18,7 +18,8 @@ Where:
 - `yi` is the logit for the `i`-th candidate token.
 - `yk` are the logits for all candidate tokens `k` in the vocabulary.
 
-This formula normalizes the logits into a probability distribution over the vocabulary, where the Temperature parameter `T` controls the sharpness of the distribution.
+This formula normalizes the logits into a probability distribution over the vocabulary, where the Temperature parameter `T` controls the sharpness of the distribution.  
+The original probability distribution is the equivalent of a Temperature of 1.
 
 > Note: When using a null value for the Temperature, usually greedy sampling is chosen instead, and the token with the highest probability is always picked.
 
