@@ -8,7 +8,7 @@ The Mistral Cookbook features examples contributed by Mistralers and our communi
 - Runnable on Colab: If you're sharing a notebook example, try to make sure it's runnable on Google Colab.
 - Authorship: Kindly include your name, your Github handle, and affiliation at the beginning of the file.
 - Descriptions: Please include your notebook along with its category and descriptions in the table below.
-- Tone: Kindly maintain a neural tone and minimize any excessive marketing materials.
+- Tone: Kindly maintain a neutral tone and minimize any excessive marketing materials.
 - Reproducibility: To ensure others can reproduce your work, kindly tag package versions in your code.
 - Image size: If you have images, please make sure each image's size is below 500KB.
 - Copyright: Always respect copyright and intellectual property laws.
