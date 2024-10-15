@@ -116,6 +116,12 @@ def apply_jinja_template(messages, bos_token='<s>', eos_token='</s>'):
 print(apply_jinja_template(messages))
 ```
 
+**FIM**
+For FIM, the template would be as follows:
+```
+<s>[SUFFIX]suffix[/INST] prefix
+```
+
 ### Instruct Tokenization Logic
 
 Now let's dig into the original logic behind the tokenization process that you can see in `mistral_common`. You often would not simply provide the text to the tokenizer and encode the entire string as it is, `mistral-common` actually goes directly from `request` -> `int`, while other approaches such as the one used by `transformers` is closer to `request` -> `str` -> `int`. The way it is actually done for the tokenization process is closer to the following logic:
