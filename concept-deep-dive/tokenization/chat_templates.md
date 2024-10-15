@@ -24,7 +24,7 @@ The ground truth for all the information available here can be found by explorin
 
 **FIM**  
 ```
-<s>[SUFFIX]suffix[/INST] prefix
+<s>[SUFFIX]suffix[PREFIX] prefix
 ```
 
 ### Tokenizer V3:
@@ -35,7 +35,7 @@ The ground truth for all the information available here can be found by explorin
 
 **FIM**  
 ```
-<s>[SUFFIX]suffix[/INST] prefix
+<s>[SUFFIX]suffix[PREFIX] prefix
 ```
 
 ### Tokenizer V3 - Tekken (Nemo):
@@ -296,7 +296,7 @@ print(apply_jinja_template(messages))
 **FIM**  
 For FIM, the template would be as follows:
 ```
-<s>[SUFFIX]suffix[/INST] prefix
+<s>[SUFFIX]suffix[PREFIX] prefix
 ```
 
 ### Instruct Tokenization Logic
