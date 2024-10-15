@@ -24,7 +24,7 @@ The ground truth for all the information available here can be found by explorin
 
 **FIM**  
 ```
-<s>[SUFFIX]suffix[PREFIX] prefix
+"<s>[SUFFIX]suffix[PREFIX] prefix"
 ```
 
 ### Tokenizer V3:
@@ -35,7 +35,7 @@ The ground truth for all the information available here can be found by explorin
 
 **FIM**  
 ```
-<s>[SUFFIX]suffix[PREFIX] prefix
+"<s>[SUFFIX]suffix[PREFIX] prefix"
 ```
 
 ### Tokenizer V3 - Tekken (Nemo):
