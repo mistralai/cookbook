@@ -22,11 +22,21 @@ The ground truth for all the information available here can be found by explorin
 ```
 <sub><sup>With mistral-common, the system prompt is prepended to the last user message by default (feel free to customise it)</sup></sub>
 
+**FIM**  
+```
+<s>[SUFFIX]suffix[/INST] prefix
+```
+
 ### Tokenizer V3:
 ```
 "<s>[INST] user message[/INST] assistant message</s>[INST] new user message[/INST]"
 ```
 <sub><sup>V3 is highly similar to V2, the only difference concerns function calling.</sup></sub>
+
+**FIM**  
+```
+<s>[SUFFIX]suffix[/INST] prefix
+```
 
 ### Tokenizer V3 - Tekken (Nemo):
 ```
@@ -114,12 +124,6 @@ def apply_jinja_template(messages, bos_token='<s>', eos_token='</s>'):
         raise ValueError(f"Template rendering error: {e}")
 
 print(apply_jinja_template(messages))
-```
-
-**FIM**
-For FIM, the template would be as follows:
-```
-<s>[SUFFIX]suffix[/INST] prefix
 ```
 
 ### Instruct Tokenization Logic
@@ -287,6 +291,12 @@ def apply_jinja_template(messages, bos_token='<s>', eos_token='</s>'):
         raise ValueError(f"Template rendering error: {e}")
 
 print(apply_jinja_template(messages))
+```
+
+**FIM**  
+For FIM, the template would be as follows:
+```
+<s>[SUFFIX]suffix[/INST] prefix
 ```
 
 ### Instruct Tokenization Logic
