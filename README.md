@@ -32,7 +32,6 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
 | [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
 | [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)     | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
-| [codestral_finetuning.ipynb](mistral/fine_tune/codestral_finetuning.ipynb)     | fine-tuning                  | Finetune Codestral model on your own repository                               |
 | [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)         | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
 | [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)             | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
 | [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide        |
