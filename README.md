@@ -23,19 +23,20 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 ## Main Notebooks
 
-| Notebook                                                                                               | Category                     | Description                                                                      |
-| ------------------------------------------------------------------------------------------------------ | ---------------------------- | -------------------------------------------------------------------------------- |
-| [quickstart.ipynb](quickstart.ipynb)                                                                   | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
-| [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb)                         | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
-| [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                                         | RAG                          | RAG from scratch with Mistral AI API                                             |
-| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                                                | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
-| [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)                              | function calling             | Use Mistral API for function calling                                             |
-| [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                                                | evaluation                   | Evaluate models with Mistral API                                                 |
-| [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)                             | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
-| [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)                                 | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
-| [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)                                     | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
-| [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide                                     |
-| [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb)     | data generation              | Simple data generation to refine news articles                                   |
+| Notebook                                                                       | Category                     | Description                                                                      |
+|--------------------------------------------------------------------------------|-----------------------------|----------------------------------------------------------------------------------|
+| [quickstart.ipynb](quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
+| [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb) | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
+| [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                 | RAG                          | RAG from scratch with Mistral AI API                                             |
+| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
+| [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
+| [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
+| [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)     | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
+| [codestral_finetuning.ipynb](mistral/fine_tune/codestral_finetuning.ipynb)     | fine-tuning                  | Finetune Codestral model on your own repository                               |
+| [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)         | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
+| [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)             | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
+| [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide        |
+| [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb) | data generation | Simple data generation to refine news articles                                |
 
 ## Third Party Tools
 
