@@ -33,7 +33,7 @@ With our previous template in mind, we have no way to know, for example, how `..
 
 This highlights the importance of understanding and addressing boundary problems in tokenization. Ensuring that the model is trained on a diverse and comprehensive dataset can help mitigate some of these issues, and other techniques may also make the model more robust.
 
-#### Solution?
+#### Solution A
 One possible solution involves reworking our template to ensure the last token is a clean expected token resulting in an expected sequence. We can do this by encoding the user message encapsulated with the special strings on its own, and only after we encode the assistant response and concatenate both sequences.
 
 The result would be:
@@ -59,7 +59,7 @@ With this in mind, we end up with:
 <s> [INST] Hello, how are you? [/INST] Fine, and you?</s> [INST] I'm doing great! [/INST] Glad to hear!</s>
 ```
 
-### Token Healing
+### Solution B - Token Healing
 
 The previous solution does not fully solve the problem for more general cases, but only around the special strings. This means that if we desire to prefix/prefill a string for the assistant response, we will once more encounter boundary issues.
 
