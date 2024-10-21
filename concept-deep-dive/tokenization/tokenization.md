@@ -8,6 +8,8 @@ Four our tokezation implementation, please refer to [mistral-common](https://git
 
 | Section                  | Description                                                                 |
 |--------------------------|-----------------------------------------------------------------------------|
-| [Deep Dive](basics.md)               | A detailed explanation of tokenization, including problems and sensitive aspects. |
+| [Basics](basics.md)               | Basics of tokenization. |
+| [Boundaries & Token Healing](boundaries.md)               | Main problems with tokenization and token healing. |
+| [Control Tokens](control_tokens.md)               | Introduction to Control Tokens and their advantages. |
 | [Templates](templates.md)               | A summarized list of all our tokenizers with their chat templates.           |
 | [Chat Templates](chat_templates.md)          | Legacy documentation around our chat templates.                             |
