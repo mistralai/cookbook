@@ -101,4 +101,4 @@ Or, with their string representations only:
 <s>[INST] Hello, how are you? [/INST] Fine, and you?</s>[INST] I'm doing great! [/INST] Glad to hear!</s>
 ```
 
-Many could stop here, as these are the bare minimum understanding requirements. However, there are a few hidden issues within tokenizers that are crucial to understand, specifically **[boundary problems](boundaries.md)**.
+While this is still not close to what we implement with [mistral-common](https://github.com/mistralai/mistral-common), many could stop here, as these are the bare minimum understanding requirements. However, there are a few hidden issues within tokenizers that are crucial to understand, specifically **[boundary problems](boundaries.md)**.
