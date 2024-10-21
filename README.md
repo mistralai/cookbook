@@ -70,6 +70,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup)                                                 | demo                   | Ollama     |
 | [Open-source LLM engineering](third_party/Langfuse)                                                             | LLM Observability      | Langfuse   |
 | [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | UI chat, demo, RAG     | Panel      |
+| [phospho integration](third_party/phospho/cookbook_phospho_mistral_integration.ipynb)                           | Evaluation, Analytics  | phospho    |
 | [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                   | RAG                    | Pinecone   |
 | [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                    | LLamaIndex |
 | [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                       | agent                  | LLamaIndex |
