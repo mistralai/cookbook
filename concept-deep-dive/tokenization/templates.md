@@ -97,7 +97,7 @@ BOS_ID
 + /INST_ID
 + encode("Fine, and you?") + EOS_ID
 + INST_ID
-+ encode("[INST] I'm doing great! [/INST]")
++ encode("I'm doing great!")
 + /INST_ID
 + encode("Glad to hear!") + EOS_ID
 ```
@@ -143,7 +143,7 @@ BOS_ID
 + /INST_ID
 + encode("Fine, and you?") + EOS_ID
 + INST_ID
-+ encode("[INST] I'm doing great! [/INST]")
++ encode("I'm doing great!")
 + /INST_ID
 + encode("Glad to hear!") + EOS_ID
 ```
