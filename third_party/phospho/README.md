@@ -31,7 +31,3 @@ You can find **phospho** documentation [here](https://docs.phospho.ai/).
 ## See it in action
 
 <img alt="phospho_overview.gif" width="100%" src="https://mintlify.s3-us-west-1.amazonaws.com/phospho/images/clustering-demo.gif">
-
-## More about us
-
-Follow us on [Linkdin](https://fr.linkedin.com/company/phospho-app).
