@@ -28,6 +28,8 @@ The latest Phoenix + Mistral AI docs can be found [here](https://docs.arize.com/
 ## Examples
 - [Tracing a Mistral AI application](./examples/arize_phoenix_tracing.ipynb)
 - [Evaluating a Mistral RAG pipeline](./examples/arize_phoenix_evaluate_rag.ipynb)
+- [Tracing a simple Python agent workflow](./examples/simple_Python_agent_workflow.ipynb)
+- [Evaluating a simple Python agent workflow](./examples/evaluate_simple_Python_agent_workflow.ipynb)
 
 ## See it in action
 
