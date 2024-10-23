@@ -30,4 +30,6 @@ You can find **phospho** documentation [here](https://docs.phospho.ai/).
 
 ## See it in action
 
+Watch a demo video [here](https://www.youtube.com/watch?v=4QeNPa4xOc8&t=2s)
+
 <img alt="phospho_overview.gif" width="100%" src="https://mintlify.s3-us-west-1.amazonaws.com/phospho/images/clustering-demo.gif">
