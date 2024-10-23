@@ -26,7 +26,7 @@ You can find **phospho** documentation [here](https://docs.phospho.ai/).
 
 ## Examples
 
-- [phospho integration with Mistral ](./examples/arize_phoenix_tracing.ipynb)
+- [phospho integration with Mistral ](./cookbook_phospho_mistral_integration.ipynb)
 
 ## See it in action
 
