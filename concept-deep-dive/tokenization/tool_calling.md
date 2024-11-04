@@ -82,7 +82,7 @@ The next step, is to run the tool with the provided information. Once we have th
 
 **Tool Result String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS]
+<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS]
 ```
 
 Perfect, the model can now answer!  
@@ -93,7 +93,7 @@ Perfect, the model can now answer!
 
 **Final String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS] 2+2=4</s>
+<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS] 2+2=4</s>
 ```
 
 In this scenario, the control tokens `TOOL_CALLS`, `BEGIN_TOOL_RESULTS`, and `END_TOOL_RESULTS` are used to encode the tool call and the tool result. The model can then generate a coherent response based on the tool result!
@@ -144,12 +144,12 @@ We provide the model with a set of tools, for this example we will provide it a 
 Now that the model has the tool, it decides to use it.  
 **Assistant Tool Call:**  
 ```
-[{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}, "id": "VvvODy9mT"}]
+[{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]
 ```
 
 **Tool Call String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}, "id": "VvvODy9mT"}]</s>
+<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>
 ```
 
 The next step, is to run the tool with the provided information. Once we have the result, we provide it to the model.  
@@ -160,7 +160,7 @@ The next step, is to run the tool with the provided information. Once we have th
 
 **Tool Result String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS]
+<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS]
 ```
 
 The model can now answer!  
@@ -171,7 +171,7 @@ The model can now answer!
 
 **Final String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS] 2+2=4</s>
+<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS] 2+2=4</s>
 ```
 
 ### Tokenizer V3 - Tekken
