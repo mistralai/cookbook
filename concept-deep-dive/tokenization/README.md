@@ -13,6 +13,6 @@ For our tokenization implementation, please refer to [mistral-common](https://gi
 | [Control Tokens](control_tokens.md)               | Introduction to Control Tokens and their advantages. |
 | [Templates](templates.md)               | A summarized list of all our tokenizers with their chat templates.           |
 | [Tokenizer](tokenizer.md)          | Make your own tokenizer with sentencepiece.                             |
-| [Tool Calling](tool_calling.md)          | Learn about how tokenization for tool calling works.                            |
+| [Tool Calling](tool_calling.md)          | Learn about how tokenization for our tool calling works.                            |
 |          |                            |
 | [Chat Templates](chat_templates.md)          | Legacy documentation around our chat templates.                             |
