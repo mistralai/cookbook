@@ -62,7 +62,7 @@ We provide the model with a set of tools, for this example we will provide it a 
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST]
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 Now that the model has the tool, it decides to use it.  
 **Assistant Tool Call:**  
@@ -74,7 +74,7 @@ Now that the model has the tool, it decides to use it.
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 The next step, is to run the tool with the provided information. Once we have the result, we provide it to the model.  
 **Tool Result:**  
@@ -86,7 +86,7 @@ The next step, is to run the tool with the provided information. Once we have th
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS]
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 Perfect, the model can now answer!  
 **Final Assistant Response:**
@@ -98,7 +98,7 @@ Perfect, the model can now answer!
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS] 2+2=4</s>
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 In this scenario, the control tokens `TOOL_CALLS`, `BEGIN_TOOL_RESULTS`, and `END_TOOL_RESULTS` are used to encode the tool call and the tool result. The model can then generate a coherent response based on the tool result!
 
@@ -144,7 +144,7 @@ We provide the model with a set of tools, for this example we will provide it a 
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST]
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 Now that the model has the tool, it decides to use it.  
 **Assistant Tool Call:**  
@@ -156,7 +156,7 @@ Now that the model has the tool, it decides to use it.
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 The next step, is to run the tool with the provided information. Once we have the result, we provide it to the model.  
 **Tool Result:**  
@@ -168,7 +168,7 @@ The next step, is to run the tool with the provided information. Once we have th
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS]
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 The model can now answer!  
 **Final Assistant Response:**
@@ -180,11 +180,11 @@ The model can now answer!
 ```
 <s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS] 2+2=4</s>
 ```
-<sub><sup>Notice the whitespacing after some of the control tokens.</sup></sub>
+<sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
 ### Tokenizer V3 - Tekken
-The main difference with tekken is once more whitespacing, its overall the same tokenization, the only difference being that its not based on `sentencepiece`, the final string representation of the previous scenario would look like so:
+The main difference with tekken is once more whitespace, its overall the same tokenization, the only difference being that its not based on `sentencepiece`, the final string representation of the previous scenario would look like so:
 ```
 <s>[AVAILABLE_TOOLS][{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]What's 2+2?[/INST][TOOL_CALLS][{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS]{"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS]2+2=4</s>
 ```
-<sub><sup>No whitespacing this time.</sup></sub>
+<sub><sup>No whitespace this time.</sup></sub>
