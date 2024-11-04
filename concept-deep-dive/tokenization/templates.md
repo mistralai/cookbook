@@ -62,7 +62,7 @@ BOS_ID
 
 ### Tokenizer V2/V3
 
-The chat template for Tokenizer V2 and V3 is as follows:
+The basic chat template for Tokenizer V2 and V3 is as follows:
 
 ```
 <s>[INST] Hello, how are you?[/INST] Fine, and you?</s>[INST] I'm doing great![/INST] Glad to hear!</s>
@@ -101,6 +101,8 @@ BOS_ID
 + /INST_ID
 + encode("Glad to hear!") + EOS_ID
 ```
+
+For Tool Calling, please refer to [this section](tool_calling.md).
 
 </details>
 
@@ -147,5 +149,7 @@ BOS_ID
 + /INST_ID
 + encode("Glad to hear!") + EOS_ID
 ```
+
+For Tool Calling, please refer to [this section](tool_calling.md).
 
 </details>
