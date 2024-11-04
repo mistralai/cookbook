@@ -60,8 +60,9 @@ We provide the model with a set of tools, for this example we will provide it a 
 ```
 **String Representation:**  
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST]
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST]
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 Now that the model has the tool, it decides to use it.  
 **Assistant Tool Call:**  
@@ -71,8 +72,9 @@ Now that the model has the tool, it decides to use it.
 
 **Tool Call String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST][TOOL_CALLS]_[{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 The next step, is to run the tool with the provided information. Once we have the result, we provide it to the model.  
 **Tool Result:**  
@@ -82,8 +84,9 @@ The next step, is to run the tool with the provided information. Once we have th
 
 **Tool Result String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS]
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST][TOOL_CALLS]_[{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS]_[{"name": "calculator", "content": 4}][/TOOL_RESULTS]
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 Perfect, the model can now answer!  
 **Final Assistant Response:**
@@ -93,8 +96,9 @@ Perfect, the model can now answer!
 
 **Final String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS] [{"name": "calculator", "content": 4}][/TOOL_RESULTS] 2+2=4</s>
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST][TOOL_CALLS]_[{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>[TOOL_RESULTS]_[{"name": "calculator", "content": 4}][/TOOL_RESULTS] 2+2=4</s>
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 In this scenario, the control tokens `TOOL_CALLS`, `BEGIN_TOOL_RESULTS`, and `END_TOOL_RESULTS` are used to encode the tool call and the tool result. The model can then generate a coherent response based on the tool result!
 
@@ -138,8 +142,9 @@ We provide the model with a set of tools, for this example we will provide it a 
 ```
 **String Representation:**  
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST]
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST]
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 Now that the model has the tool, it decides to use it.  
 **Assistant Tool Call:**  
@@ -149,8 +154,9 @@ Now that the model has the tool, it decides to use it.
 
 **Tool Call String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST][TOOL_CALLS]_[{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 The next step, is to run the tool with the provided information. Once we have the result, we provide it to the model.  
 **Tool Result:**  
@@ -160,8 +166,9 @@ The next step, is to run the tool with the provided information. Once we have th
 
 **Tool Result String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS]
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST][TOOL_CALLS]_[{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS]_{"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS]
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 The model can now answer!  
 **Final Assistant Response:**
@@ -171,8 +178,9 @@ The model can now answer!
 
 **Final String Representation:**
 ```
-<s>[AVAILABLE_TOOLS] [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST] What's 2+2?[/INST][TOOL_CALLS] [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS] {"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS] 2+2=4</s>
+<s>[AVAILABLE_TOOLS]_[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]_What's 2+2?[/INST][TOOL_CALLS]_[{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS]_{"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS] 2+2=4</s>
 ```
+<sub><sup>to better highlight them, `_` represents normal whitespaces, meaning `"_"` = `" "`</sup></sub>
 
 ### Tokenizer V3 - Tekken
 The main difference with tekken is once more whitespacing, its overall the same tokenization, the only difference being that its not based on `sentencepiece`, the final string representation of the previous scenario would look like so:
