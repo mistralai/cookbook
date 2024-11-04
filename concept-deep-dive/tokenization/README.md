@@ -2,7 +2,7 @@
 
 Tokenization is a crucial concept around LLMs, and it can be more complex than one may think!
 
-Four our tokezation implementation, please refer to [mistral-common](https://github.com/mistralai/mistral-common).
+For our tokenization implementation, please refer to [mistral-common](https://github.com/mistralai/mistral-common).
 
 ## Overview
 
