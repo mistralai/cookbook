@@ -63,7 +63,7 @@ The theoretical string representation changes slightly:
 
 #### Tokenizer V2/V3
 
-All tokenizers since V1 use Control Tokens. The end result of their string representations, however, is still affected by `sentencepiece` for the most part, adding a whitespace at each encoding step similarly to our V1:
+All tokenizers after V1 use Control Tokens. The end result of their string representations, however, is still affected by `sentencepiece` for the most part, adding a whitespace at each encoding step similarly to our V1:
 ```
 <s>[INST] Hello, how are you?[/INST] Fine, and you?</s>[INST] I'm doing great![/INST] Glad to hear!</s>
 ```
