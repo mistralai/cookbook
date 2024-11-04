@@ -118,6 +118,7 @@ For better visualization, here is the string broken into different sections:
 [/TOOL_RESULTS]
  2+2=4</s>
 ```
+<sub><sup>There is no line breaker in the real version.</sup></sub>
 
 ### Tokenizer V3
 
@@ -215,6 +216,7 @@ String broken into different sections:
 [/TOOL_RESULTS]
  2+2=4</s>
 ```
+<sub><sup>There is no line breaker in the real version.</sup></sub>
 
 ### Tokenizer V3 - Tekken
 The main difference with tekken is once more whitespace, its overall the same tokenization, the only difference being that its not based on `sentencepiece`, the final string representation of the previous scenario would look like so:
@@ -239,3 +241,4 @@ What's 2+2?
 [/TOOL_RESULTS]
 2+2=4</s>
 ```
+<sub><sup>There is no line breaker in the real version.</sup></sub>
