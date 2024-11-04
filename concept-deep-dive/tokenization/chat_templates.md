@@ -1,10 +1,55 @@
 # Demystifying Mistral's Instruct Tokenization & Chat Templates
 
+> [!IMPORTANT]
+> This document is deprecated. Please take a look at the full, in-depth documentation [here](README.md).
+
 From the original tokenizer V1 to the most recent V3 and Tekken tokenizers, Mistral's tokenizers have undergone subtle changes related to how to tokenize for the instruct models. We've come a long way in optimization and research to find the best approach. Today, we'll delve into these tokenizers, demystify any sources of debate, and explore how they work, the proper chat templates to use for each one, and their story within the community!
 
 In this article, we will mostly delve into instruction tokenization and chat templates for simple instruction following. We won't dig into function calling or fill in the middle.
 
 The ground truth for all the information available here can be found by exploring the repos on hugging face as well as on github, specifically [mistral_common](https://github.com/mistralai/mistral-common).
+
+<details>
+
+<summary><b>TL;DR</b></summary>
+
+### Tokenizer V1:
+```
+"<s> [INST] user message [/INST] assistant message</s> [INST] new user message [/INST]"
+```
+<sub><sup>With mistral-common, the system prompt is prepended to the first user message by default (feel free to customise it)</sup></sub>
+
+### Tokenizer V2:
+```
+"<s>[INST] user message[/INST] assistant message</s>[INST] new user message[/INST]"
+```
+<sub><sup>With mistral-common, the system prompt is prepended to the last user message by default (feel free to customise it)</sup></sub>
+
+**FIM**  
+```
+"<s>[SUFFIX]suffix[PREFIX] prefix"
+```
+
+### Tokenizer V3:
+```
+"<s>[INST] user message[/INST] assistant message</s>[INST] new user message[/INST]"
+```
+<sub><sup>V3 is highly similar to V2, the only difference concerns function calling.</sup></sub>
+
+**FIM**  
+```
+"<s>[SUFFIX]suffix[PREFIX] prefix"
+```
+
+### Tokenizer V3 - Tekken (Nemo):
+```
+"<s>[INST]user message[/INST]assistant message</s>[INST]new user message[/INST]"
+```
+<sub><sup>With mistral-common, the system prompt is prepended to the last user message by default (feel free to customise it)</sup></sub>
+
+EDIT: New document explaining can be found in our [cookbooks](https://github.com/mistralai/cookbook/blob/main/concept-deep-dive/tokenization/chat_templates.md)
+
+</details>
 
 ## Tokenizer V1
 
@@ -251,6 +296,12 @@ def apply_jinja_template(messages, bos_token='<s>', eos_token='</s>'):
 print(apply_jinja_template(messages))
 ```
 
+**FIM**  
+For FIM, the template would be as follows:
+```
+<s>[SUFFIX]suffix[PREFIX] prefix
+```
+
 ### Instruct Tokenization Logic
 
 Now that we have control tokens, the process to tokenize has changed slightly. Here is the new logic behind the chat template:
@@ -332,7 +383,7 @@ This tokenizer powers models such as Mixtral 8x22B, Codestral 22B, Mathstral 7B,
 The chat template, tokenization, and system prompt for basic instruct are the same as the previous one.
 
 ### Tekken
-Tekken is a different version of the V3 tokenizer and powers Mistral Nemo. While the original one and previous tokenizers were based on `sentencepiece`, Tekken is based on `tiktoken`. With a considerably larger vocabulary size, it also deals with encoding differently. The main difference for the chat template is that it does not prepend a whitespace like `sentencepiece`.
+Tekken is a different version of the V3 tokenizer and powers Mistral Nemo 12B and Pixtral 12B. While the original one and previous tokenizers were based on `sentencepiece`, Tekken is based on `tiktoken`. With a considerably larger vocabulary size, it also deals with encoding differently. The main difference for the chat template is that it does not prepend a whitespace like `sentencepiece`.
 
 This results in a simpler chat template and more intuitive tokenization.
 
