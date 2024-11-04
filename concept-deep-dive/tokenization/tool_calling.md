@@ -102,6 +102,23 @@ Perfect, the model can now answer!
 
 In this scenario, the control tokens `TOOL_CALLS`, `BEGIN_TOOL_RESULTS`, and `END_TOOL_RESULTS` are used to encode the tool call and the tool result. The model can then generate a coherent response based on the tool result!
 
+For better visualization, here is the string broken into different sections:
+```
+<s>
+[AVAILABLE_TOOLS]
+ [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}]
+[/AVAILABLE_TOOLS]
+[INST]
+ What's 2+2?
+[/INST]
+[TOOL_CALLS]
+ [{"name": "calculator", "arguments": {"operation": "2+2"}}]</s>
+[TOOL_RESULTS]
+ [{"name": "calculator", "content": 4}]
+[/TOOL_RESULTS]
+ 2+2=4</s>
+```
+
 ### Tokenizer V3
 
 The tokenizer V3 is overall similar to V2, but introduces a slightly different way of encoding tool messages. The main differences are:
@@ -182,9 +199,43 @@ The model can now answer!
 ```
 <sub><sup>Notice the whitespace after some of the control tokens.</sup></sub>
 
+String broken into different sections:
+```
+<s>
+[AVAILABLE_TOOLS]
+ [{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}]
+[/AVAILABLE_TOOLS]
+[INST]
+ What's 2+2?
+[/INST]
+[TOOL_CALLS]
+ [{"name": "calculator", "arguments": {"operation": "2+2"}, "id": "VvvODy9mT"}]</s>
+[TOOL_RESULTS]
+ {"content": 4, "call_id": "VvvODy9mT"}
+[/TOOL_RESULTS]
+ 2+2=4</s>
+```
+
 ### Tokenizer V3 - Tekken
 The main difference with tekken is once more whitespace, its overall the same tokenization, the only difference being that its not based on `sentencepiece`, the final string representation of the previous scenario would look like so:
 ```
 <s>[AVAILABLE_TOOLS][{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}][/AVAILABLE_TOOLS][INST]What's 2+2?[/INST][TOOL_CALLS][{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}, "id": "VvvODy9mT"}]</s>[TOOL_RESULTS]{"content": 4, "call_id": "VvvODy9mT"}[/TOOL_RESULTS]2+2=4</s>
 ```
 <sub><sup>No whitespace this time.</sup></sub>
+
+String broken into different sections:
+```
+<s>
+[AVAILABLE_TOOLS]
+[{"type": "function", "function": {"name": "calculator", "description": "Performs mathematical calculations", "parameters": {"type": "object", "properties": {"operation": {"type": "string", "description": "The operation to be done in python format."}}, "required": ["operation"]}}}]
+[/AVAILABLE_TOOLS]
+[INST]
+What's 2+2?
+[/INST]
+[TOOL_CALLS]
+[{"name": "calculator", "arguments": {"operation": "2+2", "format": "celsius"}, "id": "VvvODy9mT"}]</s>
+[TOOL_RESULTS]
+{"content": 4, "call_id": "VvvODy9mT"}
+[/TOOL_RESULTS]
+2+2=4</s>
+```
