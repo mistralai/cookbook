@@ -31,7 +31,7 @@ Imagine a scenario where we have the following sentence: "Hello, how are"
    We will then have a full sequence of token IDs:
    - `432` + `523` + `87` + `75`
 
-4. This sequence will be decoded back into a full string:
+4. This sequence can be decoded back into a full string:
    - `Hello,` + ` how` + ` are` + ` you` -> `Hello, how are you`
 
 We can then repeat this process as much as needed.
@@ -47,7 +47,9 @@ We can then repeat this process as much as needed.
 
 This iterative process of encoding, prediction, and decoding allows the model to generate coherent and contextually relevant text.
 
-### How to Talk with It?
+You can learn more on how to make your own tokenizer [here](tokenizer.md)!
+
+### How to talk with a model?
 
 Now, one might wonder how to discuss with an LLM or use it as a chatbot. The idea is simple: fine-tune the model with conversations and dialogues so that the model learns to complete dialogues with coherent responses.
 
@@ -101,4 +103,4 @@ Or, with their string representations only:
 <s>[INST] Hello, how are you? [/INST] Fine, and you?</s>[INST] I'm doing great! [/INST] Glad to hear!</s>
 ```
 
-While this is still not close to what we implement with [mistral-common](https://github.com/mistralai/mistral-common), many could stop here, as these are the bare minimum understanding requirements. However, there are a few hidden issues within tokenizers that are crucial to understand, specifically **[boundary problems](boundaries.md)**.
+While this is still not close to what we implement with [mistral-common](https://github.com/mistralai/mistral-common), many could stop here, as these are the bare minimum understanding requirements. However, there are a few hidden issues within tokenizers and LLMs that are crucial to understand, specifically **[boundary problems](boundaries.md)**.

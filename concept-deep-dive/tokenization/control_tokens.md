@@ -68,7 +68,7 @@ All tokenizers since V1 use Control Tokens. The end result of their string repre
 <s>[INST] Hello, how are you?[/INST] Fine, and you?</s>[INST] I'm doing great![/INST] Glad to hear!</s>
 ```
 
-The only difference between V2 and V3 is regarding the **tool calling**, otherwise everything is identical.
+The only difference between V2 and V3 is regarding the **tool calling**, otherwise everything is identical. You can learn more about tool calling [here](tool_calling.md).
 
 #### Tokenizer V3-Tekken
 
