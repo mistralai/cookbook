@@ -1,7 +1,7 @@
 # Demystifying Mistral's Instruct Tokenization & Chat Templates
 
 > [!IMPORTANT]
-> This document is deprecated. Please take a look at the full, in-depth documentation [here](tokenization.md).
+> This document is deprecated. Please take a look at the full, in-depth documentation [here](README.md).
 
 From the original tokenizer V1 to the most recent V3 and Tekken tokenizers, Mistral's tokenizers have undergone subtle changes related to how to tokenize for the instruct models. We've come a long way in optimization and research to find the best approach. Today, we'll delve into these tokenizers, demystify any sources of debate, and explore how they work, the proper chat templates to use for each one, and their story within the community!
 
