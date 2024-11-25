@@ -2,7 +2,8 @@
 
 ## Description
 
-*Please include a summary behind the objective of this PR and list any dependencies that are required for this change.*
+*Please include a summary behind the objective of this PR and list any dependencies that are required for this change.*  
+*Do not forget to hide or delete any API KEY used.*  
 
 ...
 
