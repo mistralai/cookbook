@@ -12,18 +12,18 @@ Let's implement a simple chat interface. To do this, we need to import `solara` 
 pip install solara mistralai
 ```
 
-*This demo uses `solara===1.35.1` and `mistralai===0.4.2`*
+*This demo uses `solara===1.41.0` and `mistralai===1.2.3`*
 
 ```py
 import solara as sl
-from mistralai.client import MistralClient
+from mistralai import Mistral
 ```
 
 Create your `MistralClient` instance using your Mistral API key.
 
 ```py
 mistral_api_key = "your_api_key"
-client = MistralClient(api_key = mistral_api_key)
+client = Mistral(api_key = mistral_api_key)
 ```
 
 Let's initialize a reactive variable where all messages will be stored.
@@ -43,9 +43,9 @@ Given a list of messages (for the moment empty but not for long), we query Mistr
 
 ```py
 def response_generator(messages):
-    response = client.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
+    response = client.chat.stream(model="open-mistral-7b", messages=messages, max_tokens=1024)
     for chunk in response:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
 ```
 
 We stream the response by displaying each chunk as it is received.
@@ -88,7 +88,7 @@ We need to handle a streamed response. Therefore we create a task which will be 
         user_message_count = len([m for m in messages.value if m["role"] == "user"])
         def response(messages):
             messages.value = [*messages.value, {"role": "assistant", "content": ""}]
-            for chunk in response_generator(messages):
+            for chunk in response_generator(messages.value[:-1]):
                 add_chunk_to_ai_message(chunk)
         def result():
             if messages.value != []:
@@ -105,10 +105,10 @@ To run this code, enter `solara run chat.py` in the console.
 
 ```py
 import solara as sl
-from mistralai.client import MistralClient
+from mistralai import Mistral
 
 mistral_api_key = "your_api_key"
-client = MistralClient(api_key=mistral_api_key)
+client = Mistral(api_key=mistral_api_key)
 
 from typing import List
 from typing_extensions import TypedDict
@@ -120,9 +120,9 @@ class MessageDict(TypedDict):
 messages: sl.Reactive[List[MessageDict]] = sl.reactive([])
 
 def response_generator(messages):
-    response = client.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
+    response = client.chat.stream(model="open-mistral-7b", messages=messages, max_tokens=1024)
     for chunk in response:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
 
 def add_chunk_to_ai_message(chunk: str):
     messages.value = [
