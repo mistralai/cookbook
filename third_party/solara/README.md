@@ -98,7 +98,7 @@ We need to handle a streamed response. Therefore we create a task which will be 
 
 That's it! An interface where you can chat with Mistral's models. I added some optional styling below.
 
-To run this code, enter `solara run chat.py` in the console.
+To run this code, enter `solara run chat.py` in the console. Alternatively, you can modify it directly in [PyCafe](https://py.cafe/alonsosilvaallende/solara-mistral-ai-chat).
 
 <details>
 <summary><b>chat.py</b></summary>
