@@ -1,8 +1,8 @@
 import solara as sl
-from mistralai.client import MistralClient
+from mistralai import Mistral
 
 mistral_api_key = "your_api_key"
-client = MistralClient(api_key=mistral_api_key)
+client = Mistral(api_key=mistral_api_key)
 
 from typing import List
 from typing_extensions import TypedDict
@@ -14,9 +14,9 @@ class MessageDict(TypedDict):
 messages: sl.Reactive[List[MessageDict]] = sl.reactive([])
 
 def response_generator(messages):
-    response = client.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
+    response = client.chat.stream(model="open-mistral-7b", messages=messages, max_tokens=1024)
     for chunk in response:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
 
 def add_chunk_to_ai_message(chunk: str):
     messages.value = [

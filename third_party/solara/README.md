@@ -19,7 +19,7 @@ import solara as sl
 from mistralai import Mistral
 ```
 
-Create your `MistralClient` instance using your Mistral API key.
+Create your `client` using your Mistral API key.
 
 ```py
 mistral_api_key = "your_api_key"
@@ -174,7 +174,7 @@ This demo uses `PyPDF2===3.0.1` and `faiss-cpu===1.8.0`
 ```py
 import io
 import solara as sl
-from mistralai.client import MistralClient
+from mistralai import Mistral
 import numpy as np
 import PyPDF2
 import faiss
@@ -258,13 +258,13 @@ Finally, we edit `response_generator` to implement our new RAG with the files! T
 
 ```py
 def response_generator(messages: list, txt: List[str]):
-    response = client.chat_stream(
+    response = client.chat.stream(
         model = "open-mistral-7b",
         messages = messages[:-1] + [{"role":"user","content": rag_pdf(txt, messages[-1]["content"]) + "\n\n" + messages[-1]["content"]}],
         max_tokens = 1024
     )
     for chunk in response:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
 ```
 
 And everything is done! Now we can run our new interface with `solara run chat_with_pdfs.py`
@@ -275,7 +275,7 @@ And everything is done! Now we can run our new interface with `solara run chat_w
 ```py
 import io
 import solara as sl
-from mistralai.client import MistralClient
+from mistralai import Mistral
 import numpy as np
 import PyPDF2
 import faiss
@@ -285,7 +285,7 @@ from typing import List, cast
 from typing_extensions import TypedDict
 
 mistral_api_key = "your_api_key"
-client = MistralClient(api_key = mistral_api_key)
+client = Mistral(api_key=mistral_api_key)
 
 def get_text_embedding(input_text: str):
     embeddings_batch_response = client.embeddings(
@@ -318,7 +318,7 @@ class MessageDict(TypedDict):
 messages: sl.Reactive[List[MessageDict]] = sl.reactive([])
 
 def response_generator(messages: list, txt: List[str]):
-    response = client.chat_stream(
+    response = client.chat.stream(
         model = "open-mistral-7b", 
         messages = messages[:-1] + [{"role":"user","content": rag_pdf(txt, messages[-1]["content"]) + "\n\n" + messages[-1]["content"]}],
         max_tokens = 1024
@@ -337,12 +337,13 @@ def add_chunk_to_ai_message(chunk: str):
 
 @sl.component
 def Page():
+    txt = sl.use_reactive(cast(List[str], []))
     with sl.Sidebar():
 
         def on_file(files: List[FileInfo]):
             get_text([file["data"] for file in files])
 
-        @solara.task
+        @sl.lab.task
         def get_text(pdf_content):
             txt_all = []
             for _content in pdf_content:

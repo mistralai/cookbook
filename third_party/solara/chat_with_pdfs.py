@@ -1,6 +1,6 @@
 import io
 import solara as sl
-from mistralai.client import MistralClient
+from mistralai import Mistral
 import numpy as np
 import PyPDF2
 import faiss
@@ -10,7 +10,7 @@ from typing import List, cast
 from typing_extensions import TypedDict
 
 mistral_api_key = "your_api_key"
-client = MistralClient(api_key = mistral_api_key)
+client = Mistral(api_key=mistral_api_key)
 
 def get_text_embedding(input_text: str):
     embeddings_batch_response = client.embeddings(
@@ -43,7 +43,7 @@ class MessageDict(TypedDict):
 messages: sl.Reactive[List[MessageDict]] = sl.reactive([])
 
 def response_generator(messages: list, txt: List[str]):
-    response = client.chat_stream(
+    response = client.chat.stream(
         model = "open-mistral-7b", 
         messages = messages[:-1] + [{"role":"user","content": rag_pdf(txt, messages[-1]["content"]) + "\n\n" + messages[-1]["content"]}],
         max_tokens = 1024
@@ -62,16 +62,16 @@ def add_chunk_to_ai_message(chunk: str):
 
 @sl.component
 def Page():
+    txt = sl.use_reactive(cast(List[str], []))
     with sl.Sidebar():
-        content, set_content = sl.use_state(cast(List[bytes], []))
-        txt = sl.use_reactive(cast(List[str], []))
 
         def on_file(files: List[FileInfo]):
-            set_content([file["file_obj"].read() for file in files])
+            get_text([file["data"] for file in files])
 
-        def get_text():
+        @sl.lab.task
+        def get_text(pdf_content):
             txt_all = []
-            for _content in content:
+            for _content in pdf_content:
                 bytes_io = io.BytesIO(_content)
                 reader = PyPDF2.PdfReader(bytes_io)
                 txt_aux = ""
@@ -87,13 +87,10 @@ def Page():
             lazy=True,
         )
 
-        if content:
+        sl.ProgressLinear(get_text.pending)
+        if get_text.value:
             sl.Info("File(s) has been uploaded. Showing the beginning of the file(s)...")
-            result: Task[List[str]] = use_task(get_text, dependencies=[content])
-            if result.finished:
-                txt.value = result.value
-            sl.ProgressLinear(result.pending)
-            for text in txt.value:
+            for text in get_text.value:
                 sl.Markdown(f"{text[:100]}")
 
     user_message_count = len([m for m in messages.value if m["role"] == "user"])
