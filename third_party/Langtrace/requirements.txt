@@ -1,0 +1,8 @@
+mistralai
+langchain
+langchain-community
+chromadb
+python-dotenv
+langtrace-python-sdk
+pypdf
+
