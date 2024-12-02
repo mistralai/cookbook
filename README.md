@@ -28,7 +28,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [quickstart.ipynb](quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
 | [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb) | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
 | [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                 | RAG                          | RAG from scratch with Mistral AI API                                             |
-| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
+| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |                                           |
 | [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
 | [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
 | [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)     | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
@@ -82,6 +82,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                       | agent                  | LLamaIndex |
 | [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                          | RAG                    | Langchain  |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | UI chat, demo, RAG     | Streamlit  |
+| [Neo4j rag](third_party/Neo4j/neo4j_rag.ipynb)                                        |  RAG     | Neo4j  |
 | [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                  | LLamaIndex |
 | [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.md)                           | fine-tuning, evaluation | Weights & Biases |
 | [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                       | CLI, TUI APP, Chat     | x-cmd |
