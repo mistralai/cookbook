@@ -39,7 +39,8 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [image_description_extraction_pixtral.ipynb](mistral/image_processing/image_description_extraction_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
 | [multimodality meets function calling.ipynb](mistral/image_processing/multimodality_meets_function_calling.ipynb.ipynb) | image processing, function calling  | Extract table from image using Mistral's Pixtral model and use for function calling |
 | [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb) | RAG, function calling, references | Reference RAG with Mistral API |
-
+| [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb) | moderation | Quick exploration on safeguarding and Mistral's moderation API |
+| [system-level-guardrails.ipynb](mistral/moderation/system-level-guardrails.ipynb) | moderation | How to implement System Level Guardrails with Mistral API |
 
 
 
