@@ -28,7 +28,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [quickstart.ipynb](quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
 | [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb) | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
 | [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                 | RAG                          | RAG from scratch with Mistral AI API                                             |
-| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
+| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |                                           |
 | [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
 | [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
 | [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)     | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
@@ -38,6 +38,11 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb) | data generation | Simple data generation to refine news articles                                |
 | [image_description_extraction_pixtral.ipynb](mistral/image_processing/image_description_extraction_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
 | [multimodality meets function calling.ipynb](mistral/image_processing/multimodality_meets_function_calling.ipynb.ipynb) | image processing, function calling  | Extract table from image using Mistral's Pixtral model and use for function calling |
+| [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb) | RAG, function calling, references | Reference RAG with Mistral API |
+| [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb) | moderation | Quick exploration on safeguarding and Mistral's moderation API |
+| [system-level-guardrails.ipynb](mistral/moderation/system-level-guardrails.ipynb) | moderation | How to implement System Level Guardrails with Mistral API |
+
+
 
 ## Third Party Tools
 
@@ -62,6 +67,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                              | summarization, PDF     | Indexify   |
 | [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)          | code                   | Langchain  |
 | [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                              | RAG                    | Langchain  |
+| [langtrace_mistral.ipynb](third_party/langtrace/langtrace_mistral.ipynb)                                        | OTEL Observability     | Langtrace  |
 | [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                             | RAG, agent             | LLamaIndex |
 | [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)           | fine-tuning            | LLamaIndex |
 | [llamaindex_mistral_multi_modal.ipynb](third_party/LlamaIndex/llamaindex_mistral_multi_modal.ipynb)             | MultiModalLLM-Pixtral  | LLamaIndex |
@@ -77,7 +83,9 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                    | LLamaIndex |
 | [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                       | agent                  | LLamaIndex |
 | [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                          | RAG                    | Langchain  |
+| [Solara Integration - Chat with PDFs](third_party/solara/README.md)                                             | UI chat, demo, RAG     | Solara     |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | UI chat, demo, RAG     | Streamlit  |
+| [Neo4j rag](third_party/Neo4j/neo4j_rag.ipynb)                                        |  RAG     | Neo4j  |
 | [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                  | LLamaIndex |
 | [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.md)                           | fine-tuning, evaluation | Weights & Biases |
 | [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                       | CLI, TUI APP, Chat     | x-cmd |
