@@ -21,9 +21,9 @@ await userEntity.setupTrigger("gmail", "gmail_new_gmail_message", {
 toolset.client.triggers.subscribe(async (data) => {
   try {
     console.log("data received", data);
-    const from = data.originalPayload.payload.headers[16].value;
-    const message = data.originalPayload.snippet;
-    const id = data.originalPayload.threadId;
+    const from = data.payload.sender;
+    const message = data.payload.messageText;
+    const id = data.payload.threadId;
     executeAgent("default", { from, message, id });
   } catch (error) {
     console.log("Error: ", error);
@@ -36,7 +36,7 @@ async function executeAgent(entityName, { from, message, id }) {
     const entity = await toolset.client.getEntity(entityName);
 
     // Step 2: Get the action for replying to a new email
-    const tools = await toolset.getActions(
+    const tools = await toolset.getTools(
       { actions: ["gmail_reply_to_thread"] },
       entity.id
     );
