@@ -31,7 +31,7 @@ async function executeAgent(entityName) {
   const a = await setupUserConnection(entity.id);
 
   // Get the desired actions
-  const tools = await toolset.getActions(
+  const tools = await toolset.getTools(
     {
       actions: [
         "gmail_send_email",
