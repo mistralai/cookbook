@@ -14,7 +14,7 @@
   "dependencies": {
     "@langchain/core": "^0.2.23",
     "@langchain/mistralai": "^0.0.28",
-    "composio-core": "^0.1.12",
+    "composio-core": "^0.3.2",
     "dotenv": "^16.4.5"
   }
 }
