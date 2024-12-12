@@ -46,47 +46,48 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 ## Third Party Tools
 
-| Tools                                                                                                           | Category               | Party      |
-| :-------------------------------------------------------------------------------------------------------------- | :--------------------- | :--------- |
-| [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                  | RAG                    | Langchain  |
-| [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                 | RAG                    | LLamaIndex |
-| [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                 | agent                  | LLamaIndex |
-| [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                  | tracing data           | Arize Phoenix  |
-| [arize_phoenix_evaluate_rag.ipynb](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)                          | evaluation           | Arize Phoenix  |
-| [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                              | RAG, embeddings        | Azure      |
-| [CAMEL Graph RAG with Mistral Models](third_party/CAMEL_AI/camel_graph_rag.ipynb)                               | multi-agent, tool, data gen| CAMEL-AI.org|
-| [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                              | multi-agent, tool, data gen| CAMEL-AI.org|
-| [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                     | UI chat, tool calling  | Chainlit   |
-| [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                              | RAG                    | Langchain  |
-| [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)            | synthetic data         | Argilla    |
-| [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)                                    | tool, agent            | E2B        |
-| [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                 | tool call              | Ollama     |
-| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                              | UI chat, demo, RAG     | Gradio     |
-| [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)                             | RAG, embeddings        | Haystack   |
-| [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)                      | entity extraction, PDF | Indexify   |
-| [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                              | summarization, PDF     | Indexify   |
-| [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)          | code                   | Langchain  |
-| [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                              | RAG                    | Langchain  |
-| [langtrace_mistral.ipynb](third_party/langtrace/langtrace_mistral.ipynb)                                        | OTEL Observability     | Langtrace  |
-| [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                             | RAG, agent             | LLamaIndex |
-| [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)           | fine-tuning            | LLamaIndex |
-| [llamaindex_mistral_multi_modal.ipynb](third_party/LlamaIndex/llamaindex_mistral_multi_modal.ipynb)             | MultiModalLLM-Pixtral  | LLamaIndex |
-| [Microsoft Autogen - Function calling a pgsql db ](third_party/MS_Autogen_pgsql/mistral_pgsql_function_calling.ipynb) | Tool call, agent, RAG  | Ms Autogen |
-| [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                | UI chat, demo, RAG     | Mesop      |
-| [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                               | code                   | Neon       |
-| [ollama_mistral_llamaindex.ipynb](third_party/LlamaIndex/ollama_mistral_llamaindex.ipynb)                       | RAG                    | LLamaIndex |
-| [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup)                                                 | demo                   | Ollama     |
-| [Open-source LLM engineering](third_party/Langfuse)                                                             | LLM Observability      | Langfuse   |
-| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                | UI chat, demo, RAG     | Panel      |
-| [phospho integration](third_party/phospho/cookbook_phospho_mistral_integration.ipynb)                           | Evaluation, Analytics  | phospho    |
-| [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                   | RAG                    | Pinecone   |
-| [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                   | RAG                    | LLamaIndex |
-| [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                       | agent                  | LLamaIndex |
-| [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                          | RAG                    | Langchain  |
-| [Solara Integration - Chat with PDFs](third_party/solara/README.md)                                             | UI chat, demo, RAG     | Solara     |
-| [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                        | UI chat, demo, RAG     | Streamlit  |
-| [Neo4j rag](third_party/Neo4j/neo4j_rag.ipynb)                                        |  RAG     | Neo4j  |
-| [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                  | agent                  | LLamaIndex |
-| [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.md)                           | fine-tuning, evaluation | Weights & Biases |
-| [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                       | CLI, TUI APP, Chat     | x-cmd |
-| [Incremental Prompt Engineering and Model Comparison](third_party/Pixeltable/README.md)                         | Prompt Engineering, Evaluation| Pixeltable |
+| Tools                                                                                                                 | Category                        | Party      |
+|:----------------------------------------------------------------------------------------------------------------------|:--------------------------------| :--------- |
+| [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
+| [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                       | RAG                             | LLamaIndex |
+| [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                       | agent                           | LLamaIndex |
+| [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                        | tracing data                    | Arize Phoenix  |
+| [arize_phoenix_evaluate_rag.ipynb](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)                              | evaluation                      | Arize Phoenix  |
+| [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                                    | RAG, embeddings                 | Azure      |
+| [CAMEL Graph RAG with Mistral Models](third_party/CAMEL_AI/camel_graph_rag.ipynb)                                     | multi-agent, tool, data gen     | CAMEL-AI.org|
+| [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                                    | multi-agent, tool, data gen     | CAMEL-AI.org|
+| [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                           | UI chat, tool calling           | Chainlit   |
+| [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                                    | RAG                             | Langchain  |
+| [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)                  | synthetic data                  | Argilla    |
+| [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)                                          | tool, agent                     | E2B        |
+| [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                       | tool call                       | Ollama     |
+| [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                                    | UI chat, demo, RAG              | Gradio     |
+| [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)                                   | RAG, embeddings                 | Haystack   |
+| [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)                            | entity extraction, PDF          | Indexify   |
+| [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                                    | summarization, PDF              | Indexify   |
+| [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)                | code                            | Langchain  |
+| [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                                    | RAG                             | Langchain  |
+| [langtrace_mistral.ipynb](third_party/langtrace/langtrace_mistral.ipynb)                                              | OTEL Observability              | Langtrace  |
+| [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                                   | RAG, agent                      | LLamaIndex |
+| [llamaindex_arxiv_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_arxiv_agentic_rag.ipynb)                       | RAG, agent, Arxiv summarization | LLamaIndex |
+| [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)                 | fine-tuning                     | LLamaIndex |
+| [llamaindex_mistral_multi_modal.ipynb](third_party/LlamaIndex/llamaindex_mistral_multi_modal.ipynb)                   | MultiModalLLM-Pixtral           | LLamaIndex |
+| [Microsoft Autogen - Function calling a pgsql db ](third_party/MS_Autogen_pgsql/mistral_pgsql_function_calling.ipynb) | Tool call, agent, RAG           | Ms Autogen |
+| [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                      | UI chat, demo, RAG              | Mesop      |
+| [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                                     | code                            | Neon       |
+| [ollama_mistral_llamaindex.ipynb](third_party/LlamaIndex/ollama_mistral_llamaindex.ipynb)                             | RAG                             | LLamaIndex |
+| [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup)                                                       | demo                            | Ollama     |
+| [Open-source LLM engineering](third_party/Langfuse)                                                                   | LLM Observability               | Langfuse   |
+| [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                      | UI chat, demo, RAG              | Panel      |
+| [phospho integration](third_party/phospho/cookbook_phospho_mistral_integration.ipynb)                                 | Evaluation, Analytics           | phospho    |
+| [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                         | RAG                             | Pinecone   |
+| [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                         | RAG                             | LLamaIndex |
+| [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                             | agent                           | LLamaIndex |
+| [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                                | RAG                             | Langchain  |
+| [Solara Integration - Chat with PDFs](third_party/solara/README.md)                                                   | UI chat, demo, RAG              | Solara     |
+| [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                              | UI chat, demo, RAG              | Streamlit  |
+| [Neo4j rag](third_party/Neo4j/neo4j_rag.ipynb)                                                                        | RAG                             | Neo4j  |
+| [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                        | agent                           | LLamaIndex |
+| [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.md)                                 | fine-tuning, evaluation         | Weights & Biases |
+| [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                             | CLI, TUI APP, Chat              | x-cmd |
+| [Incremental Prompt Engineering and Model Comparison](third_party/Pixeltable/README.md)                               | Prompt Engineering, Evaluation  | Pixeltable |
