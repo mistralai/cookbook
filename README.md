@@ -82,3 +82,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.md)                           | fine-tuning, evaluation | Weights & Biases |
 | [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                       | CLI, TUI APP, Chat     | x-cmd |
 | [Incremental Prompt Engineering and Model Comparison](third_party/Pixeltable/README.md)                         | Prompt Engineering, Evaluation| Pixeltable |
+| [Build a bank support agent with Pydantic AI and Mistral AI](third_party/PydanticAI/pydantic_bank_support_agent.ipynb)| Agent| Pydantic |
