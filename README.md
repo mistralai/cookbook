@@ -93,3 +93,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                             | CLI, TUI APP, Chat              | x-cmd |
 | [Incremental Prompt Engineering and Model Comparison](third_party/Pixeltable/README.md)                               | Prompt Engineering, Evaluation  | Pixeltable |
 | [Build a bank support agent with Pydantic AI and Mistral AI](third_party/PydanticAI/pydantic_bank_support_agent.ipynb)| Agent                           | Pydantic   |
+| [Analyzing Reddit Comments Sentiment using MistralAI and LangGraph](third_party/langchain/reddit_comments_sentiment_agent_mistral.ipynb)| Agent, Structured Output, Graph | Langchain   |
