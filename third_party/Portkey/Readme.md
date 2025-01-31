@@ -79,6 +79,6 @@ print(completion.choices[0].message.content)
 
 ## Support
 
-- [Portkey AI Mistral Documentation](https://docs.portkey.ai/integrations/llms/mistral-ai)
+- [Portkey AI Mistral Documentation](https://portkey.sh/mistral)
 - [Portkey Wesbite](https://portkey.ai/)
 - [Join Portkey Discord](https://discord.gg/SqX9epQKNR)
