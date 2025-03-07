@@ -121,7 +121,7 @@ def get_content_type(url):
 
 ### Perform OCR on File
 
-To perform OCR on local PDF files, it is required to upload them first to the Platform and get a signed URL that will be used for OCR tasks.
+To perform OCR on local PDF files, it is required to upload them first to the Platforme and get a signed URL that will be used for OCR tasks.
 
 ```python
 def perform_ocr_file(file, ocr_method="Mistral OCR"):
@@ -159,7 +159,7 @@ def perform_ocr_file(file, ocr_method="Mistral OCR"):
         combined_markdown, raw_markdown = get_combined_markdown(ocr_response)
         return combined_markdown, raw_markdown
 
-    return "", ""
+    return "## Method not supported.", "Method not supported."
 ```
 
 ### Perform OCR on URL
