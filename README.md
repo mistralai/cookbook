@@ -39,6 +39,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide        |
 | [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb) | data generation | Simple data generation to refine news articles                                |
 | [image_description_extraction_pixtral.ipynb](mistral/image_understanding/image_description_extraction_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
+| [catalog_enrichment.ipynb](mistral/data_generation/catalog_enrichment.ipynb) | image understanding, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
 | [multimodality meets function calling.ipynb](mistral/image_understanding/multimodality_meets_function_calling.ipynb) | image processing, function calling  | Extract table from image using Mistral's Pixtral model and use for function calling |
 | [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb) | RAG, function calling, references | Reference RAG with Mistral API |
 | [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb) | moderation | Quick exploration on safeguarding and Mistral's moderation API |
