@@ -47,6 +47,9 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
 | [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
+| [product_classification.ipynb](mistral/classifier_factory/product_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for food classification. |
+| [intent_classification.ipynb](mistral/classifier_factory/intent_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for intent classification. |
+| [moderation_classifier.ipynb](mistral/classifier_factory/moderation_classifier.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for moderation. |
 
 
 
