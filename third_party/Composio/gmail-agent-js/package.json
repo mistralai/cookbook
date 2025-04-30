@@ -1,0 +1,20 @@
+{
+  "name": "gmail-agent",
+  "version": "1.0.0",
+  "main": "email-send-example.js",
+  "scripts": {
+    "start": "node email-send-example.js",
+    "trigger": "node trigger-example.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "description": "",
+  "dependencies": {
+    "@langchain/core": "^0.2.23",
+    "@langchain/mistralai": "^0.0.28",
+    "composio-core": "^0.3.2",
+    "dotenv": "^16.4.5"
+  }
+}
