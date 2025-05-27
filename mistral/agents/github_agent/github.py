@@ -27,7 +27,7 @@ client = Mistral(api_key=api_key)
 
 MCP_TOOLS=[]
 messages=[]
-github_agent = client.agents.create(
+github_agent = client.beta.agents.create(
         model=MODEL,
         name="github agent",
         instructions="You are able to handle issues and request on a github repository.You can use your tools to help with the task",
@@ -121,7 +121,7 @@ async def on_message(message: cl.Message):
 
                 
             inputs_messages=format_messages(messages)
-            response = await client.conversations.run_async(
+            response = await client.beta.conversations.run_async(
                 run_ctx=run_ctx,
                 inputs=inputs_messages,
             )
