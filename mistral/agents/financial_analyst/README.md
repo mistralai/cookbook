@@ -29,7 +29,7 @@ A financial analysis application that uses MistralAI agents API with MCP servers
 ## Installation
 
 ```bash
-pip install chainlit yfinance mcp mistralai-private loguru
+pip install chainlit yfinance mcp mistralai loguru griffe
 ```
 
 ## Environment Setup
