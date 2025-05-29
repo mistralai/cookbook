@@ -14,9 +14,7 @@ MODEL = "mistral-medium-latest"
 server_to_tool_map = {
     "get_current_stock_price": "Yahoo Finance Server",
     "get_historical_stock_prices": "Yahoo Finance Server",
-    "get_income_statements": "Yahoo Finance Server",
     "get_analyst_recommendations": "Yahoo Finance Server",
-    "get_company_news": "Yahoo Finance Server",
     "generate_report_content": "Report Generation Server",
     "save_report": "Save Report Server",
 }
