@@ -79,7 +79,7 @@ async def on_message(message: cl.Message):
         async with RunContext(
         agent_id=github_agent.id,
     ) as run_ctx:
-            messages = cl.user_session.get("messages")
+            messages = cl.user_session.get("messages", [])  # Add default [] to avoid None error
             messages.append(message)
             cl.user_session.set("messages", messages)
             
