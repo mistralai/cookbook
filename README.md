@@ -81,6 +81,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [llamaindex_arxiv_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_arxiv_agentic_rag.ipynb)                       | RAG, agent, Arxiv summarization | LLamaIndex |
 | [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)                 | fine-tuning                     | LLamaIndex |
 | [llamaindex_mistral_multi_modal.ipynb](third_party/LlamaIndex/llamaindex_mistral_multi_modal.ipynb)                   | MultiModalLLM-Pixtral           | LLamaIndex |
+| [Maxim AI - Observability ](third_party/Maxim/cookbook_maxim_mistral_integration.ipynb) | Observability, Evaluation           | Maxim AI |
 | [Microsoft Autogen - Function calling a pgsql db ](third_party/MS_Autogen_pgsql/mistral_pgsql_function_calling.ipynb) | Tool call, agent, RAG           | Ms Autogen |
 | [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                      | UI chat, demo, RAG              | Mesop      |
 | [Monitoring Mistral AI using OpenTelemetry](third_party/openlit/cookbook_mistral_opentelemetry.ipynb)                 | AI Observability                | OpenLIT    |
