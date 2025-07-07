@@ -1,4 +1,4 @@
-# Semantic search in Rust using SurrealDB and Mistral AI
+# Semantic search in Rust using SurrealDB
 
 This post demonstrates how to use the Rust SDK to store Mistral AI embeddings as [SurrealDB vectors](https:www.surrealdb.com/docs/surrealdb/reference-guide/vector-search), which can then be queried natively in SurrealQL to perform semantic search.
 
