@@ -47,6 +47,10 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
 | [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
+| [product_classification.ipynb](mistral/classifier_factory/product_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for food classification. |
+| [intent_classification.ipynb](mistral/classifier_factory/intent_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for intent classification. |
+| [moderation_classifier.ipynb](mistral/classifier_factory/moderation_classifier.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for moderation. |
+| [pixtral_finetune_on_satellite_data.ipynb](mistral/fine_tune/pixtral_finetune_on_satellite_data.ipynb) | fine-tuning, image processing, batch | Fine-tuning a Pixtral-12B for satellite images classification. |
 
 
 
@@ -78,6 +82,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [llamaindex_arxiv_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_arxiv_agentic_rag.ipynb)                       | RAG, agent, Arxiv summarization | LLamaIndex |
 | [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)                 | fine-tuning                     | LLamaIndex |
 | [llamaindex_mistral_multi_modal.ipynb](third_party/LlamaIndex/llamaindex_mistral_multi_modal.ipynb)                   | MultiModalLLM-Pixtral           | LLamaIndex |
+| [Maxim AI - Observability ](third_party/Maxim/cookbook_maxim_mistral_integration.ipynb) | Observability, Evaluation           | Maxim AI |
 | [Microsoft Autogen - Function calling a pgsql db ](third_party/MS_Autogen_pgsql/mistral_pgsql_function_calling.ipynb) | Tool call, agent, RAG           | Ms Autogen |
 | [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                      | UI chat, demo, RAG              | Mesop      |
 | [Monitoring Mistral AI using OpenTelemetry](third_party/openlit/cookbook_mistral_opentelemetry.ipynb)                 | AI Observability                | OpenLIT    |
@@ -101,3 +106,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Build a bank support agent with Pydantic AI and Mistral AI](third_party/PydanticAI/pydantic_bank_support_agent.ipynb)| Agent                           | Pydantic   |
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
+| [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision

@@ -1,0 +1,432 @@
+Name,Code
+Two Sum,"def function(nums, target):
+    for i in range(len(nums)):
+        for j in range(i + 1, len(nums)):
+            if nums[i] + nums[j] == target:
+                return [i, j]
+    return []"
+Two Sum,"def function(nums, target):
+    num_dict = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in num_dict:
+            return [num_dict[complement], i]
+        num_dict[num] = i
+    return []"
+Two Sum,"def function(nums, target):
+    nums_sorted = sorted(enumerate(nums), key=lambda x: x[1])
+    left, right = 0, len(nums) - 1
+    while left < right:
+        current_sum = nums_sorted[left][1] + nums_sorted[right][1]
+        if current_sum == target:
+            return [nums_sorted[left][0], nums_sorted[right][0]]
+        elif current_sum < target:
+            left += 1
+        else:
+            right -= 1
+    return []"
+Two Sum,"def function(nums, target):
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in nums[i + 1:]:
+            return [i, nums[i + 1:].index(complement) + i + 1]
+    return []"
+Two Sum,"def function(nums, target):
+    seen = set()
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [nums.index(complement), i]
+        seen.add(num)
+    return []"
+FizzBuzz,"def function(n):
+    for i in range(1, n + 1):
+        if i % 15 == 0:
+            print('FizzBuzz')
+        elif i % 3 == 0:
+            print('Fizz')
+        elif i % 5 == 0:
+            print('Buzz')
+        else:
+            print(i)"
+FizzBuzz,"def function(n):
+    return ['FizzBuzz' if i % 15 == 0 else 'Fizz' if i % 3 == 0 else 'Buzz' if i % 5 == 0 else str(i) for i in range(1, n + 1)]"
+FizzBuzz,"def function(n):
+    result = []
+    rules = {3: 'Fizz', 5: 'Buzz'}
+    for i in range(1, n + 1):
+        output = ''
+        for key, value in rules.items():
+            if i % key == 0:
+                output += value
+        result.append(output or str(i))
+    return result"
+FizzBuzz,"def function(n):
+    result = []
+    for i in range(1, n + 1):
+        output = ''
+        if i % 3 == 0:
+            output += 'Fizz'
+        if i % 5 == 0:
+            output += 'Buzz'
+        result.append(output or str(i))
+    return result"
+FizzBuzz,"def function(n):
+    def get_fizzbuzz_value(i):
+        if i % 15 == 0:
+            return 'FizzBuzz'
+        elif i % 3 == 0:
+            return 'Fizz'
+        elif i % 5 == 0:
+            return 'Buzz'
+        else:
+            return str(i)
+    return [get_fizzbuzz_value(i) for i in range(1, n + 1)]"
+Beam Search,"def function(model, start_token, end_token, beam_width, max_length):
+    beams = [(tuple(), 1.0)]
+    for _ in range(max_length):
+        candidates = []
+        for seq, score in beams:
+            if seq and seq[-1] == end_token:
+                candidates.append((seq, score))
+                continue
+            last_token = seq[-1] if seq else start_token
+            for token, log_prob in model.predict(last_token):
+                candidate_seq = seq + (token,)
+                candidate_score = score * log_prob
+                candidates.append((candidate_seq, candidate_score))
+        beams = sorted(candidates, key=lambda x: x[1], reverse=True)[:beam_width]
+        if all(seq[-1] == end_token for seq, _ in beams):
+            break
+    return beams[0][0]"
+Beam Search,"def function(model, start_token, end_token, beam_width, max_length, alpha=0.7):
+    beams = [(tuple(), 1.0)]
+    for step in range(max_length):
+        candidates = []
+        for seq, score in beams:
+            if seq and seq[-1] == end_token:
+                length = len(seq)
+                normalized_score = score / (length ** alpha)
+                candidates.append((seq, normalized_score))
+                continue
+            last_token = seq[-1] if seq else start_token
+            for token, log_prob in model.predict(last_token):
+                candidate_seq = seq + (token,)
+                candidate_score = score * log_prob
+                candidates.append((candidate_seq, candidate_score))
+        beams = sorted(candidates, key=lambda x: x[1], reverse=True)[:beam_width]
+        if all(seq[-1] == end_token for seq, _ in beams):
+            break
+    return max(beams, key=lambda x: x[1])[0]"
+Beam Search,"def function(model, start_token, end_token, beam_width, max_length, prune_factor=0.5):
+    beams = [(tuple(), 1.0)]
+    for _ in range(max_length):
+        candidates = []
+        for seq, score in beams:
+            if seq and seq[-1] == end_token:
+                candidates.append((seq, score))
+                continue
+            last_token = seq[-1] if seq else start_token
+            for token, log_prob in model.predict(last_token):
+                candidate_seq = seq + (token,)
+                candidate_score = score * log_prob
+                candidates.append((candidate_seq, candidate_score))
+        candidates = sorted(candidates, key=lambda x: x[1], reverse=True)
+        beams = candidates[:int(beam_width * prune_factor)]
+        if all(seq[-1] == end_token for seq, _ in beams):
+            break
+    return beams[0][0]"
+Tower of Hanoi,"def function(n, source, target, auxiliary):
+    if n > 0:
+        function(n - 1, source, auxiliary, target)
+        print(f'Move disk {n} from {source} to {target}')
+        function(n - 1, auxiliary, target, source)"
+Tower of Hanoi,"def function(n, source, target, auxiliary):
+    stack = []
+    stack.append((n, source, target, auxiliary, False))
+    while stack:
+        num, src, tgt, aux, flag = stack.pop()
+        if num > 0:
+            if not flag:
+                stack.append((num, src, tgt, aux, True))
+                stack.append((num - 1, src, aux, tgt, False))
+            else:
+                print(f'Move disk {num} from {src} to {tgt}')
+                stack.append((num - 1, aux, tgt, src, False))"
+Tower of Hanoi,"def function(n, source, target, auxiliary):
+    moves = []
+    def hanoi(n, source, target, auxiliary):
+        if n > 0:
+            hanoi(n - 1, source, auxiliary, target)
+            moves.append((n, source, target))
+            hanoi(n - 1, auxiliary, target, source)
+    hanoi(n, source, target, auxiliary)
+    for move in moves:
+        print(f'Move disk {move[0]} from {move[1]} to {move[2]}')"
+Tower of Hanoi,"def function(n, source, target, auxiliary):
+    class Stack:
+        def __init__(self):
+            self.items = []
+        def push(self, item):
+            self.items.append(item)
+        def pop(self):
+            return self.items.pop()
+        def is_empty(self):
+            return len(self.items) == 0
+    stack = Stack()
+    stack.push((n, source, target, auxiliary, False))
+    while not stack.is_empty():
+        num, src, tgt, aux, flag = stack.pop()
+        if num > 0:
+            if not flag:
+                stack.push((num, src, tgt, aux, True))
+                stack.push((num - 1, src, aux, tgt, False))
+            else:
+                print(f'Move disk {num} from {src} to {tgt}')
+                stack.push((num - 1, aux, tgt, src, False))"
+Knapsack,"def function(values, weights, capacity, n):
+    if n == 0 or capacity == 0:
+        return 0
+    if weights[n - 1] > capacity:
+        return function(values, weights, capacity, n - 1)
+    else:
+        return max(
+            values[n - 1] + function(values, weights, capacity - weights[n - 1], n - 1),
+            function(values, weights, capacity, n - 1)
+        )"
+Knapsack,"def function(values, weights, capacity):
+    n = len(values)
+    dp = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
+    for i in range(n + 1):
+        for w in range(capacity + 1):
+            if i == 0 or w == 0:
+                dp[i][w] = 0
+            elif weights[i - 1] <= w:
+                dp[i][w] = max(values[i - 1] + dp[i - 1][w - weights[i - 1]], dp[i - 1][w])
+            else:
+                dp[i][w] = dp[i - 1][w]
+    return dp[n][capacity]"
+Knapsack,"def function(values, weights, capacity):
+    n = len(values)
+    memo = [[-1 for _ in range(capacity + 1)] for _ in range(n + 1)]
+    def knapSackMemo(n, capacity):
+        if n == 0 or capacity == 0:
+            return 0
+        if memo[n][capacity] != -1:
+            return memo[n][capacity]
+        if weights[n - 1] > capacity:
+            memo[n][capacity] = knapSackMemo(n - 1, capacity)
+            return memo[n][capacity]
+        else:
+            memo[n][capacity] = max(
+                values[n - 1] + knapSackMemo(n - 1, capacity - weights[n - 1]),
+                knapSackMemo(n - 1, capacity)
+            )
+            return memo[n][capacity]
+    return knapSackMemo(n, capacity)"
+Knapsack,"def function(values, weights, capacity):
+    items = list(zip(values, weights))
+    items.sort(key=lambda x: x[0] / x[1], reverse=True)
+    total_value = 0
+    for value, weight in items:
+        if capacity >= weight:
+            total_value += value
+            capacity -= weight
+        else:
+            fraction = capacity / weight
+            total_value += value * fraction
+            break
+    return total_value"
+Binary Search,"def function(arr, low, high, target):
+    if high >= low:
+        mid = (high + low) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] > target:
+            return function(arr, low, mid - 1, target)
+        else:
+            return function(arr, mid + 1, high, target)
+    else:
+        return -1"
+Binary Search,"def function(arr, target):
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = (high + low) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1"
+Binary Search,"def function(arr, target):
+    import bisect
+    index = bisect.bisect_left(arr, target)
+    if index != len(arr) and arr[index] == target:
+        return index
+    return -1"
+Binary Search,"def function(arr, target, comparator):
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = (high + low) // 2
+        comparison = comparator(arr[mid], target)
+        if comparison == 0:
+            return mid
+        elif comparison < 0:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1"
+Quick Sort,"def function(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return function(left) + middle + function(right)"
+Quick Sort,"def function(arr, low, high):
+    if low < high:
+        pi = partition(arr, low, high)
+        function(arr, low, pi - 1)
+        function(arr, pi + 1, high)
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1"
+Quick Sort,"def function(arr, low, high):
+    while low < high:
+        if high - low < 10:
+            insertion_sort(arr, low, high)
+            break
+        else:
+            pi = partition(arr, low, high)
+            if pi - low < high - pi:
+                function(arr, low, pi - 1)
+                low = pi + 1
+            else:
+                function(arr, pi + 1, high)
+                high = pi - 1
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+def insertion_sort(arr, low, high):
+    for i in range(low + 1, high + 1):
+        key = arr[i]
+        j = i - 1
+        while j >= low and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key"
+Quick Sort,"def function(arr, low, high):
+    if low < high:
+        pi = random_partition(arr, low, high)
+        function(arr, low, pi - 1)
+        function(arr, pi + 1, high)
+def random_partition(arr, low, high):
+    import random
+    pivot_index = random.randint(low, high)
+    arr[pivot_index], arr[high] = arr[high], arr[pivot_index]
+    return partition(arr, low, high)
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1"
+BFS,"from collections import deque
+def function(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    while queue:
+        vertex = queue.popleft()
+        print(vertex, end=' ')
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)"
+BFS,"from collections import deque
+def function(graph, start):
+    visited = {start: [start]}
+    queue = deque([start])
+    while queue:
+        vertex = queue.popleft()
+        print(f'Path to {vertex}: {visited[vertex]}')
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited[neighbor] = visited[vertex] + [neighbor]
+                queue.append(neighbor)"
+BFS,"from collections import deque
+def function(graph, start):
+    visited = {start: 0}
+    queue = deque([start])
+    while queue:
+        vertex = queue.popleft()
+        print(f'Vertex {vertex} is at distance {visited[vertex]}')
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited[neighbor] = visited[vertex] + 1
+                queue.append(neighbor)"
+BFS,"from collections import deque
+def function(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    while queue:
+        vertex = queue.popleft()
+        print(vertex, end=' ')
+        for neighbor in range(len(graph)):
+            if graph[vertex][neighbor] == 1 and neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)"
+DFS,"def function(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    print(start, end=' ')
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            function(graph, neighbor, visited)"
+DFS,"def function(graph, start):
+    visited = set()
+    stack = [start]
+    while stack:
+        vertex = stack.pop()
+        if vertex not in visited:
+            print(vertex, end=' ')
+            visited.add(vertex)
+            stack.extend(reversed(graph[vertex]))"
+DFS,"def function(graph, start):
+    visited = {}
+    stack = [(start, [start])]
+    while stack:
+        vertex, path = stack.pop()
+        if vertex not in visited:
+            visited[vertex] = path
+            print(f'Path to {vertex}: {path}')
+            for neighbor in reversed(graph[vertex]):
+                if neighbor not in visited:
+                    stack.append((neighbor, path + [neighbor]))"
+DFS,"def function(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    print(start, end=' ')
+    for neighbor in range(len(graph)):
+        if graph[start][neighbor] == 1 and neighbor not in visited:
+            function(graph, neighbor, visited)"

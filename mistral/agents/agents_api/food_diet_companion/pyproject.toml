@@ -1,0 +1,26 @@
+[project]
+name = "food-diet-companion"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "chainlit>=2.5.5",
+    "ipykernel>=6.29.5",
+    "loguru",
+    "mistralai>=1.7.0",
+    "mistralai-private==1.3.8rc71",
+    "python-dotenv>=1.1.0",
+    "tavily-python>=0.7.2",
+    "streamlit>=1.44.1",
+]
+
+[[tool.uv.index]]
+name = "mistralai"
+url = "https://2kUrwd-RY03seHskbjvagCk3bmdnwsM3U@pypi.fury.io/mistralai/"
+
+[tool.uv.sources]
+mistralai-private = { index = "mistralai" }
+
+[tool.uv.workspace]
+members = ["food_diet_companion"]
