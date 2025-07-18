@@ -38,7 +38,6 @@ A powerful AI-powered food diet companion built with Mistral's agent SDK that he
 - Python 3.10 or higher
 - API Keys:
   - [Mistral AI API key](https://mistral.ai/api-key)
-  - Mistral Agents private access key (Available in Bitwarden)
 
 ## Installation
 

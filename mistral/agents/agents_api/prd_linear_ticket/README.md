@@ -28,7 +28,7 @@ Application that generates Product Requirements Documents (PDF) from transcript 
 ## Installation
 
 ```bash
-pip install chainlit mcp mistralai-private loguru pydantic gql
+pip install chainlit mcp loguru pydantic gql
 ```
 
 ## Environment Setup

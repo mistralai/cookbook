@@ -36,7 +36,7 @@ A powerful AI-powered travel assistant built with Mistral's agent SDK that helps
 - API Keys:
   - [Mistral AI API key](https://mistral.ai/api-key)
   - [SerpAPI key](https://serpapi.com/dashboard) (Free plan available)
-  - Mistral Agents private access key (Available in Bitwarden)
+
 
 ## Installation
 
