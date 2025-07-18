@@ -9,7 +9,7 @@ dependencies = [
     "google-search-results>=2.4.2",
     "ipykernel>=6.29.5",
     "loguru",
-    "mistralai>=1.7.0",
+    "mistralai>=1.9.2",
     "python-dotenv>=1.1.0",
     "sqlalchemy>=2.0.40",
     "streamlit>=1.44.1",
