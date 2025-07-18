@@ -3,7 +3,7 @@ import chainlit as cl
 from dotenv import load_dotenv
 from mistralai import (
     Mistral,
-    ReferenceChunk,
+    ToolReferenceChunk,
     FunctionResultEntry,
     MessageOutputEvent,
     AgentHandoffDoneEvent,
