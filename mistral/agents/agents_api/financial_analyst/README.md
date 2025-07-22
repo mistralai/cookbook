@@ -1,8 +1,8 @@
 # Financial Analyst with MistralAI Agents API and MCP
 
-![Financial Analyst Demo](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/gifs/gif/financial_analyst.gif)
-
 A financial analysis application that uses MistralAI agents API with MCP servers for stock analysis and report generation.
+
+![Financial Analyst Demo](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/gifs/gif/financial_analyst.gif)
 
 ## Use Case
 
