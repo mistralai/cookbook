@@ -2,6 +2,7 @@
 
 A powerful AI-powered travel assistant built with Mistral's agent SDK that helps users plan their trips, book accommodations, and manage their travel needs.
 
+![Travel Assistant](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Travel_assistant.gif)
 
 ## Architecture
 
