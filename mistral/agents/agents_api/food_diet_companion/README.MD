@@ -2,6 +2,8 @@
 
 A powerful AI-powered food diet companion built with Mistral's agent SDK that helps users with goal setting, logging the food, food recommendations, daily progress, and restaurant recommendations based on their daily diet goals.
 
+![Food Diet Companion](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Nutrition_demo.gif)
+
 ## Features
 
 - 🍽️ **Diet Goal Setting**: Set and update your daily diet goals throughout the day.
