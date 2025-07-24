@@ -4,8 +4,6 @@ An intelligent multi-agent system that processes your queries into sophisticated
 
 ![Architecture Diagram](../assets/solution_architecture.png)
 
-![Demo GIF](../assets/demo.gif)
-
 ## 🎯 What It Does
 
 Ask questions in plain English → Get analysis/ Report + automated CRM updates(Optional)
@@ -15,6 +13,12 @@ Ask questions in plain English → Get analysis/ Report + automated CRM updates(
 - Calculates priority scores  
 - Updates HubSpot records in batches
 - Provides executive summary
+
+## Quick Demo:
+
+![Demo GIF](../assets/demo.gif)
+
+*Watch the dynamic multi-agent system process a query in real-time*
 
 ## 🏗️ Architecture
 
