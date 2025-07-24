@@ -17,7 +17,7 @@ In this deep dive, we will dig into 3 versions of our tokenizer:
 | [Basics](basics.md)               | Basics of tokenization. |
 | [Boundaries & Token Healing](boundaries.md)               | Main problems with tokenization and token healing. |
 | [Control Tokens](control_tokens.md)               | Introduction to Control Tokens and their advantages. |
-| [Templates](templates.md)               | A summarized list of all our tokenizers with their chat templates.           |
+| [Templates](templates.md)               | A summarized list of our tokenizers with their chat templates.           |
 | [Tokenizer](tokenizer.md)          | Make your own tokenizer with sentencepiece.                             |
 | [Tool Calling](tool_calling.md)          | Learn about how tokenization for our tool calling works.                            |
 |          |                            |
