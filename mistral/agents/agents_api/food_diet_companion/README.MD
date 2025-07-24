@@ -1,4 +1,4 @@
-# NutriSense
+# Build NutriSense - An AI-powered food diet companion
 
 A powerful AI-powered food diet companion built with Mistral's agent SDK that helps users with goal setting, logging the food, food recommendations, daily progress, and restaurant recommendations based on their daily diet goals.
 
