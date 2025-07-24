@@ -16,9 +16,9 @@ Ask questions in plain English → Get analysis/ Report + automated CRM updates(
 
 ## Quick Demo:
 
-![Demo GIF](../assets/demo.gif)
-
 *Watch the dynamic multi-agent system process a query in real-time*
+
+![Demo GIF](../assets/demo.gif)
 
 ## 🏗️ Architecture
 
