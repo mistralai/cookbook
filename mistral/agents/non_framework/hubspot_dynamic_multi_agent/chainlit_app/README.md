@@ -2,7 +2,9 @@
 
 An intelligent multi-agent system that processes your queries into sophisticated CRM operations by dynamically creating specialized agents on-the-fly, demonstrating the power of Magistral reasoning combined with HubSpot integration to automatically understand complex business queries.
 
-![Architecture Diagram](../solution_architecture.png)
+![Architecture Diagram](../assets/solution_architecture.png)
+
+![Demo GIF](../assets/demo.gif)
 
 ## 🎯 What It Does
 
