@@ -4,7 +4,7 @@ Tokenization is a crucial concept around LLMs, and it can be more complex than o
 
 For our tokenization implementation, please refer to [mistral-common](https://github.com/mistralai/mistral-common).
 
-We currently have 3 main versions of our tokenizer:
+In this deep dive, we will dig into 3 versions of our tokenizer:
 - V1: The tokenizer behind our very first models.
 - V2: Introducing control tokens and function calling!
 - V3: Better function calling implementation.
