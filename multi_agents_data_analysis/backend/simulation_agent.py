@@ -11,18 +11,18 @@ import pandas as pd
 import sqlite3
 from mistralai import Mistral
 
-# Canadian market rates (realistic for RBC demo)
+# Mock market rates
 MARKET_RATES = {
-    "deposit_rate": 4.25,  # 4.25% - Canadian avg savings rate
-    "overdraft_rate": 19.5,  # 19.5% - Canadian avg overdraft rate
-    "prime_rate": 6.45,  # 6.45% - Bank of Canada rate context
-    "mortgage_rate": 5.25,  # 5.25% - Canadian mortgage benchmark
+    "deposit_rate": 4.25,  # 4.25% - avg savings rate
+    "overdraft_rate": 19.5,  # 19.5% - avg overdraft rate
+    "prime_rate": 6.45,  # 6.45% - rate context
+    "mortgage_rate": 5.25,  # 5.25% - mortgage benchmark
 }
 
 SIMULATION_PROMPT = f"""
-You are a banking simulation agent for RBC (Royal Bank of Canada). You have access to account data and market intelligence.
+You are a banking simulation agent. You have access to account data and market intelligence.
 
-MARKET CONTEXT (Canadian Banking):
+MARKET CONTEXT (Banking):
 - Average deposit rate: {MARKET_RATES["deposit_rate"]}%
 - Average overdraft rate: {MARKET_RATES["overdraft_rate"]}%
 - Prime rate: {MARKET_RATES["prime_rate"]}%
