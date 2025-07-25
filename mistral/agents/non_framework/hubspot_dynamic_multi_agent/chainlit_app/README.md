@@ -31,7 +31,7 @@ Ask questions in plain English → Get analysis/ Report + automated CRM updates(
 
 ### Requirements
 ```bash
-pip install chainlit mistralai hubspot-api-client
+pip install chainlit=="2.6.2" hubspot-api-client=="12.0.0" mistralai=="1.9.3"
 ```
 
 ### Setup
