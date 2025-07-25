@@ -39,8 +39,8 @@ pip install uv
 1. Clone the repo:
 
 ```python
-git clone mistralai/cookbook
-cd mistral/agents/non_framework/hubspot_dynamic_multi_agent
+git clone https://github.com/mistralai/cookbook.git
+cd cookbook/mistral/agents/non_framework/hubspot_dynamic_multi_agent
 uv sync
 ```
 
