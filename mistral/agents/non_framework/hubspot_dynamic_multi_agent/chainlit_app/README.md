@@ -31,23 +31,32 @@ Ask questions in plain English → Get analysis/ Report + automated CRM updates(
 
 ### Requirements
 ```bash
-pip install chainlit=="2.6.2" hubspot-api-client=="12.0.0" mistralai=="1.9.3"
+# Install uv (if not already installed)
+pip install uv
 ```
 
 ### Setup
-1. Get API keys:
+1. Clone the repo:
+
+```python
+git clone mistralai/cookbook
+cd mistral/agents/non_framework/hubspot_dynamic_multi_agent
+uv sync
+```
+
+2. Get API keys:
    - [HubSpot API Key](https://developers.hubspot.com/docs/guides/api/overview) 
    - [Mistral API Key](https://console.mistral.ai/api-keys)
 
-2. Set environment variables:
+3. Set environment variables:
 ```bash
 export HUBSPOT_API_KEY="your_hubspot_key"
 export MISTRAL_API_KEY="your_mistral_key"
 ```
 
-3. Run the app:
+4. Run the app:
 ```bash
-chainlit run app.py
+uv run chainlit run app.py
 ```
 
 ## 💡 Example Query
