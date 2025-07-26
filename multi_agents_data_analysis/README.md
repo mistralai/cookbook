@@ -23,8 +23,8 @@ Desired Status
 
 - [Installation](#-installation)
 - [Usage](#-usage)
+- [Demos](#-demos)
 - [Architecture](#-architecture)
-- [Examples](#-examples)
 - [Roadmap](#-roadmap)
 
 ## 🛠️ Installation
@@ -78,19 +78,15 @@ Desired Status
 
 Type "Show workflow" to see the system architecture diagram.
 
-## 📊 Examples
+## 📊 Demos
 
-### Chat Interface
+### Data Analysis
 
-![Chat Interface](public/assets/screenshot1.png)
+![](public/assets/multi_agent_1.gif)
 
-### Query Results
+### Scenario Simulation
 
-![Query Results](public/assets/screenshot2.png)
-
-### Simulation Output
-
-![Simulation Output](public/assets/screenshot3.png)
+![](public/assets/multi_agent_2.png)
 
 ## 🏛️ Architecture
 
