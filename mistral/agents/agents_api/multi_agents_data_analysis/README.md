@@ -4,10 +4,10 @@
 
 A sophisticated data analysis and simulation platform using a multi-agent workflow powered by Chainlit and Mistral AI. This application enables users to perform complex data queries and run what-if scenario simulations through natural language interactions.
 
-Current Status
+### Current Status
 ![Current Status](public/assets/current_status.jpg)
 
-Desired Status
+### Desired Status
 ![Desired Status](public/assets/desired_status.jpg)
 
 ## 🚀 Features
