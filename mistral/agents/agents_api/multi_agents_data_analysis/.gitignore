@@ -21,3 +21,4 @@ Thumbs.db
 # Virtual environments
 .venv
 .env
+.chainlit/translations 
