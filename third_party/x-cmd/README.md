@@ -1,4 +1,4 @@
-## The Mistral AI Command Line Client
+## The Mistral AI Command Line Client with x-cmd
 
 The **mistral module** is a command-line client tool built by the x-cmd team using the Mistral AI API.  Written in posix shell and awk, it uses `curl` to send API requests. 
 

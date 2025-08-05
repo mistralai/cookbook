@@ -2,6 +2,7 @@
 
 A powerful AI-powered travel assistant built with Mistral's agent SDK that helps users plan their trips, book accommodations, and manage their travel needs.
 
+[![Travel Assistant](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Travel_assistant.gif)](https://www.youtube.com/watch?v=DSYlhtG2UNM)
 
 ## Architecture
 
@@ -36,7 +37,7 @@ A powerful AI-powered travel assistant built with Mistral's agent SDK that helps
 - API Keys:
   - [Mistral AI API key](https://mistral.ai/api-key)
   - [SerpAPI key](https://serpapi.com/dashboard) (Free plan available)
-  - Mistral Agents private access key (Available in Bitwarden)
+
 
 ## Installation
 

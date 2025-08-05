@@ -2,6 +2,8 @@
 
 Application that generates Product Requirements Documents (PDF) from transcript PDFs and creates Linear tickets using MistralAI Agents API with MCP servers.
 
+[![Linear Ticket](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Linear_tickets.gif)](https://www.youtube.com/watch?v=4UPP-JEjcKo)
+
 ## Use Case
 
 - Extract text from PDF transcripts using OCR
@@ -28,7 +30,7 @@ Application that generates Product Requirements Documents (PDF) from transcript 
 ## Installation
 
 ```bash
-pip install chainlit mcp mistralai-private loguru pydantic gql
+pip install chainlit mcp loguru pydantic gql
 ```
 
 ## Environment Setup

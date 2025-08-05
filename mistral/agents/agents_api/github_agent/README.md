@@ -1,7 +1,10 @@
-# GITHUB Agent
+# Github Automation with Mistral AI Agents
 
 This cookbook show how to create an Agent that use mistral Medium to perform some actions on your github.
 > WIP: This cookbook is minimal working example and will still evolve in the near future.
+
+[![Github Agent](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Github_PR.gif)](https://www.youtube.com/watch?v=1Tt9Fq1pUPQ)
+
 
 ## Use Case
 

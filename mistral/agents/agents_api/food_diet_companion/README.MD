@@ -1,6 +1,8 @@
-# NutriSense
+# Build NutriSense - An AI-powered food diet companion
 
 A powerful AI-powered food diet companion built with Mistral's agent SDK that helps users with goal setting, logging the food, food recommendations, daily progress, and restaurant recommendations based on their daily diet goals.
+
+[![Food Diet Companion](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Nutrition_demo.gif)](https://www.youtube.com/watch?v=uEG2z2esl14)
 
 ## Features
 
@@ -38,7 +40,6 @@ A powerful AI-powered food diet companion built with Mistral's agent SDK that he
 - Python 3.10 or higher
 - API Keys:
   - [Mistral AI API key](https://mistral.ai/api-key)
-  - Mistral Agents private access key (Available in Bitwarden)
 
 ## Installation
 
