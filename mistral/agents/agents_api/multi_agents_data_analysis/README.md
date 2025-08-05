@@ -80,6 +80,8 @@ Type "Show workflow" to see the system architecture diagram.
 
 ## 📊 Demos
 
+[Demo Script](public/scripts/script.md)
+
 ### Data Analysis
 
 ![](public/assets/multi_agent_1.gif)
