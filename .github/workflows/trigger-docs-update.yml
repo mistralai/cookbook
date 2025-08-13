@@ -1,5 +1,5 @@
 name: Trigger Docs Submodule Update
-
+permissions: {}
 on:
   push:
     branches:
