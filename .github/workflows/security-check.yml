@@ -1,0 +1,25 @@
+name: Security Check - Private Keys
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install pre-commit
+      run: pip install pre-commit
+      
+    - name: Check for private keys
+      run: pre-commit run detect-private-key --all-files
