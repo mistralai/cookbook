@@ -1,4 +1,4 @@
-# An Overview of Prompt Optimization
+# Concept Deep Dive: An Overview of Prompt Optimization
 
 Early successes with prompt-based learning demonstrated that the phrasing of tasks can drastically affect a language model (LLM)'s performance. In their seminal work, Brown et al. (2020) argue that carefully crafted text prompts could induce LLMs to perform new tasks without any parameter update. Together with empirical findings related to the effectiveness of LLMs across a wide variety of tasks, this spurred interest in prompt engineering. Yet, designing prompts by hand proved to be a cumbersome and error-prone effort, requiring expertise and extensive trial-and-error (Liu et al., 2023).
 

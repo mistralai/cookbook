@@ -1,4 +1,4 @@
-# Samplers
+# Concept Deep Dive: Samplers
 
 When an LLM is making a prediction, it's not actually simply picking a token. It first assigns each token a degree of probability before picking among these. The question often relies on "how to choose from" those thousands of tokens. The most intuitive solution would be to always pick the best possible token, however, not all use cases would benefit from this, as sometimes you want a bit more randomness or to avoid repetition. This is where sampling takes an important role. Sampling is the process of choosing the token to be outputted among the thousands of possible ones.
 

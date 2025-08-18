@@ -2,7 +2,7 @@
 
 Application that generates Product Requirements Documents (PDF) from transcript PDFs and creates Linear tickets using MistralAI Agents API with MCP servers.
 
-![Linear Ticket](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Linear_tickets.gif)
+[![Linear Ticket](https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/gif/Linear_tickets.gif)](https://www.youtube.com/watch?v=4UPP-JEjcKo)
 
 ## Use Case
 

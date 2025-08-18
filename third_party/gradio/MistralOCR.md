@@ -1,4 +1,4 @@
-# Mistral OCR with Gradio
+# Building Gradio app with Mistral OCR to extract text and images from PDFs
 
 This cookbook provides a step-by-step guide to setting up and using Mistral OCR with Gradio.  
 The application allows you to extract text and images from PDFs and images using Mistral's OCR capabilities.
