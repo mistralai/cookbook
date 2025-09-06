@@ -132,8 +132,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)                            | entity extraction, PDF          | Indexify   |
 | [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                                    | summarization, PDF              | Indexify   |
 | [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)                | code                            | Langchain  |
-| [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)                | code                            | Langchain  |
-| [langtrace_mistral.ipynb](third_party/langtrace/langtrace_mistral.ipynb)                                              | OTEL Observability              | Langtrace  |
+| [langtrace_mistral.ipynb](third_party/Langtrace/langtrace_mistral.ipynb)                                              | OTEL Observability              | Langtrace  |
 | [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                                   | RAG, agent                      | LLamaIndex |
 | [llamaindex_arxiv_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_arxiv_agentic_rag.ipynb)                       | RAG, agent, Arxiv summarization | LLamaIndex |
 | [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)                 | fine-tuning                     | LLamaIndex |
