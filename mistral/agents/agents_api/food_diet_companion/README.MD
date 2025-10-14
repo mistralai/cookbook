@@ -45,8 +45,8 @@ A powerful AI-powered food diet companion built with Mistral's agent SDK that he
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/mistralai/cookbook-internal.git
-cd mistral/agents/food_diet_companion
+git clone https://github.com/mistralai/cookbook.git
+cd mistral/agents/agents_api/food_diet_companion
 ```
 
 2. Install dependencies:
