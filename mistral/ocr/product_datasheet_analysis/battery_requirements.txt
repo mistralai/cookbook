@@ -1,0 +1,40 @@
+Lithium-Ion Battery Design Requirements:
+
+Capacity:
+- Normal Capacity: ≥ 2400 mAh
+- Minimum Capacity: ≥ 2350 mAh
+
+Voltage:
+- Nominal Voltage: 3.6V - 3.7V
+- Charge Voltage: ≤ 4.2V
+- Discharge Cut-off Voltage: ≥ 2.75V
+
+Current:
+- Standard Charge Current: ≤ 1250 mA (0.5C)
+- Maximum Charge Current: ≤ 2500 mA (1C)
+- Standard Discharge Current: ≥ 500 mA
+- Maximum Continuous Discharge: ≥ 5000 mA (2C)
+
+Physical:
+- Diameter: 18mm ± 0.5mm (18650 standard)
+- Height: 65mm ± 1mm
+- Weight: ≤ 50g
+
+Performance:
+- Cycle Life: ≥ 500 cycles (at 80% capacity retention)
+- Internal Impedance: ≤ 50mΩ
+
+Operating Conditions:
+- Charge Temperature: 0°C to 45°C
+- Discharge Temperature: -20°C to 60°C
+- Storage Temperature: -20°C to 45°C
+
+Safety:
+- Must include over-charge protection
+- Must include over-discharge protection
+- Must include short-circuit protection
+- Must meet UN38.3 or IEC62133 certification
+
+Quality:
+- Must be manufactured by certified facility
+- Must pass all standard performance tests
