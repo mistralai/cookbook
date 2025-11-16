@@ -4,11 +4,11 @@ import asyncio
 import chainlit as cl
 from dotenv import load_dotenv
 
-from mistralai.client import MistralClient
+from mistralai import Mistral
 
 load_dotenv()
 
-mai_client = MistralClient(api_key=os.environ["MISTRAL_API_KEY"])
+mai_client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 cl.instrument_mistralai()
 
@@ -101,9 +101,7 @@ async def run_multiple(tool_calls):
         }
 
     # Run tool calls in parallel.
-    tool_results = await asyncio.gather(
-        *(run_single(tool_call) for tool_call in tool_calls)
-    )
+    tool_results = await asyncio.gather(*(run_single(tool_call) for tool_call in tool_calls))
     return tool_results
 
 
@@ -115,7 +113,7 @@ async def run_agent(user_query: str):
     answer_message_content = None
 
     while number_iterations < 5:
-        completion = mai_client.chat(
+        completion = mai_client.chat.complete(
             model="mistral-large-latest",
             messages=messages,
             tool_choice="auto",

@@ -15,7 +15,7 @@ pip install mesop mistralai
 ```py
 import mesop as me
 import mesop.labs as mel
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 ```
 
@@ -23,16 +23,16 @@ Next, create your `MistralClient` instance using your Mistral API key.
 
 ```py
 mistral_api_key = "api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 ```
 
 To create our interface with `mesop`, we can make use of their `chat` function. It will look something like this:
 
 ```py
 def ask_mistral(message: str, history: list[mel.ChatMessage]):
-    messages = [ChatMessage(role=m.role, content=m.content) for m in history[:-1]]
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        yield chunk.choices[0].delta.content
+    messages = [{"role": m.role, "content": m.content} for m in history[:-1]]
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        yield chunk.data.choices[0].delta.content
 
 @me.page(title="Talk to Mistral")
 def page():
@@ -47,16 +47,16 @@ Now, all we have to do is run the command `mesop chat.py`!
 ```py
 import mesop as me
 import mesop.labs as mel
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 
 mistral_api_key = "api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 def ask_mistral(message: str, history: list[mel.ChatMessage]):
-    messages = [ChatMessage(role=m.role, content=m.content) for m in history[:-1]]
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        yield chunk.choices[0].delta.content
+    messages = [{"role": m.role, "content": m.content} for m in history[:-1]]
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        yield chunk.data.choices[0].delta.content
 
 @me.page(title="Talk to Mistral")
 def page():
@@ -82,7 +82,7 @@ pip install numpy PyPDF2 faiss
 import io
 import mesop as me
 import mesop.labs as mel
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 import numpy as np
 import PyPDF2
@@ -125,7 +125,7 @@ We are ready to read the PDF files and implement some RAG. For this, we will nee
 
 ```py
 def get_text_embedding(input: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model = "mistral-embed",
           input = input
       )
@@ -157,15 +157,15 @@ In this function, we cut the PDF files into chunks of equal sizes, get their emb
 
 ```py
 def ask_mistral(message: str, history: list[mel.ChatMessage]):
-    messages = [ChatMessage(role=m.role, content=m.content) for m in history[:-1]]
+    messages = [{"role": m.role, "content": m.content} for m in history[:-1]]
 
     state = me.state(State)
     if state.content:
         retrieved_text = rag_pdf([state.content], message)
-        messages[-1] = ChatMessage(role = "user", content = retrieved_text + "\n\n" +messages[-1].content)
+        messages[-1] = {"role": "user", "content": retrieved_text + "\n\n" + messages[-1]["content"]}
 
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        yield chunk.choices[0].delta.content
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        yield chunk.data.choices[0].delta.content
 ```
 
 With this, we are ready to go! We can run our script with the command `mesop chat_with_pdfs.py`.
@@ -177,17 +177,17 @@ With this, we are ready to go! We can run our script with the command `mesop cha
 import io
 import mesop as me
 import mesop.labs as mel
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 import numpy as np
 import PyPDF2
 import faiss
 
 mistral_api_key = "api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 def get_text_embedding(input: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model = "mistral-embed",
           input = input
       )
@@ -211,15 +211,15 @@ def rag_pdf(pdfs: list, question: str) -> str:
     return text_retrieved
 
 def ask_mistral(message: str, history: list[mel.ChatMessage]):
-    messages = [ChatMessage(role=m.role, content=m.content) for m in history[:-1]]
+    messages = [{"role": m.role, "content": m.content} for m in history[:-1]]
 
     state = me.state(State)
     if state.content:
         retrieved_text = rag_pdf([state.content], message)
-        messages[-1] = ChatMessage(role = "user", content = retrieved_text + "\n\n" +messages[-1].content)
+        messages[-1] = {"role": "user", "content": retrieved_text + "\n\n" + messages[-1]["content"]}
 
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        yield chunk.choices[0].delta.content
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        yield chunk.data.choices[0].delta.content
 
 @me.stateclass
 class State:

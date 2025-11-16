@@ -1,8 +1,8 @@
 import streamlit as st
-from mistralai.client import MistralClient
+from mistralai import Mistral
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key=mistral_api_key)
 
 st.title("Chat with Mistral")
 
@@ -13,10 +13,12 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+
 def ask_mistral(messages: list):
-    resp = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
+    resp = cli.chat.stream(model="open-mistral-7b", messages=messages, max_tokens=1024)
     for chunk in resp:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
+
 
 if prompt := st.chat_input("Talk to Mistral!"):
     with st.chat_message("user"):

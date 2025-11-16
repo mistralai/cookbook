@@ -18,14 +18,14 @@ pip install streamlit mistralai
 
 ```py
 import streamlit as st
-from mistralai.client import MistralClient
+from mistralai import Mistral
 ```
 
-Next, create your `MistralClient` instance using your Mistral API key.
+Next, create your `Mistral` instance using your Mistral API key.
 
 ```py
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 ```
 
 Now, we will initialize a session variable where all messages will be stored and display them on the screen.
@@ -54,9 +54,9 @@ All that's left is to query Mistral and retrieve the response. To make the inter
 
 ```py
 def ask_mistral(messages: list):
-    resp = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
+    resp = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
     for chunk in resp:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
 ```
 
 With everything set, all we need to do is retrieve the response from the model and save it in the session.
@@ -83,10 +83,10 @@ To run this code, enter `streamlit run chat.py` in the console.
 
 ```py
 import streamlit as st
-from mistralai.client import MistralClient
+from mistralai import Mistral
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key=mistral_api_key)
+cli = Mistral(api_key=mistral_api_key)
 
 st.title("Chat with Mistral")
 
@@ -98,9 +98,9 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 def ask_mistral(messages: list):
-    resp = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
+    resp = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
     for chunk in resp:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
 
 if prompt := st.chat_input("Talk to Mistral!"):
     with st.chat_message("user"):
@@ -160,7 +160,7 @@ First, let's define a function that converts text to embeddings with Mistral:
 
 ```py
 def get_text_embedding(input_text: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model = "mistral-embed",
           input = input_text
       )
@@ -202,9 +202,9 @@ def ask_mistral(messages: list, pdfs_bytes: list):
             pdfs.append(txt)
         messages[-1]["content"] = rag_pdf(pdfs, messages[-1]["content"]) + "\n\n" + messages[-1]["content"]
 
-    resp = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
+    resp = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
     for chunk in resp:
-        yield chunk.choices[0].delta.content
+        yield chunk.data.choices[0].delta.content
 
 # Don't forget to add the new argument 'pdfs_bytes = st.session_state.pdfs' when you call this function.
 ```
@@ -217,16 +217,16 @@ And everything is done! Now we can run our new interface with `streamlit run cha
 ```py
 import io
 import streamlit as st
-from mistralai.client import MistralClient
+from mistralai import Mistral
 import numpy as np
 import PyPDF2
 import faiss
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 def get_text_embedding(input: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model="mistral-embed",
           input=input
       )

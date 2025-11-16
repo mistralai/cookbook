@@ -18,7 +18,7 @@ pip install gradio mistralai
 
 ```py
 import gradio as gr
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 ```
 
@@ -26,7 +26,7 @@ Next, create your `MistralClient` instance using your Mistral API key.
 
 ```py
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 ```
 
 To create our interface with `gradio`, we can make use of their `ChatInterface`. It will look something like this:
@@ -45,13 +45,13 @@ Now, all we have to do is edit `ask_mistral` so it parses our message and histor
 def ask_mistral(message: str, history: list):
     messages = []
     for couple in history:
-        messages.append(ChatMessage(role = "user", content = couple[0]))
-        messages.append(ChatMessage(role = "assistant", content = couple[1]))
-    messages.append(ChatMessage(role = "user", content = message))
+        messages.append({"role": "user", "content": couple[0]})
+        messages.append({"role": "assistant", "content": couple[1]})
+    messages.append({"role": "user", "content": message})
 
     full_response = ""
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        full_response += chunk.choices[0].delta.content
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        full_response += chunk.data.choices[0].delta.content
         yield full_response
 ```
 
@@ -62,22 +62,22 @@ Done! Once ready, you can run the script (`chat.py`)!
 
 ```py
 import gradio as gr
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 def ask_mistral(message: str, history: list):
     messages = []
     for couple in history:
-        messages.append(ChatMessage(role = "user", content = couple[0]))
-        messages.append(ChatMessage(role = "assistant", content = couple[1]))
-    messages.append(ChatMessage(role = "user", content = message))
+        messages.append({"role": "user", "content": couple[0]})
+        messages.append({"role": "assistant", "content": couple[1]})
+    messages.append({"role": "user", "content": message})
 
     full_response = ""
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        full_response += chunk.choices[0].delta.content
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        full_response += chunk.data.choices[0].delta.content
         yield full_response
 
 app = gr.ChatInterface(fn = ask_mistral, title = "Ask Mistral")
@@ -101,7 +101,7 @@ pip install numpy PyPDF2 faiss
 
 ```py
 import gradio as gr
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 import numpy as np
 import PyPDF2
@@ -125,14 +125,14 @@ def ask_mistral(message: str, history: list):
         if type(couple[0]) is tuple:
             pdfs += couple[0]
         else:
-            messages.append(ChatMessage(role = "user", content = couple[0]))
-            messages.append(ChatMessage(role = "assistant", content = couple[1]))
+            messages.append({"role": "user", "content": couple[0]})
+            messages.append({"role": "assistant", "content": couple[1]})
 
-    messages.append(ChatMessage(role = "user", content = message["text"]))
+    messages.append({"role": "user", "content": message["text"]})
 
     full_response = ""
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        full_response += chunk.choices[0].delta.content
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        full_response += chunk.data.choices[0].delta.content
         yield full_response
 ```
 
@@ -140,7 +140,7 @@ We are ready to read the PDF files and implement some RAG. For this, we will nee
 
 ```py
 def get_text_embedding(input: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model = "mistral-embed",
           input = input
       )
@@ -191,13 +191,13 @@ def ask_mistral(message: str, history: list):
             pdfs_extracted.append(txt)
 
         retrieved_text = rag_pdf(pdfs_extracted, message["text"])
-        messages.append(ChatMessage(role = "user", content = retrieved_text + "\n\n" + message["text"]))
+        messages.append({"role": "user", "content": retrieved_text + "\n\n" + message["text"]})
     else:
-        messages.append(ChatMessage(role = "user", content = message["text"]))
+        messages.append({"role": "user", "content": message["text"]})
 
     full_response = ""
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        full_response += chunk.choices[0].delta.content
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        full_response += chunk.data.choices[0].delta.content
         yield full_response
 ```
 
@@ -208,17 +208,17 @@ With this, we are ready to go! We can run our script `chat_with_pdfs.py`.
 
 ```py
 import gradio as gr
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 import numpy as np
 import PyPDF2
 import faiss
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 def get_text_embedding(input: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model = "mistral-embed",
           input = input
       )
@@ -248,8 +248,8 @@ def ask_mistral(message: str, history: list):
         if type(couple[0]) is tuple:
             pdfs += couple[0]
         else:
-            messages.append(ChatMessage(role= "user", content = couple[0]))
-            messages.append(ChatMessage(role= "assistant", content = couple[1]))
+            messages.append({"role": "user", "content": couple[0]})
+            messages.append({"role": "assistant", "content": couple[1]})
 
     if pdfs:
         pdfs_extracted = []
@@ -261,13 +261,13 @@ def ask_mistral(message: str, history: list):
             pdfs_extracted.append(txt)
 
         retrieved_text = rag_pdf(pdfs_extracted, message["text"])
-        messages.append(ChatMessage(role = "user", content = retrieved_text + "\n\n" + message["text"]))
+        messages.append({"role": "user", "content": retrieved_text + "\n\n" + message["text"]})
     else:
-        messages.append(ChatMessage(role = "user", content = message["text"]))
+        messages.append({"role": "user", "content": message["text"]})
 
     full_response = ""
-    for chunk in cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
-        full_response += chunk.choices[0].delta.content
+    for chunk in cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024):
+        full_response += chunk.data.choices[0].delta.content
         yield full_response
 
 app = gr.ChatInterface(fn = ask_mistral, title = "Ask Mistral and talk to your PDFs", multimodal = True)

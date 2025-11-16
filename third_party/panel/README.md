@@ -18,7 +18,7 @@ pip install panel mistralai
 
 ```py
 import panel as pn
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 ```
 
@@ -32,18 +32,18 @@ Next, create your `MistralClient` instance using your Mistral API key.
 
 ```py
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 ```
 
 With the client ready, it's time to build the interface. For this, we will use the `ChatInterface` from `panel`!
 
 ```py
 async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
-    messages = [ChatMessage(role = "user", content = contents)]
-    response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
+    messages = [{"role": "user", "content": contents}]
+    response = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
     message = ""
     for chunk in response:
-        message += chunk.choices[0].delta.content
+        message += chunk.data.choices[0].delta.content
         yield message
 
 chat_interface = pn.chat.ChatInterface(callback = callback, callback_user = "Mistral")
@@ -59,20 +59,20 @@ To run this code, enter `panel serve basic_chat.py` in the console.
 
 ```py
 import panel as pn
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 
 pn.extension()
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
-    messages = [ChatMessage(role = "user", content = contents)]
-    response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
+    messages = [{"role": "user", "content": contents}]
+    response = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
     message = ""
     for chunk in response:
-        message += chunk.choices[0].delta.content
+        message += chunk.data.choices[0].delta.content
         yield message
 
 chat_interface = pn.chat.ChatInterface(callback = callback, callback_user = "Mistral")
@@ -95,10 +95,10 @@ async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
         content = w.object
         ) for w in messages_objects]
 
-    response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
+    response = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
     message = ""
     for chunk in response:
-        message += chunk.choices[0].delta.content
+        message += chunk.data.choices[0].delta.content
         yield message
 ```
 
@@ -107,15 +107,15 @@ While we're at it, let's add a welcoming message for the user. We'll need to ign
 ```py
 async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
     messages_objects = [w for w in instance.objects if w.user != "System"]
-    messages = [ChatMessage(
-        role="user" if w.user == "User" else "assistant",
-        content=w.object
-        ) for w in messages_objects]
+    messages = [{
+        "role": "user" if w.user == "User" else "assistant",
+        "content": w.object
+        } for w in messages_objects]
 
-    response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
+    response = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
     message = ""
     for chunk in response:
-        message += chunk.choices[0].delta.content
+        message += chunk.data.choices[0].delta.content
         yield message
 
 chat_interface = pn.chat.ChatInterface(callback = callback, callback_user = "Mistral")
@@ -130,25 +130,25 @@ We can now have a full conversation with Mistral: `panel serve chat_history.py`
 
 ```py
 import panel as pn
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 
 pn.extension()
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
     messages_objects = [w for w in instance.objects if w.user != "System"]
-    messages = [ChatMessage(
-        role="user" if w.user == "User" else "assistant",
-        content=w.object
-        ) for w in messages_objects]
+    messages = [{
+        "role": "user" if w.user == "User" else "assistant",
+        "content": w.object
+        } for w in messages_objects]
 
-    response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
+    response = cli.chat.stream(model = "open-mistral-7b", messages = messages, max_tokens = 512)
     message = ""
     for chunk in response:
-        message += chunk.choices[0].delta.content
+        message += chunk.data.choices[0].delta.content
         yield message
 
 chat_interface = pn.chat.ChatInterface(callback = callback, callback_user = "Mistral")
@@ -172,7 +172,7 @@ pip install io numpy PyPDF2 faiss
 
 ```py
 import io
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 import numpy as np
 import panel as pn
@@ -204,7 +204,7 @@ async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
         response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
         message = ""
         for chunk in response:
-            message += chunk.choices[0].delta.content
+            message += chunk.data.choices[0].delta.content
             yield message
 ```
 
@@ -224,7 +224,7 @@ But before continuing, we will need to get the embeddings for all the chunks. Le
 
 ```py
 def get_text_embedding(input_text: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model = "mistral-embed",
           input = input_text
       )
@@ -272,12 +272,12 @@ async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
                 for page in reader.pages:
                     txt += page.extract_text()
                 pdfs.append(txt)
-            messages[-1].content = rag_pdf(pdfs, contents) + "\n\n" + contents
+            messages[-1]["content"] = rag_pdf(pdfs, contents) + "\n\n" + contents
 
         response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
         message = ""
         for chunk in response:
-            message += chunk.choices[0].delta.content
+            message += chunk.data.choices[0].delta.content
             yield message
 ```
 
@@ -290,7 +290,7 @@ With this ready, we can now fully chat with Mistral and our PDFs: `panel serve c
 
 ```py
 import io
-from mistralai.client import MistralClient
+from mistralai import Mistral
 from mistralai.models.chat_completion import ChatMessage
 import numpy as np
 import panel as pn
@@ -300,10 +300,10 @@ import faiss
 pn.extension()
 
 mistral_api_key = "your_api_key"
-cli = MistralClient(api_key = mistral_api_key)
+cli = Mistral(api_key = mistral_api_key)
 
 def get_text_embedding(input_text: str):
-    embeddings_batch_response = cli.embeddings(
+    embeddings_batch_response = cli.embeddings.create(
           model = "mistral-embed",
           input = input_text
       )
@@ -343,12 +343,12 @@ async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
                 for page in reader.pages:
                     txt += page.extract_text()
                 pdfs.append(txt)
-            messages[-1].content = rag_pdf(pdfs, contents) + "\n\n" + contents
+            messages[-1]["content"] = rag_pdf(pdfs, contents) + "\n\n" + contents
         
         response = cli.chat_stream(model = "open-mistral-7b", messages = messages, max_tokens = 1024)
         message = ""
         for chunk in response:
-            message += chunk.choices[0].delta.content
+            message += chunk.data.choices[0].delta.content
             yield message
 
 chat_interface = pn.chat.ChatInterface(widgets = [pn.widgets.TextInput(),pn.widgets.FileInput(accept = ".pdf")], callback = callback, callback_user = "Mistral")
