@@ -6,7 +6,7 @@
         |
         <a href="https://github.com/Arize-ai/phoenix">GitHub</a>
         |
-        <a href="https://join.slack.com/t/arize-ai/shared_invite/zt-1px8dcmlf-fmThhDFD_V_48oU7ALan4Q">Community</a>
+        <a href="https://arize-ai.slack.com/join/shared_invite/zt-11t1vbu4x-xkBIHmOREQnYnYDH1GDfCg?__hstc=259489365.a667dfafcfa0169c8aee4178d115dc81.1733501603539.1733501603539.1733501603539.1&__hssc=259489365.1.1733501603539&__hsfp=3822854628&submissionGuid=381a0676-8f38-437b-96f2-fc10875658df#/shared-invite/email">Community</a>
     </p>
 </center>
 
@@ -26,8 +26,9 @@ Phoenix runs practically anywhere, including your Jupyter notebook, local machin
 The latest Phoenix + Mistral AI docs can be found [here](https://docs.arize.com/phoenix/tracing/integrations-tracing/mistralai).
 
 ## Examples
-- [Tracing a Mistral AI application](./examples/arize_phoenix_tracing.ipynb)
-- [Evaluating a Mistral RAG pipeline](./examples/arize_phoenix_evaluate_rag.ipynb)
+- [Tracing a Mistral AI application](third_party/Phoenix/arize_phoenix_tracing.ipynb)
+- [Evaluating a Mistral RAG pipeline](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)
+- [Evaluating a Python agent workflow](third_party/Phoenix/analytical_agent_workflow.ipynb)
 
 ## See it in action
 
@@ -35,5 +36,5 @@ The latest Phoenix + Mistral AI docs can be found [here](https://docs.arize.com/
 
 
 ## Other Resources
-- 🤝 [Join the Phoenix community](https://join.slack.com/t/arize-ai/shared_invite/zt-1px8dcmlf-fmThhDFD_V_48oU7ALan4Q)
+- 🤝 [Join the Phoenix community](https://arize-ai.slack.com/join/shared_invite/zt-11t1vbu4x-xkBIHmOREQnYnYDH1GDfCg?__hstc=259489365.a667dfafcfa0169c8aee4178d115dc81.1733501603539.1733501603539.1733501603539.1&__hssc=259489365.1.1733501603539&__hsfp=3822854628&submissionGuid=381a0676-8f38-437b-96f2-fc10875658df#/shared-invite/email)
 - 🐛 [Submit an issue or feature request](https://github.com/Arize-ai/phoenix/issues)
