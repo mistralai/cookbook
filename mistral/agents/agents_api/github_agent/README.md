@@ -15,7 +15,7 @@ This cookbook show how to create an Agent that use mistral Medium to perform som
 ## Installation
 
 ```bash
-pip install chainlit mcp mistralai
+pip install chainlit mcp mistralai griffe authlib
 ```
 
 ## Environment Setup
