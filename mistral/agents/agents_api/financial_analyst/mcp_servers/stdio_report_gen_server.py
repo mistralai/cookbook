@@ -1,7 +1,5 @@
 from mcp.server.fastmcp import FastMCP
 import logging
-import os
-from typing import List
 from mistralai import Mistral
 
 # Configure logging to only show errors
