@@ -51,6 +51,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [intent_classification.ipynb](mistral/classifier_factory/intent_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for intent classification. |
 | [moderation_classifier.ipynb](mistral/classifier_factory/moderation_classifier.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for moderation. |
 | [pixtral_finetune_on_satellite_data.ipynb](mistral/fine_tune/pixtral_finetune_on_satellite_data.ipynb) | fine-tuning, image processing, batch | Fine-tuning a Pixtral-12B for satellite images classification. |
+| [Fine-tuning Mistral 7B for STM32 HAL](mistral/fine_tune/mistral_stm_32_fine_tune.ipynb) | Fine-tuning | A guide to fine-tune Mistral 7B for generating STM32 HAL code using QLoRA |
 
 
 
