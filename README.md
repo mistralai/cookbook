@@ -51,6 +51,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [intent_classification.ipynb](mistral/classifier_factory/intent_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for intent classification. |
 | [moderation_classifier.ipynb](mistral/classifier_factory/moderation_classifier.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for moderation. |
 | [pixtral_finetune_on_satellite_data.ipynb](mistral/fine_tune/pixtral_finetune_on_satellite_data.ipynb) | fine-tuning, image processing, batch | Fine-tuning a Pixtral-12B for satellite images classification. |
+| [llmops_evaluation_pipeline.ipynb](mistral/llmops/llmops_evaluation_pipeline.ipynb) | LLMOps, evaluation, MLflow | Complete LLMOps pipeline for model comparison and evaluation with MLflow |
 
 
 
