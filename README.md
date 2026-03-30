@@ -60,6 +60,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 |:----------------------------------------------------------------------------------------------------------------------|:--------------------------------| :--------- |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                       | RAG                             | LLamaIndex |
+| [Multi-Agent Orchestration with AG2](third_party/AG2/ag2_multi_agent_mistral.ipynb)                                   | Agents, Function calling        | AG2        |
 | [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                       | agent                           | LLamaIndex |
 | [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                        | tracing data                    | Arize Phoenix  |
 | [arize_phoenix_evaluate_rag.ipynb](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)                              | evaluation                      | Arize Phoenix  |
