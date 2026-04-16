@@ -97,7 +97,7 @@ import asyncio
 import os
 import random
 
-from mistralai import Mistral
+from mistralai.client import Mistral
 from mistralai.extra.run.context import RunContext
 from mistralai.extra.exceptions import DeferredToolCallsException
 
@@ -177,7 +177,7 @@ asyncio.run(main())
 import asyncio
 import os
 
-from mistralai import Mistral
+from mistralai.client import Mistral
 from mistralai.extra.exceptions import DeferredToolCallsException
 from mistralai.extra.run.context import RunContext
 
@@ -263,7 +263,7 @@ import asyncio
 import json
 import os
 
-from mistralai import Mistral
+from mistralai.client import Mistral
 from mistralai.extra.run.context import RunContext
 from mistralai.extra.exceptions import DeferredToolCallsException
 
@@ -305,7 +305,7 @@ import asyncio
 import json
 import os
 
-from mistralai import Mistral
+from mistralai.client import Mistral
 from mistralai.extra.run.context import RunContext
 from mistralai.extra.exceptions import DeferredToolCallsException, DeferredToolCallEntry
 

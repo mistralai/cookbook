@@ -7,10 +7,10 @@ and query execution for data analysis tasks.
 
 import os
 import sqlite3
-from typing import Tuple, List, AsyncGenerator
-from mistralai import Mistral, MessageOutputEvent
+from typing import AsyncGenerator, List, Tuple
+from mistralai.client import Mistral
+from mistralai.client.models import MessageOutputEvent
 from utils.db_manager import load_excel_to_sqlite
-
 
 DATA_ANALYSIS_PROMPT = """
 You are an advanced data analysis agent with a strong attention to detail. You are given a question and database schema in metadata. Your task is to write a SQL query to answer the question.

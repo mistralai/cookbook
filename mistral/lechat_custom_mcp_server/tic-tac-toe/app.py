@@ -5,7 +5,7 @@ import logging
 import json
 import uuid
 import time
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 app = Flask(__name__)
 CORS(app)
@@ -33,22 +33,22 @@ class Room:
         self.created = time.time()
         self.last_activity = time.time()
         self.moves_count = 0
-        
+
         # Add welcome message
         self.chat_history.append({
             'sender': 'ai',
             'message': "Hey there! Ready for a game of Tic-Tac-Toe? I'm pretty good at this... 😏 You're X, I'm O. Good luck!",
             'timestamp': time.time()
         })
-    
+
     def make_move(self, position, player):
         if self.game_status != 'active' or self.board[position] != '':
             return False
-        
+
         self.board[position] = player
         self.moves_count += 1
         self.last_activity = time.time()
-        
+
         # Check for winner
         if self.check_winner():
             self.game_status = 'won'
@@ -57,22 +57,22 @@ class Room:
             self.game_status = 'draw'
         else:
             self.current_player = 'O' if player == 'X' else 'X'
-        
+
         return True
-    
+
     def check_winner(self):
         win_patterns = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8],  # rows
             [0, 3, 6], [1, 4, 7], [2, 5, 8],  # columns
             [0, 4, 8], [2, 4, 6]              # diagonals
         ]
-        
+
         for pattern in win_patterns:
             a, b, c = pattern
             if self.board[a] and self.board[a] == self.board[b] == self.board[c]:
                 return True
         return False
-    
+
     def add_chat_message(self, message, sender):
         self.chat_history.append({
             'sender': sender,
@@ -80,12 +80,12 @@ class Room:
             'timestamp': time.time()
         })
         self.last_activity = time.time()
-    
+
     def to_markdown(self):
         # Game header
         markdown = f"# Game Room: {self.id}\n"
         markdown += f"## Status: "
-        
+
         if self.game_status == 'won':
             winner_name = "You" if self.winner == 'X' else "Mistral AI"
             markdown += f"Game Over - {winner_name} wins! 🎉\n"
@@ -94,9 +94,9 @@ class Room:
         else:
             turn_name = "Your turn" if self.current_player == 'X' else "Mistral's turn"
             markdown += f"{turn_name} ({self.current_player} to play)\n"
-        
+
         markdown += f"Moves: {self.moves_count}/9\n\n"
-        
+
         # Board representation
         markdown += "```\n"
         for i in range(0, 9, 3):
@@ -105,7 +105,7 @@ class Room:
             if i < 6:
                 markdown += "-----------\n"
         markdown += "```\n\n"
-        
+
         # Chat history (last 5 messages)
         if self.chat_history:
             markdown += "## Recent Chat\n"
@@ -113,9 +113,9 @@ class Room:
             for msg in recent_messages:
                 sender_name = "**You:**" if msg['sender'] == 'user' else "**Mistral AI:**"
                 markdown += f"{sender_name} {msg['message']}\n"
-        
+
         return markdown
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -148,7 +148,7 @@ def create_room():
 def get_room(room_id):
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
-    
+
     room = rooms[room_id]
     return jsonify({
         'room_id': room_id,
@@ -160,18 +160,18 @@ def get_room(room_id):
 def make_room_move(room_id):
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
-    
+
     room = rooms[room_id]
     data = request.json
     position = data.get('position')
-    
+
     if position is None or position < 0 or position > 8:
         return jsonify({'error': 'Invalid position'}), 400
-    
+
     # Make human move
     if not room.make_move(position, 'X'):
         return jsonify({'error': 'Invalid move'}), 400
-    
+
     # Check if game ended
     if room.game_status != 'active':
         return jsonify({
@@ -179,7 +179,7 @@ def make_room_move(room_id):
             'markdown': room.to_markdown(),
             'ai_move': None
         })
-    
+
     # Get AI move
     try:
         ai_response = get_ai_move_for_room(room)
@@ -198,7 +198,7 @@ def make_room_move(room_id):
                     fallback_move = empty_positions[0]  # Take first available
                     room.make_move(fallback_move, 'O')
                     room.add_chat_message("Oops, had a brain freeze! But I'm still playing! 🤖", 'ai')
-        
+
         return jsonify({
             'room_data': room.to_dict(),
             'markdown': room.to_markdown(),
@@ -212,7 +212,7 @@ def make_room_move(room_id):
             fallback_move = empty_positions[0]
             room.make_move(fallback_move, 'O')
             room.add_chat_message("Technical difficulties, but I'm improvising! 😅", 'ai')
-        
+
         return jsonify({
             'room_data': room.to_dict(),
             'markdown': room.to_markdown(),
@@ -223,22 +223,22 @@ def make_room_move(room_id):
 def room_chat(room_id):
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
-    
+
     room = rooms[room_id]
     data = request.json
     user_message = data.get('message', '')
-    
+
     if not user_message.strip():
         return jsonify({'error': 'Empty message'}), 400
-    
+
     # Add user message
     room.add_chat_message(user_message, 'user')
-    
+
     # Get AI response
     try:
         ai_response = get_ai_chat_for_room(room, user_message)
         room.add_chat_message(ai_response, 'ai')
-        
+
         return jsonify({
             'room_data': room.to_dict(),
             'markdown': room.to_markdown(),
@@ -252,7 +252,7 @@ def room_chat(room_id):
 def get_room_markdown(room_id):
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
-    
+
     room = rooms[room_id]
     return jsonify({
         'room_id': room_id,
@@ -267,7 +267,7 @@ def get_ai_move_for_room(room):
         board_string += f"{row[0]} | {row[1]} | {row[2]}\n"
         if i < 6:
             board_string += "---------\n"
-    
+
     messages = [
         {
             "role": "system",
@@ -295,14 +295,14 @@ Board positions:
             "content": f"Current board:\n{board_string}\n\nBoard array: {room.board}"
         }
     ]
-    
+
     response = client.chat.complete(
         model="mistral-large-latest",
         messages=messages,
         temperature=0.1,
         response_format={"type": "json_object"}
     )
-    
+
     return json.loads(response.choices[0].message.content)
 
 def get_ai_chat_for_room(room, user_message):
@@ -312,7 +312,7 @@ def get_ai_chat_for_room(room, user_message):
         board_string += f"{row[0]} | {row[1]} | {row[2]}\n"
         if i < 6:
             board_string += "---------\n"
-    
+
     messages = [
         {
             "role": "system",
@@ -329,12 +329,12 @@ Keep responses under 50 words. Use emojis occasionally. Don't make game moves in
             "content": user_message
         }
     ]
-    
+
     response = client.chat.complete(
         model="mistral-large-latest",
         messages=messages
     )
-    
+
     return response.choices[0].message.content
 
 # Serve the room-based game page

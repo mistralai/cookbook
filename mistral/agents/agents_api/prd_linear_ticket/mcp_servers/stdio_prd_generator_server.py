@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 import logging
-from mistralai import Mistral
+from mistralai.client import Mistral
 import traceback
 import os
 
@@ -15,10 +15,10 @@ mistral_client = Mistral(api_key="<YOUR MISTRALAI API KEY>")
 
 def parse_transcript(file_path: str) -> str:
     """Parse a transcript PDF file and extract text from all pages using MistralAI OCR
-    
+
     Args:
         file_path (str): Path to the PDF file to process
-        
+
     Returns:
         str: Extracted text content from the PDF
     """
@@ -82,16 +82,16 @@ async def generate_prd(file_name: str) -> str:
 
         PRD:
         """
-        
+
         # Generate PRD using MistralAI
         response = mistral_client.chat.complete(
             model="mistral-medium-latest",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1
         )
-        
+
         return response.choices[0].message.content
-    
+
     except Exception as e:
         logging.error(f"Error in generate_prd: {str(e)}")
         return traceback.format_exc()

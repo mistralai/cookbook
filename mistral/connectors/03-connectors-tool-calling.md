@@ -79,7 +79,7 @@ For scenarios where the model should autonomously pick which tools to call, use 
 
 ```python
 import os
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 ```
@@ -124,7 +124,7 @@ export BASE_URL="https://api.mistral.ai"
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -215,7 +215,7 @@ Name: my_deepwiki
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -300,7 +300,7 @@ Tool output:
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 

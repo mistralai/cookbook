@@ -63,7 +63,7 @@ Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 ```python
 import os
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 ```
@@ -108,7 +108,7 @@ export BASE_URL="https://api.mistral.ai"
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -212,7 +212,7 @@ Created at:  2026-02-24 10:30:00
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -311,7 +311,7 @@ Verified: get-by-name and get-by-ID return the same connector.
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -465,7 +465,7 @@ Active connectors: 12
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -569,7 +569,7 @@ New name: my_deepwiki_v2
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -666,7 +666,7 @@ Confirmed deleted: NotFoundError
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 

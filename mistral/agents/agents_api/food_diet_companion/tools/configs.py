@@ -1,4 +1,4 @@
-from mistralai import Mistral
+from mistralai.client import Mistral
 from dotenv import load_dotenv
 
 import os
