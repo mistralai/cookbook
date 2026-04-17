@@ -118,7 +118,7 @@ All recipes below reference this helper. Copy it into your project, or inline th
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -200,7 +200,7 @@ The capital of France is Paris.
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -297,7 +297,7 @@ Based on current web search results, the weather in Paris today is 8°C with par
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -406,7 +406,7 @@ The sqlite/sqlite repository is organized into several key directories:
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -523,7 +523,7 @@ I have access to the following tools:
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -614,7 +614,7 @@ I have access to: read_wiki_contents, ask_question
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -728,7 +728,7 @@ I have access to: ask_question
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -892,7 +892,7 @@ Deleted agent: b2c3d4e5-6789-01ab-cdef-234567890abc
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -1014,7 +1014,7 @@ Your latest email is from John Doe with the subject "Q1 Report Review" received 
 
 ```python
 import asyncio
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 client = Mistral(api_key="your-api-key")
 

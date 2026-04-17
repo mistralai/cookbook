@@ -9,7 +9,7 @@ import os
 import json
 import pandas as pd
 import sqlite3
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 # Mock market rates
 MARKET_RATES = {

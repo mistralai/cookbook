@@ -16,7 +16,7 @@ pip install solara mistralai
 
 ```py
 import solara as sl
-from mistralai import Mistral
+from mistralai.client import Mistral
 ```
 
 Create your `client` using your Mistral API key.
@@ -105,7 +105,7 @@ To run this code, enter `solara run chat.py` in the console. Alternatively, you 
 
 ```py
 import solara as sl
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 mistral_api_key = "your_api_key"
 client = Mistral(api_key=mistral_api_key)
@@ -174,7 +174,7 @@ This demo uses `PyPDF2===3.0.1` and `faiss-cpu===1.8.0`
 ```py
 import io
 import solara as sl
-from mistralai import Mistral
+from mistralai.client import Mistral
 import numpy as np
 import PyPDF2
 import faiss
@@ -275,7 +275,7 @@ And everything is done! Now we can run our new interface with `solara run chat_w
 ```py
 import io
 import solara as sl
-from mistralai import Mistral
+from mistralai.client import Mistral
 import numpy as np
 import PyPDF2
 import faiss
@@ -319,7 +319,7 @@ messages: sl.Reactive[List[MessageDict]] = sl.reactive([])
 
 def response_generator(messages: list, txt: List[str]):
     response = client.chat.stream(
-        model = "open-mistral-7b", 
+        model = "open-mistral-7b",
         messages = messages[:-1] + [{"role":"user","content": rag_pdf(txt, messages[-1]["content"]) + "\n\n" + messages[-1]["content"]}],
         max_tokens = 1024
     )

@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 from typing import List, Dict, Any
 from pydantic import BaseModel
-from mistralai import Mistral
+from mistralai.client import Mistral
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 
@@ -129,7 +129,7 @@ def create_tickets_from_prd(prd: str) -> List[Dict[str, Any]]:
     # Parse the PRD into structured feature data
     parsed_items = parse_prd(prd)
     results = []
-    
+
     # Create a Linear ticket for each feature
     for title, description in zip(
         parsed_items['Features'],

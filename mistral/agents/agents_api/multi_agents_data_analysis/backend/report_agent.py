@@ -10,7 +10,7 @@ import os
 import json
 from typing import Optional, Any
 from pathlib import Path
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 MODEL = "mistral-medium-latest"
 

@@ -1,7 +1,8 @@
 import chainlit as cl
 import requests
 import json
-from mistralai import Mistral, ThinkChunk, TextChunk
+from mistralai.client import Mistral
+from mistralai.client.models import ThinkChunk, TextChunk
 from typing import Dict, List
 import re
 import asyncio
@@ -41,7 +42,7 @@ class HubSpotConnector:
                     prop_list.append(prop_str)
 
                 properties[obj_type] = prop_list
-        
+
         return properties
 
     async def get_data(self, object_type: str) -> List[Dict]:
@@ -58,10 +59,10 @@ class HubSpotConnector:
 
             data = response.json()
             all_data.extend(data.get("results", []))
-            
+
             url = data.get("paging", {}).get("next", {}).get("link")
             params = {}
-        
+
         return all_data
 
     async def batch_update(self, updates: Dict) -> None:
@@ -138,7 +139,7 @@ class LeadAgent:
 
     async def analyze_query(self, query: str) -> Dict:
         """Analyze query using Magistral reasoning and create execution plan"""
-        
+
         try:
             await cl.Message(
                 content="🧠 **Lead Agent Activated**\n\n"
@@ -181,14 +182,14 @@ class LeadAgent:
 
             try:
                 analysis = await magistral_reasoning(analysis_prompt)
-                
+
                 await cl.Message(
                     content="✅ **Magistral Analysis Complete**\n\nReasoning process finished successfully!",
                     author="Lead Agent"
                 ).send()
-                
+
             except Exception as e:
-                
+
                 analysis = {
                     "reasoning": "Failed during reasoning. Using fallback plan.",
                     "conclusion": '{"sub_agents": [{"name": "priority_assigner", "task": "Assign priorities to deals based on value", "task_type": "write_back", "input_data": ["deals"], "output_format": "JSON with deal updates"}]}'
@@ -201,13 +202,13 @@ class LeadAgent:
                     execution_plan = json.loads(json_match.group(0))
                 else:
                     raise ValueError("No JSON found in analysis")
-                    
+
             except Exception as e:
                 await cl.Message(
                     content=f"⚠️ **Fallback Plan Activated**\n\nJSON parsing failed ({str(e)}), using general analysis approach",
                     author="Lead Agent"
                 ).send()
-                
+
                 execution_plan = {
                     "sub_agents": [{
                         "name": "priority_assigner",
@@ -233,13 +234,13 @@ class LeadAgent:
                 "execution_plan": execution_plan,
                 "conclusion": analysis["conclusion"]
             }
-            
+
         except Exception as e:
             await cl.Message(
                 content=f"❌ **Lead Agent Error**\n\nError: {str(e)}\n\nUsing emergency fallback...",
                 author="Lead Agent"
             ).send()
-            
+
             # Emergency fallback
             return {
                 "reasoning": f"Emergency fallback due to error: {str(e)}",
@@ -268,7 +269,7 @@ class SubAgent:
 
     async def execute(self, data: Dict, properties_context: str, hubspot_updater=None) -> Dict:
         """Execute the assigned task"""
-        
+
         await cl.Message(
             content=f"🤖 **{self.name} Activated**\n\n"
                    f"**Task Type**: {self.task_type}\n"
@@ -321,13 +322,13 @@ class SubAgent:
                 content="📤 **Preparing HubSpot Updates**\n\nValidating and formatting update payload...",
                 author=self.name
             ).send()
-            
+
             try:
                 json_match = re.search(r'\{.*\}', result, re.DOTALL)
                 if json_match:
                     updates = json.loads(json_match.group(0))
                     await hubspot_updater.batch_update(updates)
-                    
+
                     await cl.Message(
                         content="✅ **Mission Accomplished**\n\nHubSpot records updated successfully!",
                         author=self.name
@@ -354,7 +355,7 @@ class SynthesisAgent:
 
     async def synthesize(self, query: str, sub_agent_results: List[Dict], execution_plan: Dict) -> str:
         """Combine all sub-agent results into final answer"""
-        
+
         await cl.Message(
             content=f"🔄 **Synthesis Agent Activated**\n\n"
                    f"Combining insights from {len(sub_agent_results)} specialized agents...\n\n",
@@ -420,7 +421,7 @@ class AgentOrchestrator:
                    "Initializing intelligent CRM automation...\n\n"
                    "⚡ **System Components:**\n"
                    "• Lead Agent (Magistral Reasoning)\n"
-                   "• Dynamic Sub-Agents (Mistral Small)\n" 
+                   "• Dynamic Sub-Agents (Mistral Small)\n"
                    "• Synthesis Agent (Final Processing)\n"
                    "• HubSpot Connector (CRM Integration)",
             author="System Orchestrator"
@@ -428,7 +429,7 @@ class AgentOrchestrator:
 
         # Load HubSpot data and properties
         self.hubspot_properties = await self.hubspot_connector.get_properties()
-        
+
         self.hubspot_data = {
             "deals": await self.hubspot_connector.get_data("deals"),
             "contacts": await self.hubspot_connector.get_data("contacts"),
@@ -436,7 +437,7 @@ class AgentOrchestrator:
         }
 
         # Initialize lead agent with properties
-        self.lead_agent = LeadAgent(self.hubspot_properties)        
+        self.lead_agent = LeadAgent(self.hubspot_properties)
 
     async def process_query(self, query: str) -> Dict:
         """Main method to process user queries through multi-agent workflow"""
@@ -519,7 +520,7 @@ orchestrator = None
 async def start():
     """Initialize the chat session"""
     global orchestrator
-    
+
     # Check API keys
     if HUBSPOT_API_KEY == "your_hubspot_api_key_here" or MISTRAL_API_KEY == "your_mistral_api_key_here":
         await cl.Message(
@@ -538,10 +539,10 @@ async def start():
             hubspot_api_key=HUBSPOT_API_KEY,
             mistral_api_key=MISTRAL_API_KEY
         )
-        
+
         # Initialize the system
         await orchestrator.initialize()
-        
+
         # Welcome message
         await cl.Message(
             content="👋 **Welcome to HubSpot Multi-Agent Assistant!**\n\n"
@@ -551,7 +552,7 @@ async def start():
                    "Just type your question and watch the multi-agent system work!",
             author="Assistant"
         ).send()
-        
+
     except Exception as e:
         await cl.Message(
             content=f"❌ **Initialization Failed**\n\n"
@@ -564,7 +565,7 @@ async def start():
 async def main(message: cl.Message):
     """Handle incoming messages"""
     global orchestrator
-    
+
     if not orchestrator:
         await cl.Message(
             content="❌ **System Not Ready**\n\nPlease restart the application.",
@@ -575,21 +576,21 @@ async def main(message: cl.Message):
     try:
         # Process the query through multi-agent system
         result = await orchestrator.process_query(message.content)
-        
+
         # Send final answer
         await cl.Message(
             content=f"## 🎯 Final Answer\n\n{result['final_answer']}",
             author="Assistant"
         ).send()
-        
+
         # Optionally show execution summary
         summary = f"**📊 Execution Summary:**\n\n"
         summary += f"• **Active Agents**: {', '.join(result['active_agents'])}\n"
         summary += f"• **Successful Operations**: {sum(1 for r in result['sub_agent_results'] if r['result']['status'] == 'success')}\n"
         summary += f"• **Total Processing Steps**: {len(result['sub_agent_results']) + 2}\n"  # +2 for Lead and Synthesis agents
-        
+
         await cl.Message(content=summary, author="System Summary").send()
-        
+
     except Exception as e:
         await cl.Message(
             content=f"❌ **Processing Error**\n\n"
