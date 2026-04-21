@@ -64,6 +64,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                       | RAG                             | LLamaIndex |
 | [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                       | agent                           | LLamaIndex |
+| [Agentic Applications in C++ with Mistral](third_party/agt/README.md)                                                 | agent, tool, streaming, MCP     | agt        |
 | [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                        | tracing data                    | Arize Phoenix  |
 | [arize_phoenix_evaluate_rag.ipynb](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)                              | evaluation                      | Arize Phoenix  |
 | [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                                    | RAG, embeddings                 | Azure      |
