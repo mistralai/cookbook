@@ -54,7 +54,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [sts_demo.py](mistral/tts/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
-
+| [visualizing_reasoning_traces.ipynb](mistral/reasoning/visualizing_reasoning_traces.ipynb) | reasoning, visualization | Turn Mistral reasoning traces into structured graphs with typed steps and dependencies |
 
 
 ## Third Party Tools
