@@ -42,10 +42,9 @@ SERVER_URL=https://api.mistral.ai
 MISTRAL_API_KEY=<your_api_key>
 MISTRAL_CLIENT_API_KEY=<your_api_key>
 DEPLOYMENT_NAME=<your_deployment_name>
-TASK_QUEUE=<your_task_queue>
 ```
 
-Deployment name and task queue can just be your name for testing.
+Deployment name can just be your name for testing.
 
 **Client:**
 
@@ -54,7 +53,7 @@ MISTRAL_API_KEY=your-mistral-api-key
 SERVER_URL=https://api.mistral.ai
 
 ```
-You need to use the same deployment name and task queue as the worker to trigger the execution of the right workflow.
+You need to use the same deployment name as the worker to trigger the execution of the right workflow.
 
 ### What you need before starting
 - Dedicate a workspace and a mistral api tied to this workspace where you will conduct your experiments. Note that people executing your workflow need to be in the same workspace as you.
@@ -87,7 +86,7 @@ Connector slots are declared at module level. Each slot holds the connector name
 from mistralai.workflows.plugins.mistralai.connectors import connector
 
 github_connector = connector("github_app")
-notion_connector = connector("Notion")
+notion_connector = connector("notion")
 ```
 
 `connector()` accepts:
@@ -172,7 +171,7 @@ class GitHubIssueCreatorWorkflow:
 
 - `on_behalf_of=True` runs the workflow using the caller's identity — required for per-user connector credentials
 - `@uses_connectors(...)` registers the slots so the auth interceptor knows which connectors to authenticate before the workflow body runs. 
-    - Note: if you want to use several connectors in the same workflow, you can use `@uses_connectors(github_connector, notion_connector)`
+    - Note: if you want to use several connectors in the same workflow, you can use `@uses_connectors(github_app, notion)`
 - :warning: The order of `@uses_connectors` and `@workflow.define` matters! you need to apply the `@uses_connectors` after workflow definition
 
 ---
@@ -256,13 +255,13 @@ if __name__ == "__main__":
 Start the worker:
 
 ```bash
-MISTRAL_CLIENT_SERVER_URL=https://api.mistral.ai SERVER_URL=https://api.mistral.ai MISTRAL_API_KEY=<your_api_key> MISTRAL_CLIENT_API_KEY=<your_api_key> DEPLOYMENT_NAME=<your_deployement_name> TASK_QUEUE=<your_task_queue> 
+MISTRAL_CLIENT_SERVER_URL=https://api.mistral.ai SERVER_URL=https://api.mistral.ai MISTRAL_API_KEY=<your_api_key> MISTRAL_CLIENT_API_KEY=<your_api_key> DEPLOYMENT_NAME=<your_deployement_name>
 uv run python -m worker
 ```
 
 **How it works:**
 
-- `run_worker` connects to the Temporal backend, registers the workflow class, and starts polling for tasks
+- `run_worker` connects to the Temporal backend, registers the workflow class, and starts polling for events
 - The `ConnectorAuthInterceptor` is automatically loaded by the plugin system — no manual setup is needed
 - Before each workflow execution, the interceptor checks credentials for every `auto_auth=True` connector slot:
   - Valid credentials found → proceed immediately
@@ -282,7 +281,7 @@ uv run python -m worker
 
 ## Execute a Workflow with Connectors
 
-Use `execute_with_connector_auth_async` from the `mistralai` SDK to trigger a workflow. This helper polls for task events and — if the worker signals that connector authorization is required — prints the OAuth URL and waits for the user to complete the flow before the workflow resumes.
+Use `execute_with_connector_auth_async` from the `mistralai` SDK to trigger a workflow. This helper polls for events and — if the worker signals that connector authorization is required — prints the OAuth URL and waits for the user to complete the flow before the workflow resumes.
 
 ---
 ### Example client script
@@ -335,7 +334,7 @@ async def main(args) -> None:
     async with Mistral(api_key=args.api_key, server_url=args.server_url) as client:
         response = await execute_with_connector_auth_async(
             client=client,
-            workflow_identifier="emma-tests-scenarios",
+            workflow_identifier="github-issue-creator",
             input_data=GitHubIssuePrompt(
                 owner="my-org",
                 repo="my-repo",
@@ -344,7 +343,6 @@ async def main(args) -> None:
             ),
             deployment_name=args.deployment_name,
             connectors=connector_slots,
-            task_queue=args.task_queue,
             on_auth_required=on_auth_required,
         )
         print(response)
@@ -358,7 +356,6 @@ if __name__ == "__main__":
         default="https://api.mistral.ai",
         help="Mistral server URL",
     )
-    parser.add_argument("--task-queue", required=True, help="Task queue")
     parser.add_argument("--deployment-name", required=True, help="Deployment name")
     parser.add_argument("--workflow_name", required=True, help="workflow to execute")
     parser.add_argument(
@@ -376,7 +373,7 @@ When the connector uses a bearer token that is already stored, execution is stra
 Run it:
 
 ```bash
-uv run python -m 09_workflow_executor_with_connectors --api-key $MISTRAL_API_KEY --task-queue emma --workflow_name emma-tests-scenarios --deployment-name emma
+uv run python -m 09_workflow_executor_with_connectors --api-key $MISTRAL_API_KEY --workflow_name github-issue-creator --deployment-name default
 ```
 
 ---
@@ -384,7 +381,7 @@ uv run python -m 09_workflow_executor_with_connectors --api-key $MISTRAL_API_KEY
 ### Oauth/Bearer execution with runtime connector binding
 To specify which credentials to use for each connector when executing the workflow, use the bindings parameter of the script. It will register workflow execution extensions and communicate to the worker which credentials to use for this user.
 ```
-uv run python -m 09_workflow_executor_with_connectors --api-key <your_api_key> --query meeting  --bindings '[{"connector_name": "github_app", "credentials_name": "galilou"}]' --task-queue emma --workflow_name emma-tests-scenarios --deployment-name emma
+uv run python -m 09_workflow_executor_with_connectors --api-key <your_api_key> --query meeting  --bindings '[{"connector_name": "github_app", "credentials_name": "galilou"}]' --workflow_name github-issue-creator --deployment-name default
 ```
 
 **Binding fields:**
