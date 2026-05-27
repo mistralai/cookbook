@@ -24,43 +24,15 @@ This cookbook covers two separate roles:
 | **Worker** | Hosts the workflow and calls connector tools | A long-running server process, separate from client scripts |
 | **Client** | Triggers workflow execution and handles OAuth redirects | Any script or AI Studio |
 
-### Worker and example client install
-
-The worker needs the Mistral workflows plugin, which bundles the Mistral AI SDK and the workflows runtime:
-
-```bash
-uv sync
-```
-
-### Required environment variables
-
-**Worker:**
-
-```bash
-MISTRAL_CLIENT_SERVER_URL=https://api.mistral.ai
-SERVER_URL=https://api.mistral.ai
-MISTRAL_API_KEY=<your_api_key>
-MISTRAL_CLIENT_API_KEY=<your_api_key>
-DEPLOYMENT_NAME=<your_deployment_name>
-```
-
-Deployment name can just be your name for testing.
-
-**Client:**
-
-```bash
-MISTRAL_API_KEY=your-mistral-api-key
-SERVER_URL=https://api.mistral.ai
-
-```
-You need to use the same deployment name as the worker to trigger the execution of the right workflow.
 
 ### What you need before starting
-- Dedicate a workspace and a mistral api tied to this workspace where you will conduct your experiments. Note that people executing your workflow need to be in the same workspace as you.
-- At least one registered MCP connector — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one
-- For OAuth-authenticated connectors (e.g. Notion, Gmail): no pre-existing credentials are needed — the auth flow is triggered automatically at workflow execution time; for bearer-authenticated connectors (e.g. GitHub PAT), credentials must be stored in the Mistral dashboard before running the workflow
+
+- Dedicate a Mistral workspace to run your workflow. Note that execution of your workflow needs to use the same workspace as the workflow.
+- At least one registered Connector. See the [Connectors Management Cookbook](./01-connectors-management.md) to create one, use of of the registered connectors in Studio, or create your own in Studio.
+- For OAuth-authenticated connectors like Notion and Gmail: no pre-existing credentials are needed — the auth flow is triggered automatically at workflow execution time; for bearer-authenticated connectors (e.g. GitHub PAT), credentials must be stored in the Mistral console before running the workflow.
 
 ---
+
 
 ## Create a Worker with Connectors
 
@@ -76,9 +48,23 @@ A workflow that uses connectors has three building blocks:
 
 The `ConnectorAuthInterceptor` is automatically registered by the plugin when `run_worker` starts. It runs an auth preflight before every workflow execution: if valid credentials exist (matching `credentials_name` if specified, else if default credentials exist) the workflow proceeds immediately; if not, it triggers an OAuth flow and waits for the user to authenticate. Note that bearer on the fly authentication is not supported yet.
 
+### Worker and example client install
+
+To set up a pre-built worker and workflow environment, run the following command:
+
+```bash
+uvx mistralai-workflows-cli setup
+```
+
+This scaffolds a ready-to-run Python project with the Workflows SDK already configured, a minimal example workflow, and helper commands to run your worker and trigger executions.
+
+The command prompts you to [generate a Mistral API key in the Mistral Console](https://console.mistral.ai/home?profile_dialog=api-keys). Follow the prompts to generate the API key, and then pass it to the command when requested. API keys are only accessible once.
+
 ---
 
 ### Step 1 — Declare connector slots
+
+Create a new Python file in the `workflows` directory (e.g. `workflows/connectors_example.py`).
 
 Connector slots are declared at module level. Each slot holds the connector name and auth configuration:
 
@@ -255,13 +241,12 @@ if __name__ == "__main__":
 Start the worker:
 
 ```bash
-MISTRAL_CLIENT_SERVER_URL=https://api.mistral.ai SERVER_URL=https://api.mistral.ai MISTRAL_API_KEY=<your_api_key> MISTRAL_CLIENT_API_KEY=<your_api_key> DEPLOYMENT_NAME=<your_deployement_name>
-uv run python -m worker
+make start-worker
 ```
 
 **How it works:**
 
-- `run_worker` connects to the Temporal backend, registers the workflow class, and starts polling for events
+- The command starts the worker, connects to the Mistral API, and registers your workflow so it can wait for tasks. For details on this command, see the Makefile.
 - The `ConnectorAuthInterceptor` is automatically loaded by the plugin system — no manual setup is needed
 - Before each workflow execution, the interceptor checks credentials for every `auto_auth=True` connector slot:
   - Valid credentials found → proceed immediately
@@ -373,7 +358,7 @@ When the connector uses a bearer token that is already stored, execution is stra
 Run it:
 
 ```bash
-uv run python -m 09_workflow_executor_with_connectors --api-key $MISTRAL_API_KEY --workflow_name github-issue-creator --deployment-name default
+make execute workflow=github-issue-creator input='{"owner": "your-username", "repo": "your-repo", "title": "Hello World", "body": "Hello World"}'
 ```
 
 ---
@@ -436,8 +421,6 @@ When credentials are not specified, the worker will try to use your default cred
 
 ### OAuth flow in the execution panel
 
-If you have no credentials for a given connector and the connector is OAuth2, the worker will trigger an auth flow on the fly — you will receive an event in the execution panel prompting you to authenticate (the orange key icon indicates an action is required):
-
-<img width="1881" height="586" alt="image" src="https://github.com/user-attachments/assets/385d5e56-1d44-40fb-bb07-64b70c5eafb3" />
+If you have no credentials for a given connector and the connector is OAuth2, the worker will trigger an auth flow on the fly — you will receive an event in the execution panel prompting you to authenticate (an orange key icon indicates an action is required).
 
 Once you complete the flow, the newly created credentials are stored as your default and the workflow resumes automatically.

@@ -86,9 +86,8 @@ export BASE_URL="https://api.mistral.ai"
 ---
 
 ### 2. Create a GitHub MCP Connector
-You can skip this part if you want to use an existing connector with bearer authentication.
 
-> **Note:** `auth_scheme` is not yet available in the SDK — use the raw API via `subprocess` + `curl` for this field.
+You can skip this step if you use an existing connector with bearer authentication. 
 
 **Python:**
 
@@ -436,7 +435,7 @@ Credentials 'github-pat-limited' deleted successfully
 MISTRAL_API_KEY=your-mistral-api-key
 ```
 
-- The `outlook_calendar` connector must already exist (it is a Mistral-managed connector).
+- The `outlook_calendar` connector must be enabled in your workspace. Enable it in the [Mistral Console](https://console.mistral.ai/connectors).
 - You need two Microsoft accounts to authenticate separately.
 
 **Script:** `python/src/scripts/08_multiple_oauth_authentication.py`
