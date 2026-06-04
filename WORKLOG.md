@@ -200,6 +200,46 @@ The following are flagged from `AGENTS/CONTEXT/agentegra_atf_validation_question
 
 ---
 
+### CB-13: Deploy cookbook ATF demo to api.robotross.art/atf-mistral
+**Status**: deployed — pending MISTRAL_API_KEY  
+**Owner**: Clau (2026-06-05)  
+**What was deployed**:
+- Cloned `feat/automated-technical-file` branch → `/opt/atf-mistral/` on DigitalOcean server (ssh robotsales = 159.223.22.165)
+- Virtualenv at `/opt/atf-mistral/venv/` — cookbook `requirements.txt` + `fastapi>=0.110` + `uvicorn[standard]>=0.29`
+- FastAPI service at `/opt/atf-mistral/third_party/automated-technical-file/serve.py`:
+  - `GET /` — health check (always responds, `ready: false` until key is set)
+  - `GET /demo` — runs CB-06 cited Q&A ("What is the bidding rule for the Wall of Fame?") against Mistral Document Library
+  - `POST /query` — arbitrary question, same cited Q&A backend
+  - On first startup with key: creates Document Library + Agent, caches IDs to `/opt/atf-mistral/state.json` to avoid recreating on restart
+- systemd unit: `/etc/systemd/system/atf-mistral.service` — enabled + running on port 8003
+- Caddy proxy: added `handle_path /atf-mistral/*` block to `/etc/caddy/Caddyfile` (before catch-all 8787); did NOT touch `/atf` live endpoint
+- `/opt/atf-mistral/.env` — placeholder file with `MISTRAL_API_KEY=` (empty; chmod 600; Miguel must fill)
+
+**Verified**:
+- `https://api.robotross.art/atf-mistral/` → `{"service":"RobotRoss ATF Demo","ready":false,...}` ✅
+- `https://api.robotross.art/atf-mistral/demo` → graceful 503 "MISTRAL_API_KEY not configured" ✅
+- `https://api.robotross.art/atf/` → HTTP 200, untouched ✅
+
+**To activate**:
+1. `echo 'MISTRAL_API_KEY=<your-key>' > /opt/atf-mistral/.env && chmod 600 /opt/atf-mistral/.env`
+2. `systemctl restart atf-mistral`
+3. `curl https://api.robotross.art/atf-mistral/demo` — should return a cited answer
+
+---
+
+## CB-13 Open Questions
+
+| # | Question | Recommendation |
+|---|---|---|
+| CB13-Q1 | **Proxy is Caddy, not nginx.** Task said nginx but the server uses Caddy for TLS on api.robotross.art. Caddy was configured instead — same result, different tool. No action needed unless you have a specific nginx preference. | Caddy fine |
+| CB13-Q2 | **MISTRAL_API_KEY not in Infisical** (checked project `3233b7c1`). Currently wired via `/opt/atf-mistral/.env`. Miguel must manually add the key. If you want it in Infisical, add it with `INFISICAL_TOKEN=... infisical secrets set MISTRAL_API_KEY=<val> --env dev --projectId 3233b7c1-8309-447d-af5a-6541e38dc1b3` and switch the service to `infisical run ...` (see crm-api pattern). | Add key to .env |
+| CB13-Q3 | **Port**: chose 8003 (8001 = tracker-api, 8002 = crm-api). No conflict found. | 8003 confirmed |
+| CB13-Q4 | **Process manager**: chose systemd (consistent with tracker-api and crm-api). No supervisor/pm2 on server. | systemd confirmed |
+| CB13-Q5 | **Agent/Library lifecycle**: on first boot with key, the service creates a fresh Mistral Document Library and Agent and caches their IDs to `/opt/atf-mistral/state.json`. Subsequent restarts reuse them. Deleting `state.json` forces recreation (and orphans the old Mistral resources). Miguel should decide when to clean up staging Agents/Libraries in the Mistral console. | Delete state.json to reprovision |
+| CB13-Q6 | **Full cited Q&A not verified** — CB-13 cannot confirm a live cited result without a real MISTRAL_API_KEY. Health endpoint verified; 503 path verified. Miguel should run `/demo` after adding the key to confirm end-to-end. | Run /demo after key set |
+
+---
+
 ## Branch status
 
 ```
