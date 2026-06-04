@@ -70,12 +70,13 @@ No other credentials are needed. The `runtime_adapter.py` also supports a local 
 
 | Notebook | Description |
 | :--- | :--- |
-| `automated_technical_file.ipynb` | **End-to-end walkthrough.** Six cells: (1) setup and imports, (2) ledger → wiki corpus via `ledger_to_md`, (3) upload corpus to Mistral Files, (4) create Document Library and cited Q&A, (5) structured-output log analysis, (6) voice shell via Voxtral (stub, opt-in). |
+| [`notebooks/automated_technical_file.ipynb`](notebooks/automated_technical_file.ipynb) | **End-to-end walkthrough.** Cell 2 regenerates `artifacts/wiki/sample_run_summary.md` from `artifacts/ledger/sample_events.jsonl` with the vendored `tools/ledger_to_md.py`; later cells can upload the corpus to Mistral Files and query it with citations. |
 
 ## Tools
 
 | File | Description |
 | :--- | :--- |
+| `tools/ledger_to_md.py` | Vendored JSONL-to-Markdown corpus generator used by notebook cell 2. |
 | `tools/runtime_adapter.py` | Model abstraction layer. Tries hosted Mistral first, falls back to local Ministral (Ollama), then `aichat`, then generic Ollama. Run `--check` to verify your backend. |
 
 ## Attribution
