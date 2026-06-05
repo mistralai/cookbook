@@ -106,10 +106,15 @@ The CB-07 vendoring (see below) brought in generic names. CB-04's status of `wai
 ---
 
 ### CB-10: Voice cell — Voxtral Transcribe 2 → Mistral → Voxtral TTS
-**Status**: todo (marked DROPPABLE in description)  
-**Owner**: Unassigned  
-**What changed**: Nothing shipped. Voice cell would add notebook cell 6: Voxtral STT → Mistral reasoning → Voxtral TTS, replacing Whisper.  
-**Miguel decision needed**: Drop this from the PR (ship 1-11 first), or block on it?
+**Status**: approved  
+**Owner**: Gem  
+**What changed**: Added notebook cell 6 (json index 6) for Voxtral Voice Loop:
+- STT: `voxtral-mini-2602` (Voxtral Transcribe 2)
+- Reasoning: `mistral-large-latest` (Mistral Large)
+- TTS: `voxtral-mini-tts-2603` (Voxtral TTS 4B)
+- Persona: Robot Ross (encouraging tone, painting metaphors)
+- Stub-ability: Clearly marked as optional, gracefully skips on missing dependencies or API key.
+- Tools: `voice/listen.py` and `voice/speak.py` updated to use Voxtral exclusively (Whisper stripped).
 
 ---
 
