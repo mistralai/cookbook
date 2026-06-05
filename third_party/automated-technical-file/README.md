@@ -78,6 +78,7 @@ No other credentials are needed. The `runtime_adapter.py` also supports a local 
 | :--- | :--- |
 | `tools/ledger_to_md.py` | Vendored JSONL-to-Markdown corpus generator used by notebook cell 2. |
 | `tools/runtime_adapter.py` | Model abstraction layer. Tries hosted Mistral first, falls back to local Ministral (Ollama), then `aichat`, then generic Ollama. Run `--check` to verify your backend. |
+| `tools/voice/` | Voice interface tools: `listen.py` (Voxtral STT) and `speak.py` (Voxtral TTS). |
 
 ## Attribution
 
