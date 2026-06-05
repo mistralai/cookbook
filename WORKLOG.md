@@ -257,3 +257,235 @@ Notebook: Cell 1 executes fully without API key; cells 2-3 gracefully degrade
 ```
 
 **STOP — do not open PR.** Miguel reviews and opens it.
+
+---
+
+## 2026-06-05 — Final session (Clau + Big Sis review)
+
+### CB-14 — Cowork review: all blockers resolved
+
+Big Sis reviewed and flagged 4 blockers + 4 nice-to-haves. All blockers fixed same session:
+
+- **B1** README "continuously from live robot run logs" → accurate phrasing (regenerable on demand, not live)
+- **B2** `notebooks/Topics/Compliance.md` deleted; EU AI Act / regulatory content removed
+- **B3** `[[Compliance]]` link stripped from `notebooks/Overview.md`
+- **B4** `from mistralai.client import Mistral` → `from mistralai import Mistral` throughout (1.x import path)
+- `artifacts/wiki/sample_run_summary.md` "compliance-ready technical-file sketch" → "wiki article" (×2)
+- `tools/runtime_adapter.py` all 5 Apertus references removed (model priority list, setup instructions, CLI help)
+- `requirements.txt` stripped to `mistralai>=1.0.0` + `python-dotenv>=1.0.0` (no server deps)
+- `serve.py` and `static/images/` removed from cookbook (DO server scope only)
+- `__pycache__` removed; `.gitignore` added
+- `img/architecture.png` compressed 4.9 MB → 360 KB via `sips -Z 750`
+
+### CB-15 — README + ARCHITECTURE rewrites (Big Sis)
+
+Big Sis provided final prose for both documents. Applied verbatim:
+
+- **README**: new thesis title "Codebase-to-Wiki Q&A — on Mistral"; ATF framing ("grounded operational memory"); simplified 5-row folder table; new "Where This Goes Next" section connecting to Mistral Forge
+- **ARCHITECTURE**: autonomous agent framing; richer Layer 2 description ("faithful record of what the agent actually did, not what someone hoped it did"); new final section "From Inference-Time Grounding to Training-Time Grounding" with Mistral Forge link
+
+### CB-16 — Smoke test: fresh venv, mistralai 1.10.0 (Clau)
+
+Three bugs found and fixed during smoke test:
+
+1. **Root detection** — nbconvert sets kernel CWD to `notebooks/`; old fallback walked down, not up. Fixed with `_find_root()` that walks up `[here, here.parent, here.parent.parent]` then tries Colab path.
+2. **Import path** — `from mistralai.client import Mistral` removed in 1.10.0. Fixed to `from mistralai import Mistral` in all code cells.
+3. **Agents response shape** — SDK 1.10.0 `agents.complete` parses response as `ChatCompletionResponse` (requires `choices[0].message` singular); document_library agents return `choices[0].messages` (list of DeltaMessage). Fixed `ask_with_citations` to call `/v1/agents/completions` directly via `httpx` with a comment explaining the mismatch.
+
+Additional hardening: upload retry with exponential backoff for 429 rate limits; `MISTRAL_LIBRARY_ID` env var skips library creation on repeat runs.
+
+All 5 code cells passed: generation → library reuse → structured outputs → cited Q&A → (voice stub, markdown only).
+
+### CB-17 — Colab setup cell (Big Sis + Clau)
+
+First code cell added — no-op locally, runs on Colab:
+- Clones `UrsushoribilisMusic/cookbook` at `feat/automated-technical-file` (pre-merge URL)
+- `pip install -q mistralai==1.10.0 python-dotenv`
+- Comment in cell: after PR merges, switch clone URL to `https://github.com/mistralai/cookbook.git` (main)
+
+Re-ran local smoke test after adding cell — all PASS.
+
+---
+
+## PR opened
+
+**PR #280** — https://github.com/mistralai/cookbook/pull/280  
+Opened by Miguel Rodriguez, 2026-06-05.
+**Status**: review_complete — 4 blockers, 4 nice-to-haves  
+**Owner**: Clau (2026-06-05)  
+**Scope reviewed**: README.md, ARCHITECTURE.md, all 15 wiki corpus pages (Overview.md, Architecture.md, 4 Subsystems, 8 Topics, sample_run_summary.md), serve.py, requirements.txt  
+
+---
+
+#### BLOCKERS — must fix before PR opens
+
+**B1 — README.md:25 — Self-updating/live claim (do-not list violation)**
+
+```
+"The production deployment at api.robotross.art/atf-mistral/ regenerates continuously
+from live robot run logs, so the wiki never drifts from reality."
+```
+
+Both "continuously" and "live" are accuracy guardrail violations. The wiki is
+regenerable-from-logs on demand, not a live self-updating system. Suggested replacement:
+
+```
+"The production deployment at api.robotross.art/atf-mistral/ was built from the same
+pipeline: regenerate the wiki from fresh logs and the corpus reflects the current system
+state without manual editing."
+```
+
+---
+
+**B2 — notebooks/Topics/Compliance.md — Full EU AI Act article (do-not list violation)**
+
+Entire page is EU AI Act / regulatory content:
+- Title: "Compliance & EU AI Act"
+- Body references: "EU AI Act (August 2026 deadline)", compliance mapping table with
+  "Key Obligation" and "Compliance Theme" columns, "Dynamic Policy: The EU AI Act is
+  evolving", "centralized compliance reporting"
+- Sources reference: `AGENTS/CONTEXT/atf_eu_ai_act_mapping.md`
+
+This page must be replaced or removed. Options:
+1. Replace with a traceability/provenance page ("Traceability & Provenance") that
+   covers the same architectural concepts (audit trail, source citation, operator
+   oversight) without regulatory framing — this preserves the wiki page count and
+   slug.
+2. Remove entirely and drop the slug from WIKI_PAGES, WIKI_CORPUS_FILES,
+   serve.py, notebooks/Architecture.md §6 Topics table, and notebooks/Overview.md §4.
+
+Option 1 is recommended — the underlying concepts are valid for the cookbook.
+
+---
+
+**B3 — notebooks/Overview.md:25 — EU AI Act text in body (do-not list violation)**
+
+```
+[[Compliance]]: EU AI Act mapping and architectural traceability.
+```
+
+"EU AI Act mapping" must go. Fix with B2: if the Compliance page is renamed to
+Traceability, update this line to match. If removed, delete the line.
+
+---
+
+**B4 — serve.py:176, serve.py:233 — Wrong mistralai import (runtime ImportError)**
+
+Both `_init_mistral()` and `_ask()` use:
+```python
+from mistralai.client import Mistral
+```
+
+This is the v0.x import path. `requirements.txt` pins `mistralai>=1.0.0`. In v1.x
+the correct import is:
+```python
+from mistralai import Mistral
+```
+
+The notebook (cell 3, CB-06) already uses the correct form. serve.py will raise
+`ImportError` on startup with the current import. Fix both occurrences.
+
+---
+
+#### NICE-TO-HAVES — not blocking
+
+**N1 — ARCHITECTURE.md — Layer 1 / Layer 2 numbering is inverted**
+
+The top-level diagram shows:
+```
+[Layer 1: Compiled Wiki]        ← ledger_to_md.py turns JSONL events into Markdown
+[Layer 2: Operational Ledger]   ← JSONL, one event per line, append-only
+```
+
+But the data flows source → Ledger → Wiki, so Ledger is the primitive layer
+and Wiki is derived. The Layer 1 / Layer 2 labels are swapped relative to
+pipeline order. The "Data Flow" section below is correct — it is only the top
+overview diagram that misleads. Swapping the numbers (or adding a "(feeds Layer 1)"
+annotation) would prevent reader confusion.
+
+---
+
+**N2 — serve.py:14 — Hardcoded /opt/ deployment path**
+
+```python
+STATE_FILE = Path('/opt/atf-mistral/state.json')
+```
+
+Not a /Users/ path (not in the do-not list) and intentional for the deployment,
+but any cookbook contributor trying to run serve.py locally gets a path that
+doesn't exist on their machine. Consider:
+
+```python
+STATE_FILE = Path(os.environ.get('ATF_STATE_FILE', str(BASE / 'state.json')))
+```
+
+This makes local runs work without touching the server config.
+
+---
+
+**N3 — serve.py — Internal ticket/staging refs in Mistral resource descriptions**
+
+```python
+description='Wiki corpus for RobotRoss ATF staging demo (CB-13)',
+description='RobotRoss ATF cited Q&A (staging / CB-13)',
+```
+
+These strings end up as the Mistral Document Library and Agent names visible in the
+Mistral console. Harmless for a staging demo but looks internal. Could be cleaned
+to "RobotRoss ATF Wiki" / "RobotRoss ATF Q&A" before any production handoff.
+
+---
+
+**N4 — notebooks/Architecture.md:51 — [[Compliance]] link in Topics table**
+
+The Four-Layer ATF Surface table (§6) lists `[[Compliance]]` in the Topics row.
+If B2 replaces the page rather than removing it, this link stays correct. If the
+page is removed, update this row.
+
+---
+
+#### Do-not list sweep — PASS (except where flagged above)
+
+| Pattern | Result |
+|---|---|
+| EU AI Act / regulatory language | ❌ B2, B3 — Compliance.md + Overview.md |
+| Apertus | ✅ NONE |
+| Anthropic / ANTHROPIC_API_KEY | ✅ NONE |
+| Infisical / infisical | ✅ NONE |
+| /Users/ paths | ✅ NONE |
+| Mexico / mexico | ✅ NONE |
+| Self-updating / live claims | ❌ B1 — README.md:25 |
+| OpenClaw | ✅ NONE |
+
+Note: "compliance-ready" appears twice in `artifacts/wiki/sample_run_summary.md` (lines 24, 57)
+as a prompt string embedded in a log event — this is the AI prompt recorded in the
+operational ledger, not an authorial compliance claim. Leave as-is; it is accurate
+to the logged event.
+
+---
+
+#### Accuracy guardrail — PASS (except B1)
+
+All prose in ARCHITECTURE.md, the subsystem pages, and the topic pages uses
+past-tense or conditional framing ("the wiki can be regenerated", "the ledger
+records", "ledger_to_md.py emits"). The only live/self-updating claim is B1 in
+README.md.
+
+---
+
+#### requirements.txt — PASS
+
+`markdown>=3.0`, `aiofiles>=23.0`, `fastapi>=0.100.0`, `uvicorn>=0.23.0` — all
+four additions are present and correctly pinned.
+
+---
+
+#### Verdict
+
+**Do not open PR yet.** Fix B1–B4, then green light.
+
+B1 and B3 are single-line edits. B4 is a two-line find-replace in serve.py.
+B2 (Compliance.md) is the most work — recommend replacing with a Traceability &
+Provenance page (~20 lines) to preserve the 15-page corpus count.
+
+Estimated fix time: 30 minutes for all four blockers.
