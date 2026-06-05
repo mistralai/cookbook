@@ -27,10 +27,9 @@ Machine / runtime prerequisites
     Local Ministral / Ollama requires:
         ollama serve                     # starts the daemon on :11434
     At least one of these models must be pulled (pull once, reuse forever):
-        ollama pull ministral-3b-latest                              # preferred
-        ollama pull MichelRosselli/apertus:8b-instruct-2509-q4_k_m   # generic fallback
-        ollama pull gemma4:e4b                                         # alt
-        ollama pull gemma:latest                                       # baseline
+        ollama pull ministral-3b-latest   # preferred
+        ollama pull gemma4:e4b            # alt
+        ollama pull gemma:latest          # baseline
     Python >= 3.9, standard library only — no pip install required.
     Optional: aichat in PATH (secondary fallback if Ollama is unreachable).
 
@@ -40,7 +39,7 @@ Model selection
         1. Mistral hosted   — mistral-medium-3-5, then mistral-large-latest
         2. Ministral local  — local Ministral 3B tags via Ollama
         3. aichat           — subprocess fallback
-        4. Ollama generic   — Apertus/Gemma/first pulled model
+        4. Ollama generic   — any locally pulled model
         5. corpus-only      — callers catch RuntimeError and answer from corpus
     Set BACKEND or --backend to auto, hosted, local, aichat, ollama, or
     corpus-only.  Set OLLAMA_HOST to override localhost:11434.
@@ -113,7 +112,7 @@ MINISTRAL_MODEL_PRIORITY: List[str] = [
     "ministral-3b",
     "ministral",
 ]
-GENERIC_OLLAMA_MODEL_PRIORITY: List[str] = ["apertus", "gemma4", "gemma"]
+GENERIC_OLLAMA_MODEL_PRIORITY: List[str] = ["gemma4", "gemma"]
 MODEL_PRIORITY: List[str] = MINISTRAL_MODEL_PRIORITY + GENERIC_OLLAMA_MODEL_PRIORITY
 
 
@@ -458,7 +457,7 @@ def query(
         The full prompt text.  Callers are responsible for injecting context.
     model:
         Optional model name or substring hint (e.g. ``"mistral-large"``,
-        ``"ministral"``, ``"apertus"``, ``"gemma:latest"``).
+        ``"ministral"``, ``"gemma:latest"``).
     timeout:
         Seconds to wait for the model response before raising RuntimeError.
 
@@ -626,7 +625,6 @@ def main() -> None:
               export MISTRAL_API_KEY=...       # hosted Mistral; env only
               ollama serve
               ollama pull ministral-3b-latest
-              ollama pull MichelRosselli/apertus:8b-instruct-2509-q4_k_m
               ollama pull gemma:latest     # alternative
 
             Backend fallback priority:
@@ -654,7 +652,7 @@ def main() -> None:
     parser.add_argument(
         "--model",
         metavar="NAME",
-        help="Model name or substring hint (e.g. 'mistral-large', 'ministral', 'apertus')",
+        help="Model name or substring hint (e.g. 'mistral-large', 'ministral', 'gemma')",
     )
     parser.add_argument(
         "--backend",

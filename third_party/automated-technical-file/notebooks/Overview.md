@@ -22,7 +22,6 @@ The system follows a three-layer architecture:
 - [[ShopifyIntegration]]: Webhooks, metadata write-back, and human e-commerce.
 - [[VirtualsACP]]: Agentic commerce protocol for autonomous hiring.
 - [[Calibration]]: Necessary startup procedures for hardware accuracy.
-- [[Compliance]]: EU AI Act mapping and architectural traceability.
 
 ## 5. Hardware Requirements
 - **Computer**: Mac Mini M4 (Apple Silicon)
@@ -32,17 +31,16 @@ The system follows a three-layer architecture:
 
 ## 6. Software Stack
 - **OS**: macOS (darwin) for Artist; Ubuntu (Linux) for Salesman.
-- **LLM**: Apertus 8B (local via Ollama)
-- **Agent Framework**: OpenClaw
-- **Utilities**: OBS Studio, ffmpeg, Python 3.12, Node.js
+- **LLM**: Mistral (hosted) with Ministral local fallback
+- - **Utilities**: OBS Studio, ffmpeg, Python 3.12, Node.js
 
 ## 7. Uncertainty & Contradictions
 - **Calibration Persistence**: Source code indicates calibration is required after every restart (`READY_FLAG` in `/tmp`), but some docs suggest it might be semi-persistent.
 - **Pen Pressure**: Manual leveling of the table is mentioned as a physical requirement that software cannot currently compensate for.
-- **Narration Latency**: There is an inherent delay while Apertus 8B generates narration, which `bob_ross.py` handles with a wait period, but the impact on "live" feel is a point of ongoing optimization.
+- **Narration Latency**: There is an inherent delay while Mistral generates narration, which `bob_ross.py` handles with a wait period, but the impact on "live" feel is a point of ongoing optimization.
 
 ---
 **Sources:**
 - `AGENTS/CONTEXT/robot_ross_artist.md`
 - `AGENTS/CONTEXT/robot_ross_salesman.md`
-- `~/.openclaw/workspace/skills/robot-ross/bob_ross.py`
+- `skills/robot-ross/bob_ross.py`

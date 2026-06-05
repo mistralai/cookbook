@@ -1,89 +1,75 @@
-# Automated Technical File — Mistral AI Cookbook Integration
+# Codebase-to-Wiki Q&A — on Mistral
 
-This cookbook demonstrates how to use Mistral AI models to produce and maintain an **Automated Technical File** (ATF) — a queryable, citation-backed compliance artifact generated automatically from the operational logs of an AI system.
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mistralai/cookbook/blob/main/third_party/automated-technical-file/notebooks/automated_technical_file.ipynb)
 
-The reference system is **Robot Ross**, an autonomous robotic painting arm. Every action the arm takes is logged. Those logs are compiled into a structured wiki corpus, indexed by Mistral's Document Library, and made queryable with full source citations — satisfying the record-keeping, transparency, and oversight requirements of the EU AI Act for high-risk AI systems.
+---
+
+## Problem Statement
+
+Documentation rots the moment code changes. Operational knowledge — how to install the system, why the last run failed, what a specific component does — is scattered across source files, run logs, and whoever set it up first. A new operator cannot answer "how do I install this?" or "why did the last run fail?" without spelunking through the repository.
+
+The running example is **Robot Ross**: an autonomous robotic arm that draws customer orders, narrates in real time, and records every action in a structured JSONL ledger. The ATF — Automated Technical File — is that ledger's grounded operational memory: a cited, regenerable wiki compiled automatically from the code and logs themselves, never written by hand.
+
+The same pipeline generalises to any system with structured logs.
+
+---
+
+## What This Does
+
+1. **Compiles** a wiki from source code and operational logs — not written by hand.
+2. **Answers** questions with citations to the actual source file or log event, so every claim is verifiable.
+3. **Stays current**: re-run the generator on fresh logs and the wiki reflects the current system state. No manual editing required.
+
+Live deployment: [api.robotross.art/atf-mistral](https://api.robotross.art/atf-mistral/)
+
+---
+
+## How It Differs from IndustrialKnowledgeAgent
+
+[IndustrialKnowledgeAgent](../../mistral/agents/non_framework/industrial_knowledge_agent/IndustrialKnowledgeAgent.ipynb) does RAG over manuals a human has already written. This cookbook compiles the knowledge base automatically from code and telemetry. The distinction matters: curated documentation is always behind the current system; a generated wiki is regenerated from the latest logs.
+
+---
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         Robot Ross                               │
-│           (autonomous painting arm / agentic system)            │
-└─────────────────────────┬────────────────────────────────────────┘
-                          │  structured action events
-                          ▼
-                  ┌───────────────┐
-                  │  JSONL Ledger │  ◄── every tool call, decision,
-                  │  (run logs)   │       sensor read, and outcome
-                  └───────┬───────┘
-                          │  ledger_to_md.py  (notebook cell 2)
-                          ▼
-                  ┌───────────────┐
-                  │  Wiki Corpus  │  ◄── one Markdown page per
-                  │  (Markdown)   │       session / component / topic
-                  └───────┬───────┘
-                          │  Mistral Files + Document Library  (cells 3-4)
-                          ▼
-              ┌─────────────────────────┐
-              │  Mistral Document       │
-              │  Library (chunked,      │
-              │  indexed, hosted)       │
-              └────────────┬────────────┘
-                           │  cited Q&A  (atf_qa.py / cell 4)
-                           ▼
-              ┌─────────────────────────┐
-              │  Answer + Citations     │  "The robot paused at 14:23
-              │  (Technical File query) │   because sensor_L read 0 V.
-              └─────────────────────────┘  Source: session_042.md §3
-```
+![Pipeline diagram](img/architecture.png)
 
-Queries resolve to answers that cite the exact wiki page and section, creating an auditable chain from natural-language question back to the raw operational log.
+*Source Code + Run Logs → Operational Ledger → Wiki Generator → Markdown Wiki → Mistral Document Library → Cited Answer.*
 
-## EU AI Act Compliance Framing
+Full layer-by-layer breakdown: [ARCHITECTURE.md](ARCHITECTURE.md)
 
-The ATF pipeline maps directly to three Articles of the EU AI Act that apply to **high-risk AI systems** (Annex III):
+---
 
-| Article | Requirement | How this cookbook satisfies it |
-| :--- | :--- | :--- |
-| **Art. 12 — Logging** | Systems must automatically record events throughout their lifetime. | The JSONL ledger captures every action, decision, and sensor event in structured, append-only form. Nothing is discarded between the robot acting and the ledger entry being written. |
-| **Art. 13 — Transparency** | Operators must be able to interpret system outputs and trace their origin. | `ledger_to_md.py` converts raw logs into human-readable wiki pages. The cited Q&A layer makes any fact traceable: every answer includes the source document and section. |
-| **Art. 14 — Human oversight** | Humans must be able to effectively oversee the system during operation. | The Technical File is queryable in plain language. Operators can ask "why did the arm stop?" and receive a cited answer grounded in the actual log, enabling informed intervention. |
-
-This architecture means the Technical File is not a document written after the fact — it is compiled continuously from the system's own operational record.
-
-## Requirements
+## Quickstart
 
 ```bash
 pip install -r requirements.txt
+export MISTRAL_API_KEY=<your-key>   # console.mistral.ai
+jupyter notebook notebooks/automated_technical_file.ipynb
 ```
 
-Only one API key is required:
+Run cells top to bottom. Step 1 (wiki generation) runs offline. Steps 2–4 require `MISTRAL_API_KEY`.
 
-```bash
-export MISTRAL_API_KEY=<your-key>   # from console.mistral.ai
-```
+---
 
-No other credentials are needed. The `runtime_adapter.py` also supports a local [Ollama](https://ollama.com/) backend (Ministral 3B) for offline use — see `tools/runtime_adapter.py --help`.
+## What's in This Folder
 
-## Notebooks
-
-| Notebook | Description |
+| Path | Description |
 | :--- | :--- |
-| [`notebooks/automated_technical_file.ipynb`](notebooks/automated_technical_file.ipynb) | **End-to-end walkthrough.** Cell 2 regenerates `artifacts/wiki/sample_run_summary.md` from `artifacts/ledger/sample_events.jsonl` with the vendored `tools/ledger_to_md.py`; later cells can upload the corpus to Mistral Files and query it with citations. |
+| `notebooks/automated_technical_file.ipynb` | End-to-end notebook walkthrough |
+| `tools/ledger_to_md.py` | JSONL → Markdown corpus generator |
+| `tools/runtime_adapter.py` | Hosted Mistral / local Ministral switch |
+| `artifacts/ledger/sample_events.jsonl` | Sample robot run log |
+| `artifacts/wiki/sample_run_summary.md` | Generated wiki output (committed for reference) |
 
-## Tools
+---
 
-| File | Description |
-| :--- | :--- |
-| `tools/ledger_to_md.py` | Vendored JSONL-to-Markdown corpus generator used by notebook cell 2. |
-| `tools/runtime_adapter.py` | Model abstraction layer. Tries hosted Mistral first, falls back to local Ministral (Ollama), then `aichat`, then generic Ollama. Run `--check` to verify your backend. |
-| `tools/voice/` | Voice interface tools: `listen.py` (Voxtral STT) and `speak.py` (Voxtral TTS). |
+## Where This Goes Next
 
-## Attribution
+Everything here grounds a stock Mistral model at **inference time**: the wiki corpus is supplied as retrieval context per query, with citations proving the answer came from the corpus rather than the weights.
 
-Developed by [Agentegra](https://agentegra.com) / [Big Bear Engineering](https://bigbearengineering.com).
+The deeper version encodes this corpus — and the institutional vocabulary it represents — at **training time**. That is precisely what [Mistral Forge](https://mistral.ai/news/forge/) is built for. The corpus this pipeline compiles — structured, regenerable, drawn straight from code and telemetry — is the kind of input a Forge training pipeline consumes.
 
-## License
+---
 
-Dual-licensed under **Apache 2.0** (matching the parent [mistralai/cookbook](https://github.com/mistralai/cookbook) repository) and **MIT** (for standalone use). See [LICENSE](LICENSE) for details.
+*Built by [Agentegra](https://agentegra.com) / [Big Bear Engineering](https://bigbearengineering.com). Apache-2.0.*

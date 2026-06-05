@@ -20,6 +20,6 @@ The Hardware Interface subsystem provides the low-level communication and contro
 
 ---
 **Sources:**
-- `~/.openclaw/workspace/skills/huenit/huenit_svg.py`
-- `~/.openclaw/workspace/skills/huenit/huenit_draw.py`
+- `skills/huenit/huenit_svg.py`
+- `skills/huenit/huenit_draw.py`
 - `AGENTS/CONTEXT/robot_ross_artist.md`
