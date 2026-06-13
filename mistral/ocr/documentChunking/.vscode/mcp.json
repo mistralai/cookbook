@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"Anaconda": {
+			"url": "https://www.anaconda.com/docs/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}

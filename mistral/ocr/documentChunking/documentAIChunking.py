@@ -120,10 +120,10 @@ def main() -> None:
     """Splits a single document into smaller parts and calls OCR or Document AI asynchronously."""
     try:
         parser = argparse.ArgumentParser(description='Encode PDF to base64 and split if necessary.')
-        parser.add_argument('--pdf_file', type=str, help='Path to the PDF file')
+        parser.add_argument('--pdf_file', type=str, required=True, help='Path to the PDF file')
         parser.add_argument('--max_size_mb', type=float, required=True, help='Maximum size of the PDF in MB')
         parser.add_argument('--max_pages', type=int, required=True, help='Maximum number of pages allowed in a single PDF')
-        parser.add_argument('--endpoint', type=str, help='Endpoint URL')
+        parser.add_argument('--endpoint', type=str, required=True, help='Endpoint URL')
         parser.add_argument('--api_key', type=str, help='API key for the endpoint')
         parser.add_argument('--model_name', type=str, help='Model name for the endpoint', default="mistral-ocr-2505")
 
@@ -132,6 +132,14 @@ def main() -> None:
         pdf_path = args.pdf_file
         max_size_mb = args.max_size_mb
         max_pages = args.max_pages
+
+        if max_size_mb <= 0:
+            logger.error("--max_size_mb must be greater than 0")
+            return
+
+        if max_pages <= 0:
+            logger.error("--max_pages must be greater than 0")
+            return
 
         # Check if file exists
         if not os.path.exists(pdf_path):
@@ -146,12 +154,13 @@ def main() -> None:
             logger.error(f"Error processing PDF: {e}")
             return
 
-        if size_in_mb <= max_size_mb and num_pages <= max_pages:
-        # Encode the whole PDF if it meets the criteria
+        needs_splitting = size_in_mb > max_size_mb or num_pages > max_pages
+
+        if not needs_splitting:
+            # Encode the whole PDF if it meets the criteria
             try:
                 base64_pdf = encode_pdf_to_base64(pdf_path)
                 logger.info("PDF has been encoded to base64 and did not need to be split")
-                # TODO: Add logic to send the base64_pdf to the API
                 response = send_to_api(base64_pdf, args.endpoint, args.api_key, args.model_name)
                 logger.info(f"API response: {response}")
             except Exception as e:
@@ -167,10 +176,15 @@ def main() -> None:
                     try:
                         with open(split_pdf_path, 'wb') as split_pdf_file:
                             pdf_writer.write(split_pdf_file)
-                            base64_pdf = encode_pdf_to_base64(split_pdf_path)
-                            logger.info(f"Part {i+1} processed successfully")
-                            response = send_to_api(base64_pdf, args.endpoint, args.api_key, args.model_name)
-                            logger.info(f"API response: {response}")
+                        split_size_in_mb = get_pdf_size_in_mb(split_pdf_path)
+                        if split_size_in_mb > max_size_mb:
+                            logger.warning(
+                                f"Part {i + 1} is {split_size_in_mb:.2f} MB and still exceeds the size limit of {max_size_mb:.2f} MB"
+                            )
+                        base64_pdf = encode_pdf_to_base64(split_pdf_path)
+                        logger.info(f"Part {i+1} processed successfully")
+                        response = send_to_api(base64_pdf, args.endpoint, args.api_key, args.model_name)
+                        logger.info(f"API response: {response}")
                     except Exception as e:
                         logger.error(f"Error processing part {i+1}: {e}")
                     finally:
