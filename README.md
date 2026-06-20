@@ -61,6 +61,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 
 | Tools                                                                                                                 | Category                        | Party      |
 |:----------------------------------------------------------------------------------------------------------------------|:--------------------------------| :--------- |
+| [AFK coding-agent sessions](third_party/AFK/README.md)                                                               | code, agent                     | AFK        |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                       | RAG                             | LLamaIndex |
 | [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                       | agent                           | LLamaIndex |
