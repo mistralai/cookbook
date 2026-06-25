@@ -117,13 +117,13 @@ Simple data generation to refine news articles
 
 <div class="cookbook-path">mistral/data_generation/data_generation_refining_news.ipynb</div>
 
-### image_description_extraction_pixtral.ipynb <span class="missing-cookbook">missing locally</span>
+### [image_description_prompting_pixtral.ipynb](mistral/image_understanding/image_description_prompting_pixtral.ipynb)
 
 **Category:** image processing, prompting
 
 Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting
 
-<div class="cookbook-path">mistral/image_understanding/image_description_extraction_pixtral.ipynb</div>
+<div class="cookbook-path">mistral/image_understanding/image_description_prompting_pixtral.ipynb</div>
 
 ### [multimodality meets function calling.ipynb](mistral/image_understanding/multimodality_meets_function_calling.ipynb)
 
@@ -319,13 +319,13 @@ Chroma
 
 <div class="cookbook-path">third_party/ChromaDB/chroma_mistral_embed_fn.ipynb</div>
 
-### corrective_rag_mistral.ipynb <span class="missing-cookbook">missing locally</span>
+### [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)
 
 **Category:** RAG
 
 Langchain
 
-<div class="cookbook-path">third_party/langchain/corrective_rag_mistral.ipynb</div>
+<div class="cookbook-path">third_party/langchain/adaptive_rag_mistral.ipynb</div>
 
 ### [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)
 
@@ -391,13 +391,13 @@ Langchain
 
 <div class="cookbook-path">third_party/langchain/langgraph_code_assistant_mistral.ipynb</div>
 
-### langgraph_crag_mistral.ipynb <span class="missing-cookbook">missing locally</span>
+### [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)
 
-**Category:** RAG
+**Category:** code
 
 Langchain
 
-<div class="cookbook-path">third_party/langchain/langgraph_crag_mistral.ipynb</div>
+<div class="cookbook-path">third_party/langchain/langgraph_code_assistant_mistral.ipynb</div>
 
 ### [langtrace_mistral.ipynb](third_party/langtrace/langtrace_mistral.ipynb)
 
@@ -543,13 +543,13 @@ LLamaIndex
 
 <div class="cookbook-path">third_party/LlamaIndex/RouterQueryEngine.ipynb</div>
 
-### self_rag_mistral.ipynb <span class="missing-cookbook">missing locally</span>
+### [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)
 
 **Category:** RAG
 
 Langchain
 
-<div class="cookbook-path">third_party/langchain/self_rag_mistral.ipynb</div>
+<div class="cookbook-path">third_party/langchain/adaptive_rag_mistral.ipynb</div>
 
 ### [Solara Integration - Chat with PDFs](third_party/solara/README.qmd)
 

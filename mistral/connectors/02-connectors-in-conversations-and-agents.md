@@ -53,7 +53,7 @@ Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 Most recipes assume you already have:
 - A working `client` (see [Recipe 1](#1-hello-world--first-conversation))
-- An existing connector for the custom-connector recipes — see the [Connectors Management Cookbook](./connectors-management.md) to create one
+- An existing connector for the custom-connector recipes — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one
 
 ---
 
@@ -291,7 +291,7 @@ Based on current web search results, the weather in Paris today is 8°C with par
 - Connecting domain-specific capabilities to the model (code search, documentation lookup, actions, etc.).
 
 **Prereqs:**
-- An existing connector — see the [Connectors Management Cookbook](./connectors-management.md) to create one.
+- An existing connector — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one.
 
 **Python:**
 
@@ -1161,5 +1161,5 @@ Cleaned up connector: Connector deleted successfully
 
 **How it works:**
 - The `try/finally` pattern ensures the connector is always deleted, even if the conversation fails.
-- This recipe combines connector CRUD (from the [Connectors Management Cookbook](./connectors-management.md)) with conversation usage.
+- This recipe combines connector CRUD (from the [Connectors Management Cookbook](./01-connectors-management.md)) with conversation usage.
 - The second conversation demonstrates the model intelligently routing between web search and the custom connector within a single request.
