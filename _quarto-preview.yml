@@ -1,0 +1,41 @@
+project:
+  type: website
+  output-dir: site
+  render:
+    - index.qmd
+    - cookbooks.qmd
+    - mistral/**/*.qmd
+    - concept-deep-dive/**/*.qmd
+    - third_party/**/*.qmd
+    - quickstart.ipynb
+    - mistral/**/*.ipynb
+    - concept-deep-dive/**/*.ipynb
+    - third_party/**/*.ipynb
+
+execute:
+  enabled: false
+  freeze: auto
+
+website:
+  title: "Mistral Cookbook Preview"
+  site-url: "/"
+  navbar:
+    left:
+      - href: /index.html
+        text: Home
+      - href: /cookbooks.html
+        text: Cookbooks
+  sidebar:
+    style: docked
+    contents:
+      - href: /index.html
+        text: Home
+      - href: /cookbooks.html
+        text: Cookbooks
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-copy: true
+    code-overflow: wrap

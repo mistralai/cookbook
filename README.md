@@ -21,6 +21,21 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 - Clear: Is your content well-structured and clearly written?
 - Value: Is your content valuable to the community? Does the community need it?
 
+## Local preview
+
+This repository includes a lightweight [Quarto](https://quarto.org/) preview site for reviewing Markdown and notebook cookbooks locally.
+
+Install Quarto, generate the local preview files, then run the preview:
+
+```bash
+python3 scripts/generate_quarto_index.py
+quarto preview --profile preview
+```
+
+Run the generator again after editing the cookbook tables in this README or Markdown cookbook files.
+
+The preview renders committed notebook content without executing notebook code. Generated preview output is written to `site/`, and generated Markdown preview files are written as ignored sibling `.qmd` files next to their source Markdown files.
+
 ## Main Notebooks
 
 | Notebook                                                                       | Category                     | Description                                                                      |
