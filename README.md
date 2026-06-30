@@ -67,6 +67,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)                                        | tracing data                    | Arize Phoenix  |
 | [arize_phoenix_evaluate_rag.ipynb](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)                              | evaluation                      | Arize Phoenix  |
 | [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)                                    | RAG, embeddings                 | Azure      |
+| [Build a Real-Time Voice Assistant with Mistral and Agora](third_party/Agora/agora_mistral_voice.ipynb) | voice, agent, real-time | Agora |
 | [CAMEL Graph RAG with Mistral Models](third_party/CAMEL_AI/camel_graph_rag.ipynb)                                     | multi-agent, tool, data gen     | CAMEL-AI.org|
 | [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                                    | multi-agent, tool, data gen     | CAMEL-AI.org|
 | [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                           | UI chat, tool calling           | Chainlit   |
@@ -111,4 +112,3 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
-| [Build a Real-Time Voice Assistant with Mistral and Agora](third_party/Agora/agora_mistral_voice.ipynb) | voice, agent, real-time | Agora |
