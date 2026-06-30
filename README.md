@@ -111,3 +111,4 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
+| [Build a Real-Time Voice Assistant with Mistral and Agora](third_party/Agora/agora_mistral_voice.ipynb) | voice, agent, real-time | Agora |
