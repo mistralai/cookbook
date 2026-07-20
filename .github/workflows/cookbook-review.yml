@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - 'mistral/**/*.md'
+      - 'mistral/**/*.ipynb'
 
 permissions:
   contents: read
@@ -34,7 +35,7 @@ jobs:
           # Only flag files that are new (A = Added) in this PR, not modifications.
           git diff --diff-filter=A --name-only \
             "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" \
-            -- 'mistral/**/*.md' > new_cookbooks.txt
+            -- 'mistral/**/*.md' 'mistral/**/*.ipynb' > new_cookbooks.txt
 
           count=$(wc -l < new_cookbooks.txt | tr -d ' ')
           echo "Found ${count} new cookbook file(s):"

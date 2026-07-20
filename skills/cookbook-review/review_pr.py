@@ -83,6 +83,8 @@ def load_style_guide() -> str:
 
 # ── File reading ──────────────────────────────────────────────────────────────
 
+MAX_REVIEW_CELLS = 40  # truncate notebooks at this many cells
+
 
 def read_numbered(filepath: str) -> tuple[str, int]:
     """
@@ -106,9 +108,36 @@ def read_numbered(filepath: str) -> tuple[str, int]:
     return numbered, total
 
 
+def read_notebook(filepath: str) -> tuple[str, int]:
+    """
+    Return (cell_content, total_cell_count) for a Jupyter notebook.
+
+    Extracts markdown and code cells into readable text so the model can
+    review prose quality and code style. Cell numbers are used instead of
+    line numbers since raw JSON line positions aren't meaningful in a PR diff.
+    """
+    nb = json.loads(Path(filepath).read_text())
+    cells = nb.get("cells", [])
+    total = len(cells)
+    visible = cells[:MAX_REVIEW_CELLS]
+
+    parts: list[str] = []
+    for i, cell in enumerate(visible, 1):
+        cell_type = cell.get("cell_type", "unknown")
+        source = "".join(cell.get("source", []))
+        if source.strip():
+            parts.append(f"[Cell {i} — {cell_type}]\n{source}")
+
+    content = "\n\n".join(parts)
+    if total > MAX_REVIEW_CELLS:
+        content += f"\n\n[Truncated: showing cells 1–{MAX_REVIEW_CELLS} of {total}.]"
+
+    return content, total
+
+
 # ── Mistral API call ──────────────────────────────────────────────────────────
 
-_SYSTEM_PROMPT = """\
+_SYSTEM_PROMPT_MD = """\
 You are a technical documentation reviewer for Mistral AI cookbooks.
 Review the provided cookbook Markdown file against the Mistral Writing Style Guide below.
 
@@ -147,13 +176,50 @@ RULES FOR EACH FIELD
 - Do not invent problems. Flag only genuine violations of the style guide.
 """
 
+_SYSTEM_PROMPT_IPYNB = """\
+You are a technical documentation reviewer for Mistral AI cookbooks.
+Review the provided Jupyter notebook against the Mistral Writing Style Guide below.
 
-def call_mistral(filepath: str, numbered_content: str, style_guide: str) -> dict:
+{style_guide}
+
+---
+
+OUTPUT RULES
+Respond with a single, valid JSON object — no text before or after. Use this exact schema:
+
+{{
+  "summary": "<2–4 sentence overall assessment of the notebook quality and main issues>",
+  "verdict": "approve" | "comment" | "request_changes",
+  "line_comments": [],
+  "file_comments": [
+    {{
+      "severity": "critical" | "moderate" | "minor",
+      "cell": <integer cell number from the input, or null for file-wide issues>,
+      "body": "<comment referencing the specific cell and quoting the problematic text>"
+    }}
+  ]
+}}
+
+RULES FOR EACH FIELD
+- verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the notebook looks good.
+- line_comments must always be an empty array — notebooks use file_comments only.
+- file_comments[].cell: the cell number shown in the input (e.g. 3 for "[Cell 3 — markdown]"). Use null for issues that apply to the whole notebook.
+- Focus on markdown cells for prose style and structure; focus on code cells for security (no hard-coded credentials), clarity, and completeness of example output.
+- Limit to the 8 most impactful issues.
+- Do not invent problems. Flag only genuine violations of the style guide.
+"""
+
+
+def call_mistral(filepath: str, content: str, style_guide: str) -> dict:
     """Call the Mistral API and return the parsed review as a Python dict."""
-    system = _SYSTEM_PROMPT.format(style_guide=style_guide)
+    is_notebook = filepath.endswith(".ipynb")
+    template = _SYSTEM_PROMPT_IPYNB if is_notebook else _SYSTEM_PROMPT_MD
+    system = template.format(style_guide=style_guide)
+
+    content_label = "Notebook cells" if is_notebook else "File content with line numbers"
     user = (
         f"Review this file: `{filepath}`\n\n"
-        f"File content with line numbers:\n```\n{numbered_content}\n```"
+        f"{content_label}:\n```\n{content}\n```"
     )
 
     payload = {
@@ -207,10 +273,12 @@ def _review_body(filepath: str, review: dict) -> str:
     lines = [f"## Cookbook review: `{filepath}`", "", summary]
 
     if file_comments:
-        lines += ["", "### File-level issues", ""]
+        lines += ["", "### Issues", ""]
         for fc in file_comments:
             prefix = _SEVERITY_PREFIX.get(fc.get("severity", "moderate"), "**Moderate**")
-            lines.append(f"- {prefix}: {fc['body']}")
+            cell = fc.get("cell")
+            location = f"Cell {cell} — " if cell is not None else ""
+            lines.append(f"- {prefix}: {location}{fc['body']}")
 
     lines += [
         "",
@@ -335,12 +403,18 @@ def main() -> None:
             print("  File not found — skipping.")
             continue
 
-        numbered_content, total_lines = read_numbered(filepath)
-        print(f"  {total_lines} total line(s), reviewing up to {MAX_REVIEW_LINES}.")
+        is_notebook = filepath.endswith(".ipynb")
+
+        if is_notebook:
+            content, total = read_notebook(filepath)
+            print(f"  {total} cell(s), reviewing up to {MAX_REVIEW_CELLS}.")
+        else:
+            content, total = read_numbered(filepath)
+            print(f"  {total} total line(s), reviewing up to {MAX_REVIEW_LINES}.")
 
         print("  Calling Mistral API ...")
         try:
-            review = call_mistral(filepath, numbered_content, style_guide)
+            review = call_mistral(filepath, content, style_guide)
         except Exception as exc:
             print(f"  Mistral API call failed: {exc}")
             exit_code = 1
@@ -356,7 +430,8 @@ def main() -> None:
 
         print("  Posting GitHub PR review ...")
         try:
-            post_review(filepath, review, total_lines)
+            # Notebooks skip inline comments — all feedback lands in the review body.
+            post_review(filepath, review, 0 if is_notebook else total)
         except requests.HTTPError as exc:
             print(f"  Failed to post review: {exc}")
             print(f"  Response body: {exc.response.text[:500]}")
