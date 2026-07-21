@@ -73,9 +73,13 @@ async function main(): Promise<void> {
   const connectorIds: Record<string, string> = {};
 
   try {
-    // Steps 2–6 go here
+    // Step 2 — Create one connector per candidate
+    // Step 3 — List to verify
+    // Step 4 — Build the comparison agent
+    // Step 5 — Run the comparison
+    // Step 6 — Promote the winner, retire the rest
   } finally {
-    // Cleanup goes here
+    // Cleanup — delete the agent
   }
 }
 
@@ -88,9 +92,10 @@ main().catch(console.error);
 
 Each connector points at the DeepWiki MCP server, which lets Mistral read and reason about any public GitHub repository. Three named connectors — one per database — give the agent independent slots to query.
 
-Replace `// Steps 2–6 go here` with:
+Replace `// Step 2 — Create one connector per candidate` with:
 
 ```typescript
+    // Step 2 — Create one connector per candidate
     for (const c of candidates) {
       const connector = await client.beta.connectors.create({
         name: c.name,
@@ -109,9 +114,10 @@ Replace `// Steps 2–6 go here` with:
 
 Confirm all three connectors are registered before proceeding.
 
-Add this after Step 2, inside the `try` block:
+Replace `// Step 3 — List to verify` with:
 
 ```typescript
+    // Step 3 — List to verify
     const page = await client.beta.connectors.list({ pageSize: 50 });
     const showdown = (page.items ?? []).filter((c) =>
       c.name?.startsWith("showdown_")
@@ -128,9 +134,10 @@ Add this after Step 2, inside the `try` block:
 
 Create a Mistral agent with all three connectors attached. Its instructions require a structured output — the agent must end every response with a `RECOMMENDATION:` line so we can parse the winner programmatically.
 
-Add this after Step 3, inside the `try` block:
+Replace `// Step 4 — Build the comparison agent` with:
 
 ```typescript
+    // Step 4 — Build the comparison agent
     const agent = await client.beta.agents.create({
       name: "Database Showdown Judge",
       description: "Compares database candidates using their source code via DeepWiki.",
@@ -158,9 +165,10 @@ Add this after Step 3, inside the `try` block:
 
 Ask the agent to evaluate all three databases for a write-heavy local analytics workload. The agent calls DeepWiki tools on each connector to read actual source code before answering — this may take a minute.
 
-Add this after Step 4, inside the `try` block:
+Replace `// Step 5 — Run the comparison` with:
 
 ```typescript
+    // Step 5 — Run the comparison
     const response = await client.beta.conversations.start({
       agentId: agent.id,
       inputs: [
@@ -208,9 +216,10 @@ Add this after Step 4, inside the `try` block:
 
 Update the winning connector's description to mark it as selected, then delete the losing connectors. This completes the full lifecycle: create → list → use → update → delete.
 
-Add this after Step 5, inside the `try` block:
+Replace `// Step 6 — Promote the winner, retire the rest` with:
 
 ```typescript
+    // Step 6 — Promote the winner, retire the rest
     const winnerDescription =
       candidates.find((c) => c.name === winnerName)?.description ?? "";
 
@@ -242,9 +251,10 @@ Add this after Step 5, inside the `try` block:
 
 ## Cleanup
 
-Delete the agent when done. Replace `// Cleanup goes here` in the `finally` block with:
+Delete the agent when done. Replace `// Cleanup — delete the agent` in the `finally` block with:
 
 ```typescript
+    // Cleanup — delete the agent
     if (agentId) {
       await client.beta.agents.delete({ agentId });
       console.log(`\nAgent deleted: ${agentId}`);
@@ -278,7 +288,7 @@ async function main(): Promise<void> {
   const connectorIds: Record<string, string> = {};
 
   try {
-    // Step 2: Create connectors
+    // Step 2 — Create one connector per candidate
     for (const c of candidates) {
       const connector = await client.beta.connectors.create({
         name: c.name,
@@ -290,7 +300,7 @@ async function main(): Promise<void> {
       console.log(`Created: ${connector.name}  (id=${connector.id})`);
     }
 
-    // Step 3: List to verify
+    // Step 3 — List to verify
     const page = await client.beta.connectors.list({ pageSize: 50 });
     const showdown = (page.items ?? []).filter((c) =>
       c.name?.startsWith("showdown_")
@@ -300,7 +310,7 @@ async function main(): Promise<void> {
       console.log(`  ${(c.name ?? "").padEnd(22)}  ${c.description}`);
     }
 
-    // Step 4: Create the comparison agent
+    // Step 4 — Build the comparison agent
     const agent = await client.beta.agents.create({
       name: "Database Showdown Judge",
       description: "Compares database candidates using their source code via DeepWiki.",
@@ -321,7 +331,7 @@ async function main(): Promise<void> {
     agentId = agent.id;
     console.log(`Agent ready: ${agent.name}  (id=${agent.id})`);
 
-    // Step 5: Run the comparison
+    // Step 5 — Run the comparison
     const response = await client.beta.conversations.start({
       agentId: agent.id,
       inputs: [
@@ -362,7 +372,7 @@ async function main(): Promise<void> {
     console.log(`\nWinner: ${winnerName}`);
     console.log(`Losers: ${loserNames.join(", ")}`);
 
-    // Step 6: Promote winner, delete losers
+    // Step 6 — Promote the winner, retire the rest
     const winnerDescription =
       candidates.find((c) => c.name === winnerName)?.description ?? "";
 
@@ -389,7 +399,7 @@ async function main(): Promise<void> {
     console.log(`  Description: ${winner.description}`);
     console.log(`  ID:          ${winner.id}`);
   } finally {
-    // Cleanup: delete the agent
+    // Cleanup — delete the agent
     if (agentId) {
       await client.beta.agents.delete({ agentId });
       console.log(`\nAgent deleted: ${agentId}`);
