@@ -53,6 +53,8 @@ MISTRAL_API_KEY=your-mistral-api-key
 
 ### Run
 
+Once your `.env` file is in place, run the script:
+
 ```bash
 npx tsx build-a-database-advisor-agent.ts
 ```

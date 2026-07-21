@@ -88,14 +88,22 @@ Each **recipe or example** inside the main section must include:
 | Troubleshooting guide | When common runtime errors need extended explanations |
 | Error codes reference table | When the API returns many distinct HTTP error codes |
 
-### Install section standard
+### Section content standard
 
-The `### Install` section must open with an introductory sentence before the first code block. The sentence should orient the reader to what follows.
+Every heading — at any level — must be followed by at least one sentence of body text before any code block, table, or list. The sentence should tell the reader what they're looking at or what to do.
 
+Flag as **Moderate** if any heading is followed immediately by a code block, table, or list with no introductory sentence.
+
+**Examples:**
+
+`### Install` — must have an intro sentence before the first code block:
 - TypeScript: "Use one of the following methods to install the Mistral TypeScript SDK:"
 - Python: "Install the Mistral Python SDK:" or "Run the following command to install the Mistral Python SDK:"
 
-Flag as **Moderate** if the `### Install` section opens directly with a code block and has no introductory sentence.
+`### Run` — must explain what the command does before showing it:
+- "Once your `.env` file is in place, run the script:"
+
+Apply the same rule to all other headings: `### Required environment variables`, recipe headings, step headings, and so on.
 
 ### API key setup standard
 
@@ -230,6 +238,7 @@ Based on the Mistral Writing Style Guide (see reference files below).
   - Bad mix: `## Create a connector`, `## Listing connectors`, `## How to delete a connector`
   - Good: `## Create a connector`, `## List connectors`, `## Delete a connector`
 - **Avoid two headings in a row** without body text in between.
+- **Never open a section with a code block, table, or list.** Every heading must be followed by at least one sentence before any code or structured content. See the section content standard above.
 
 ### Lists
 
