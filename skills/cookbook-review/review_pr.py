@@ -3,8 +3,8 @@
 Review Mistral cookbook files added or modified in a pull request.
 
 Reads the Mistral Writing Style Guide from skills/cookbook-review/,
-calls the Mistral API for each changed file, then posts a GitHub PR review
-with inline suggestions and comments.
+calls the Mistral API for each changed file, then posts one GitHub comment
+per issue — each tied to the specific line or cell it pertains to.
 
 For new files (A), the full content is reviewed.
 For modified files (M), only the changed cells/lines are reviewed.
@@ -163,13 +163,11 @@ def read_changed_cells(filepath: str) -> tuple[str, int]:
     Compares the notebook at BASE_SHA against the current version and surfaces
     each changed or added cell labelled with its index and change type.
     """
-    # Load the base version from git history
     base_result = subprocess.run(
         ["git", "show", f"{BASE_SHA}:{filepath}"],
         capture_output=True, text=True,
     )
     if base_result.returncode != 0:
-        # File is new or base unavailable — fall back to full read
         return read_notebook(filepath)
 
     try:
@@ -215,7 +213,6 @@ def read_changed_lines(filepath: str) -> tuple[str, int]:
         return "(No line-level changes detected.)", 0
 
     lines = diff.splitlines()
-    # Strip the extended git header (index, ---, +++ lines) — keep hunks only
     hunk_start = next((i for i, l in enumerate(lines) if l.startswith("@@")), 0)
     hunks = "\n".join(lines[hunk_start:MAX_REVIEW_LINES])
     return hunks, len(lines)
@@ -242,24 +239,34 @@ Respond with a single, valid JSON object — no text before or after. Use this e
       "line": <integer — exact line number shown in the numbered content>,
       "severity": "critical" | "moderate" | "minor",
       "issue": "<concise label, max 10 words>",
-      "body": "<full explanation for the GitHub review comment>",
-      "suggestion": "<replacement text for this single line — omit key entirely if no single-line fix applies>"
+      "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
+      "suggestion": "<see SUGGESTION RULES below>"
     }}
   ],
   "file_comments": [
     {{
       "severity": "critical" | "moderate" | "minor",
-      "body": "<comment about a file-level issue: missing required section, wrong structure, etc.>"
+      "issue": "<concise label, max 10 words>",
+      "reasoning": "<1–2 sentences explaining which rule is violated and why it matters>",
+      "body": "<description of the structural problem — quote the relevant style guide rule>"
     }}
   ]
 }}
 
-RULES FOR EACH FIELD
+RULES
 - verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the file looks good.
-- line_comments[].line: must be an integer matching a line number visible in the numbered input. Do not guess.
-- line_comments[].suggestion: when present, contains ONLY the replacement text for that one line — no backticks, no fences. If the fix requires touching multiple lines, use file_comments instead.
+- line_comments[].line: must be an integer matching a line number in the numbered input. Do not guess.
+- Use line_comments for every issue you can tie to a specific line. Use file_comments ONLY for issues with no applicable line — for example, an entire required section is completely absent from the file.
 - Limit the total issues across both arrays to the 8 most impactful.
 - Do not invent problems. Flag only genuine violations of the style guide.
+
+SUGGESTION RULES
+The suggestion field replaces the full content of that one line. Be SURGICAL:
+- Change ONLY the specific word, phrase, or value that violates the rule.
+- Preserve all surrounding text exactly as it appears on that line.
+- Do NOT rewrite an entire sentence when only one word needs changing.
+- Do NOT include surrounding lines, backticks, or code fences in the suggestion value.
+- Omit the "suggestion" key entirely if the fix requires changing multiple lines, or if no minimal single-line replacement is possible.
 """
 
 _SYSTEM_PROMPT_IPYNB = """\
@@ -281,20 +288,27 @@ Respond with a single, valid JSON object — no text before or after. Use this e
     {{
       "severity": "critical" | "moderate" | "minor",
       "cell": <integer cell number from the input, or null for file-wide issues>,
-      "body": "<comment referencing the specific cell and quoting the problematic text>"
+      "issue": "<concise label, max 10 words>",
+      "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
+      "body": "<description referencing the specific cell and quoting the problematic text>",
+      "suggestion": "<the corrected replacement for the specific phrase or sentence only — omit if structural or multi-line>"
     }}
   ]
 }}
 
-RULES FOR EACH FIELD
+RULES
 - verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the notebook looks good.
 - line_comments must always be an empty array — notebooks use file_comments only.
-- file_comments[].cell: the cell number shown in the input (e.g. 3 for "[Cell 3 — markdown]"). Use null for issues that apply to the whole notebook.
+- file_comments[].cell: the cell number shown in the input (e.g. 3 for "[Cell 3 — markdown]"). Use null only for issues that apply to the entire notebook with no specific cell.
 - Focus on markdown cells for prose style and structure; focus on code cells for security (no hard-coded credentials), clarity, and completeness of example output.
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
-"""
 
+SUGGESTION RULES
+- The suggestion contains ONLY the corrected version of the specific phrase or sentence that is wrong.
+- Do not rewrite the entire cell when only a few words need changing.
+- Omit the "suggestion" key if the fix is structural (e.g. adding a missing section) or spans multiple sentences.
+"""
 
 _SYSTEM_PROMPT_MD_DIFF = """\
 You are a technical documentation reviewer for Mistral AI cookbooks.
@@ -316,17 +330,25 @@ Respond with a single, valid JSON object — no text before or after. Use this e
   "file_comments": [
     {{
       "severity": "critical" | "moderate" | "minor",
-      "body": "<comment about a changed line — quote the specific '+' line you are flagging>"
+      "issue": "<concise label, max 10 words>",
+      "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
+      "body": "<description quoting the specific '+' line being flagged>",
+      "suggestion": "<the corrected replacement for the specific phrase or value only — omit if structural or multi-line>"
     }}
   ]
 }}
 
-RULES FOR EACH FIELD
+RULES
 - Only comment on added ('+') lines. Ignore removed ('-') and context lines.
 - verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the changes look good.
 - line_comments must always be an empty array.
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
+
+SUGGESTION RULES
+- The suggestion contains ONLY the corrected version of the specific phrase or value that is wrong.
+- Do not rewrite the full line when only a word or phrase needs changing.
+- Omit the "suggestion" key if the fix spans multiple lines.
 """
 
 _SYSTEM_PROMPT_IPYNB_DIFF = """\
@@ -350,18 +372,26 @@ Respond with a single, valid JSON object — no text before or after. Use this e
     {{
       "severity": "critical" | "moderate" | "minor",
       "cell": <integer cell number from the input, or null for notebook-wide issues>,
-      "body": "<comment referencing the specific cell and quoting the problematic text>"
+      "issue": "<concise label, max 10 words>",
+      "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
+      "body": "<description referencing the specific cell and quoting the problematic text>",
+      "suggestion": "<the corrected replacement for the specific phrase or sentence only — omit if structural or multi-line>"
     }}
   ]
 }}
 
-RULES FOR EACH FIELD
+RULES
 - Only evaluate the cells shown — do not speculate about unchanged cells.
 - verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the changes look good.
 - line_comments must always be an empty array — notebooks use file_comments only.
-- file_comments[].cell: the cell number from the label (e.g. 3 for "[Cell 3 — markdown — MODIFIED]"). Use null for notebook-wide issues.
+- file_comments[].cell: the cell number from the label (e.g. 3 for "[Cell 3 — markdown — MODIFIED]"). Use null only for notebook-wide issues with no specific cell.
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
+
+SUGGESTION RULES
+- The suggestion contains ONLY the corrected version of the specific phrase or sentence that is wrong.
+- Do not rewrite the entire cell when only a few words need changing.
+- Omit the "suggestion" key if the fix is structural or spans multiple sentences.
 """
 
 
@@ -401,7 +431,7 @@ def call_mistral(filepath: str, content: str, style_guide: str, is_diff: bool = 
     return json.loads(raw)
 
 
-# ── GitHub review posting ─────────────────────────────────────────────────────
+# ── Comment body builders ─────────────────────────────────────────────────────
 
 _SEVERITY_PREFIX = {
     "critical": "**Critical**",
@@ -410,127 +440,139 @@ _SEVERITY_PREFIX = {
 }
 
 
-def _inline_body(lc: dict) -> str:
-    """Build the body for a single inline comment, adding a suggestion block if present."""
+def _build_line_comment_body(lc: dict) -> str:
+    """Build the body for a single inline line comment."""
     prefix = _SEVERITY_PREFIX.get(lc.get("severity", "moderate"), "**Moderate**")
     issue = lc.get("issue", "")
-    explanation = lc.get("body", "")
+    reasoning = lc.get("reasoning", "")
 
-    parts = [f"{prefix} — {issue}", "", explanation]
+    parts = [f"{prefix} — {issue}", "", reasoning]
 
     suggestion = lc.get("suggestion")
     if suggestion is not None:
-        # GitHub renders this as a one-click "Apply suggestion" button in the PR.
         parts += ["", "```suggestion", suggestion, "```"]
 
     return "\n".join(parts)
 
 
-def _review_body(filepath: str, review: dict) -> str:
-    """Build the top-level review body (shown above the diff in the PR timeline)."""
-    summary = review.get("summary", "")
-    file_comments = review.get("file_comments", [])
+def _build_file_comment_body(filepath: str, fc: dict) -> str:
+    """Build the body for a file-level or cell-level PR comment."""
+    prefix = _SEVERITY_PREFIX.get(fc.get("severity", "moderate"), "**Moderate**")
+    issue = fc.get("issue", "")
+    cell = fc.get("cell")
+    reasoning = fc.get("reasoning", "")
+    body = fc.get("body", "")
 
-    lines = [f"## Cookbook review: `{filepath}`", "", summary]
+    location = f"Cell {cell} — " if cell is not None else ""
+    parts = [f"`{filepath}` — {prefix} — {location}{issue}"]
 
-    if file_comments:
-        lines += ["", "### Issues", ""]
-        for fc in file_comments:
-            prefix = _SEVERITY_PREFIX.get(fc.get("severity", "moderate"), "**Moderate**")
-            cell = fc.get("cell")
-            location = f"Cell {cell} — " if cell is not None else ""
-            lines.append(f"- {prefix}: {location}{fc['body']}")
+    if reasoning:
+        parts += ["", reasoning]
+    if body and body != reasoning:
+        parts += ["", body]
 
-    lines += [
-        "",
-        "---",
-        "_Reviewed against the "
-        "[Mistral Writing Style Guide](../skills/cookbook-review/SKILL.md)._",
-    ]
+    suggestion = fc.get("suggestion")
+    if suggestion:
+        parts += ["", "**Suggested fix:**", "```", suggestion, "```"]
 
-    return "\n".join(lines)
+    return "\n".join(parts)
 
 
-def _fallback_review_body(filepath: str, review: dict, rejected_comments: list[dict]) -> str:
-    """
-    Extended review body used when GitHub rejects inline comments.
-
-    Appends the rejected inline issues as a plain list so no feedback is lost.
-    """
-    body = _review_body(filepath, review)
-
-    if not rejected_comments:
-        return body
-
-    body += "\n\n### Inline issues (applied as file-level comments)\n\n"
-    for lc in rejected_comments:
-        prefix = _SEVERITY_PREFIX.get(lc.get("severity", "moderate"), "**Moderate**")
-        line = lc.get("line", "?")
-        body += f"- Line {line} — {prefix}: {lc.get('body', '')}\n"
-        suggestion = lc.get("suggestion")
-        if suggestion:
-            body += f"\n  Suggested replacement:\n  ```\n  {suggestion}\n  ```\n"
-
-    return body
+# ── GitHub posting ────────────────────────────────────────────────────────────
 
 
-def post_review(filepath: str, review: dict, total_lines: int) -> None:
-    """Post the review to the GitHub PR."""
+def post_verdict_review(filepath: str, summary: str, verdict: str) -> None:
+    """Post a lightweight review event with just the summary — no bundled inline comments."""
     event_map = {
         "approve": "APPROVE",
         "request_changes": "REQUEST_CHANGES",
         "comment": "COMMENT",
     }
-    gh_event = event_map.get(review.get("verdict", "comment"), "COMMENT")
-
-    # Validate line numbers — GitHub will reject the entire review if any comment
-    # references a line that isn't part of the diff.
-    valid_comments: list[dict] = []
-    invalid_comments: list[dict] = []
-
-    for lc in review.get("line_comments", []):
-        line = lc.get("line")
-        if isinstance(line, int) and 1 <= line <= total_lines:
-            valid_comments.append(lc)
-        else:
-            print(f"  Skipping line comment with out-of-range line={line!r}")
-            invalid_comments.append(lc)
-
-    inline = [
-        {
-            "path": filepath,
-            "line": lc["line"],
-            "side": "RIGHT",
-            "body": _inline_body(lc),
-        }
-        for lc in valid_comments
-    ]
-
+    gh_event = event_map.get(verdict, "COMMENT")
+    body = (
+        f"## Cookbook review: `{filepath}`\n\n"
+        f"{summary}\n\n"
+        "---\n"
+        "_Reviewed against the "
+        "[Mistral Writing Style Guide](../skills/cookbook-review/SKILL.md)._"
+    )
     payload = {
         "commit_id": HEAD_SHA,
-        "body": _review_body(filepath, review),
+        "body": body,
         "event": gh_event,
-        "comments": inline,
+        "comments": [],
     }
-
     url = f"{GITHUB_API}/repos/{REPO}/pulls/{PR_NUMBER}/reviews"
     resp = requests.post(url, headers=GH_HEADERS, json=payload, timeout=30)
-
-    # 422 means one or more inline comments was rejected (line not in the diff).
-    # Retry without inline comments so the review still lands.
-    if resp.status_code == 422 and inline:
-        print(
-            f"  GitHub rejected inline comments (HTTP 422). "
-            "Retrying without them — all issues will appear in the review body."
-        )
-        payload["comments"] = []
-        payload["body"] = _fallback_review_body(filepath, review, valid_comments)
-        resp = requests.post(url, headers=GH_HEADERS, json=payload, timeout=30)
-
     resp.raise_for_status()
-    review_id = resp.json().get("id", "?")
-    n_inline = len(inline) if resp.status_code == 200 else 0
-    print(f"  Posted review #{review_id} ({gh_event}, {n_inline} inline comment(s)).")
+    print(f"  Posted {gh_event} verdict review.")
+
+
+def post_line_comment(path: str, line: int, body: str) -> bool:
+    """
+    Post a single inline comment on a specific diff line.
+    Returns True on success, False if GitHub rejects the line (not in diff).
+    """
+    payload = {
+        "body": body,
+        "commit_id": HEAD_SHA,
+        "path": path,
+        "line": line,
+        "side": "RIGHT",
+    }
+    url = f"{GITHUB_API}/repos/{REPO}/pulls/{PR_NUMBER}/comments"
+    resp = requests.post(url, headers=GH_HEADERS, json=payload, timeout=30)
+    if resp.status_code == 422:
+        print(f"    Line {line} not in diff (HTTP 422) — will post as PR comment.")
+        return False
+    resp.raise_for_status()
+    return True
+
+
+def post_pr_comment(body: str) -> None:
+    """Post a general PR conversation comment (not attached to a specific line)."""
+    payload = {"body": body}
+    url = f"{GITHUB_API}/repos/{REPO}/issues/{PR_NUMBER}/comments"
+    resp = requests.post(url, headers=GH_HEADERS, json=payload, timeout=30)
+    resp.raise_for_status()
+
+
+def post_review(filepath: str, review: dict, total_lines: int) -> None:
+    """
+    Post the review as separate comments:
+    1. One lightweight verdict review (summary only, no bundled comments).
+    2. One separate inline comment per line_comment issue.
+    3. One separate PR comment per file_comment issue.
+    """
+    verdict = review.get("verdict", "comment")
+    summary = review.get("summary", "")
+
+    post_verdict_review(filepath, summary, verdict)
+
+    n_inline = 0
+    n_fallback = 0
+    for lc in review.get("line_comments", []):
+        line = lc.get("line")
+        body = _build_line_comment_body(lc)
+        if isinstance(line, int) and 1 <= line <= total_lines:
+            if post_line_comment(filepath, line, body):
+                n_inline += 1
+                continue
+        else:
+            print(f"    Out-of-range line={line!r} — posting as PR comment.")
+        post_pr_comment(body)
+        n_fallback += 1
+
+    n_file = 0
+    for fc in review.get("file_comments", []):
+        post_pr_comment(_build_file_comment_body(filepath, fc))
+        n_file += 1
+
+    print(
+        f"  {n_inline} inline comment(s), "
+        f"{n_fallback} fallback PR comment(s), "
+        f"{n_file} file-level PR comment(s)."
+    )
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
@@ -599,12 +641,11 @@ def main() -> None:
         n_file = len(review.get("file_comments", []))
         print(
             f"  Verdict: {verdict} | "
-            f"{n_line} inline comment(s), {n_file} file-level comment(s)."
+            f"{n_line} line comment(s), {n_file} file-level comment(s)."
         )
 
         print("  Posting GitHub PR review ...")
         try:
-            # Notebooks and diff reviews skip inline comments — feedback lands in the review body.
             post_review(filepath, review, 0 if (is_notebook or is_diff) else total)
         except requests.HTTPError as exc:
             print(f"  Failed to post review: {exc}")
