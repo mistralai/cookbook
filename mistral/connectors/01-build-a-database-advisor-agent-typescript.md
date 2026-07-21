@@ -28,6 +28,8 @@ To complete this tutorial, you will need:
 
 ### Install
 
+Use one of the following methods to install the Mistral TypeScript SDK:
+
 ```bash
 # npm
 npm install @mistralai/mistralai
