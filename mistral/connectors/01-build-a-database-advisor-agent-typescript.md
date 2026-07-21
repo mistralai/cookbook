@@ -14,7 +14,7 @@ This script demonstrates the full Mistral Connector lifecycle:
 
 > **API status:** This script uses `client.beta.connectors` and `client.beta.agents`. These are **beta** endpoints and may change.
 
-A Python version of the same workflow is also available [here](./01-build-a-database-advisor-agent.ipynb).
+A Python version of the same agent is also available [here](./01-build-a-database-advisor-agent.ipynb).
 
 ---
 
@@ -108,6 +108,8 @@ Replace `// Step 2 — Create one connector per candidate` with:
     }
 ```
 
+View your registered Connectors in [Studio](https://console.mistral.ai/build/connectors).
+
 ---
 
 ## Step 3 — List to verify
@@ -158,6 +160,8 @@ Replace `// Step 4 — Build the comparison agent` with:
     agentId = agent.id;
     console.log(`Agent ready: ${agent.name}  (id=${agent.id})`);
 ```
+
+View your agents in [Studio](https://console.mistral.ai/build/agents).
 
 ---
 
