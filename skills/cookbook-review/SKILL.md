@@ -29,7 +29,9 @@ Every cookbook file must include these sections, in this order:
 [One-sentence description]         ← immediately under title, no heading
 > [Status/note callout]            ← blockquote for beta APIs or important constraints
 
-## Prerequisites                   ← H2
+## Prerequisites                   ← H2: "To complete this cookbook, you will need:" + bullet list only
+
+## Environment setup               ← H2
 
 ### Install                        ← H3
 
@@ -39,6 +41,15 @@ Every cookbook file must include these sections, in this order:
 
 ## Summary                         ← H2: closing summary (required)
 ```
+
+The `## Prerequisites` section must contain only the sentence "To complete this cookbook, you will need:" followed by a bulleted list. List items should appear in this order:
+1. Language runtime and tooling (e.g., "Python 3.9 or later", "Node.js and a package manager")
+2. A Mistral account and API key (nearly always required)
+3. Any other accounts, tokens, or external services needed
+
+Flag as **Critical** if `## Prerequisites` contains installation instructions, environment variable setup, or code blocks — those belong in `## Environment setup`.
+
+The `## Environment setup` section contains everything the reader needs to run the code: package installation, API key setup, and (for standalone scripts) a run command. See the API key setup standard below for exact wording.
 
 The `## Summary` section must appear at the end of every cookbook. It must contain:
 
@@ -83,7 +94,7 @@ Every cookbook that requires a Mistral API key must follow this exact wording an
 
 #### Getting the key
 
-The "Prerequisites" section must include this sentence verbatim (Markdown links intact):
+The "Environment setup" section must include this sentence verbatim (Markdown links intact):
 
 > To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
 
@@ -312,8 +323,9 @@ Write the review as a Markdown document with the following structure:
 | H1 title | ✅ / ❌ / ⚠️ | |
 | One-sentence description | ✅ / ❌ / ⚠️ | |
 | Status/note callout (if applicable) | ✅ / ❌ / N/A | |
-| Prerequisites > Install | ✅ / ❌ / ⚠️ | |
-| Prerequisites > Environment variables | ✅ / ❌ / ⚠️ | |
+| Prerequisites (bullet list only) | ✅ / ❌ / ⚠️ | |
+| Environment setup > Install | ✅ / ❌ / ⚠️ | |
+| Environment setup > Environment variables | ✅ / ❌ / ⚠️ | |
 | Goal per recipe | ✅ / ❌ / ⚠️ | |
 | When to use per recipe | ✅ / ❌ / ⚠️ | |
 | Code blocks (Python / TS / curl) | ✅ / ❌ / ⚠️ | |

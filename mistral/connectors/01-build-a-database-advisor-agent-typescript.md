@@ -20,6 +20,12 @@ A Python version of the same agent is also available [here](./01-build-a-databas
 
 ## Prerequisites
 
+To complete this tutorial, you will need:
+- Node.js and a package manager (npm, pnpm, or yarn)
+- A Mistral account and API key
+
+## Environment setup
+
 ### Install
 
 ```bash
