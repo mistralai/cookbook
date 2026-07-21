@@ -1,6 +1,6 @@
 # Connectors in Workflows Cookbook
 
-Use MCP connectors inside Mistral Workflows — declare connector dependencies on a worker, call connector tools from activities with specific credentials, and execute workflows with automatic OAuth handling.
+Use Connectors inside Workflows — declare connector dependencies on a worker, call connector tools from activities with specific credentials, and execute workflows with automatic OAuth handling.
 
 > **API status:** The workflow connector integration uses `mistralai-workflows-plugins-mistralai`. These are **beta** features and may change.
 
@@ -35,7 +35,7 @@ A workflow that uses connectors has three building blocks:
 
 | Building block | What it does |
 |---|---|
-| `connector(name)` | Declares a named connector slot — a dependency on an MCP connector |
+| `connector(name)` | Declares a named connector slot — a dependency on a Connector |
 | `@uses_connectors(slot, ...)` | Attaches declared slots to a workflow class so the runtime knows which connectors to authenticate |
 | `ToolCallClient` | Activity-level client for calling connector tools, injected via `Depends` |
 
@@ -112,7 +112,7 @@ async def create_github_issue(
     )
 ```
 
-`call_tool(tool_name, arguments)` dispatches the call to the MCP connector and returns the raw tool response.
+`call_tool(tool_name, arguments)` dispatches the call to the Connector and returns the raw tool response.
 
 ---
 

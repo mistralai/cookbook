@@ -16,8 +16,8 @@ Before you invent a term, make sure a suitable term doesn't already exist.
 | **model** | Use *model* to refer to a Mistral language model (e.g., Mistral Large, Codestral). Don't use *AI* as a noun in place of *model* (not "the AI responded"; instead, "the model responded"). |
 | **agent** | Use *agent* to refer to a pre-configured model instance with instructions and tools. Distinct from a general-purpose assistant. |
 | **bot, chatbot** | Use *bot* to refer to an app that performs automated tasks or engages with humans through a conversational interface. Use *chatbot* only when you need to clarify that it uses conversation. After first use, just use *bot*. |
-| **tool** | Use *tool* to refer to a function or capability the model can invoke (built-in tools, MCP connector tools). |
-| **connector** | Use *connector* to refer to an MCP server registered with Mistral that exposes tools the model can call. |
+| **tool** | Use *tool* to refer to a function or capability the model can invoke (built-in tools, MCP Connector tools). |
+| **Connector / Connectors** | Capitalize when referring to the Mistral Connectors product or feature. Lowercase *connector* only when referring to a specific registered instance ("create a connector named...", "the connector returned..."). |
 | **conversation** | Use *conversation* for a session in which a model responds to a series of messages. |
 | **prompt** | Use *prompt* for the input text sent to a model. In UI text, format prompts in quotation marks. |
 | **context** | Use *context* or *context window* to refer to the amount of text a model can process in a single request. Don't use *memory* as a synonym unless referring to an explicit memory feature. |
@@ -46,7 +46,7 @@ Before you invent a term, make sure a suitable term doesn't already exist.
 
 ## Capitalization for AI terms
 
-- Lowercase *model*, *agent*, *tool*, *connector*, *prompt*, *token*, *embedding*, *inference*, *fine-tuning*, and *context* in general use.
+- Lowercase *model*, *agent*, *tool*, *prompt*, *token*, *embedding*, *inference*, *fine-tuning*, and *context* in general use. Capitalize *Connector* and *Connectors* when referring to the Mistral product; use lowercase *connector* only for a specific registered instance.
 - Capitalize proper model names: *Mistral Large*, *Mistral Small*, *Codestral*, *Pixtral*, *Mistral Embed*.
 - Capitalize *Le Chat* as a proper product name.
 - Capitalize *Mistral AI* when referring to the company.
@@ -76,11 +76,18 @@ Use these names exactly as written. Don't prefix them with "Mistral" or "Mistral
 
 | Correct | Do not use |
 |---|---|
+| Connectors | MCP connectors, Mistral Connectors |
 | Workflows | Mistral Workflows, Mistral AI Workflows |
 | Studio | Mistral Studio, AI Studio, Mistral AI Studio |
 | Vibe | Le Chat |
 | Vibe Code | Mistral Vibe Code |
 | Vibe Work | Mistral Vibe Work |
+
+**Connectors** — capitalize when referring to the Mistral Connectors product or feature. Lowercase *connector* only when referring to a specific registered instance.
+- Correct: "Register a Connector in Studio."
+- Correct: "Use Connectors to access external tools."
+- Correct: "Create a connector named `github_app`." (specific instance)
+- Incorrect: "Use MCP connectors to call external APIs."
 
 **Workflows** — always standalone, never prefixed.
 - Correct: "Build a pipeline in Workflows."

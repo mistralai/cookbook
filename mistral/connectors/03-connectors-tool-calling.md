@@ -1,6 +1,6 @@
 # Connectors Tool Calling Cookbook
 
-Call individual tools on an MCP connector directly, without going through a conversation.
+Call individual tools on a Connector directly, without going through a conversation.
 
 > **API status:** Tool calling uses `client.beta.connectors.call_tool`. This is a **beta** endpoint and may change.
 
@@ -184,7 +184,7 @@ Name: my_deepwiki
 
 ### 3. Call a Tool on a Connector
 
-**Goal:** Invoke a specific tool exposed by an MCP connector and get the raw result.
+**Goal:** Invoke a specific tool exposed by a Connector and get the raw result.
 
 **When to use:**
 - You know exactly which tool to call and what arguments to pass.

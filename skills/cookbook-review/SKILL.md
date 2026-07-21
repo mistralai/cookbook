@@ -243,6 +243,7 @@ See [`inclusive-language.md`](./inclusive-language.md) for the full guide.
 
 | Avoid | Use instead |
 |---|---|
+| MCP connectors / mcp connectors (referring to the product) | Connectors (capital C) |
 | utilize | use |
 | initiate / instantiate (in prose) | start, create |
 | leverage (as a verb) | use, take advantage of |

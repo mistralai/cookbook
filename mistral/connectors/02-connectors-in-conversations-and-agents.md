@@ -1,6 +1,6 @@
 # Using Connectors in Conversations Cookbook
 
-Use MCP connectors, built-in tools, and agents in Mistral AI conversations.
+Use Connectors, built-in tools, and agents in Mistral AI conversations.
 
 > **API status:** Conversations use `client.beta.conversations`. Agents use `client.beta.agents`. These are **beta** endpoints and may change.
 
@@ -267,7 +267,7 @@ Based on current web search results, the weather in Paris today is 8°C with par
 
 ### 3. Conversation with a custom connector
 
-**Goal:** Use a custom MCP connector in a conversation so the model can call external tools.
+**Goal:** Use a Connector in a conversation so the model can call external tools.
 
 **When to use:**
 - You've registered a connector (e.g., DeepWiki) and want the model to use its tools.

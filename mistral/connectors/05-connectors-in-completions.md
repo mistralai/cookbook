@@ -1,6 +1,6 @@
 # Using Connectors in Chat Completions Cookbook
 
-Use MCP connectors, built-in tools, and agents with the Chat Completions API (`/v1/chat/completions`) and Agent Completions API (`/v1/agents/completions`).
+Use Connectors, built-in tools, and agents with the Chat Completions API (`/v1/chat/completions`) and Agent Completions API (`/v1/agents/completions`).
 
 > **SDK support:** The `mistralai` SDK supports connector-style tools in `chat.complete()`. Note that responses use `messages` (array) instead of `message` (object) when tools are invoked.
 
@@ -362,7 +362,7 @@ Here's a beautiful sunset over the ocean as requested.
 
 ### 3. Completion with a Custom Connector
 
-**Goal:** Use a custom MCP connector in a chat completion so the model can call external tools.
+**Goal:** Use a Connector in a chat completion so the model can call external tools.
 
 **When to use:**
 - You've registered a connector (e.g., DeepWiki) and want the model to use its tools
