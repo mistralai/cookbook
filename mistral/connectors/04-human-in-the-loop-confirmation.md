@@ -30,17 +30,19 @@ uv add mistralai
 
 ### Required environment variables
 
-```bash
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
+Create a `.env` at the root of your project and add your Mistral API key:
+
+```
 MISTRAL_API_KEY=your-mistral-api-key
 ```
-
-Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 ---
 
 ## Concepts
 
-There are two kinds of deferral flows with the `RunContext.run_async` loop:
+Two deferral flows are available with the `RunContext.run_async` loop:
 - Client-side: [local MCP clients & functions](https://docs.mistral.ai/agents/tools/mcp) registered through `register_mcp_client` or `register_func`
 - Server-side: remote Mistral connectors (gmail, ...)
 
@@ -97,7 +99,7 @@ import asyncio
 import os
 import random
 
-from mistralai.client import Mistral
+from mistralai import Mistral
 from mistralai.extra.run.context import RunContext
 from mistralai.extra.exceptions import DeferredToolCallsException
 
@@ -177,7 +179,7 @@ asyncio.run(main())
 import asyncio
 import os
 
-from mistralai.client import Mistral
+from mistralai import Mistral
 from mistralai.extra.exceptions import DeferredToolCallsException
 from mistralai.extra.run.context import RunContext
 
@@ -263,7 +265,7 @@ import asyncio
 import json
 import os
 
-from mistralai.client import Mistral
+from mistralai import Mistral
 from mistralai.extra.run.context import RunContext
 from mistralai.extra.exceptions import DeferredToolCallsException
 
@@ -305,7 +307,7 @@ import asyncio
 import json
 import os
 
-from mistralai.client import Mistral
+from mistralai import Mistral
 from mistralai.extra.run.context import RunContext
 from mistralai.extra.exceptions import DeferredToolCallsException, DeferredToolCallEntry
 

@@ -39,18 +39,18 @@ pnpm add @mistralai/mistralai
 
 ### Required environment variables
 
-Create a `.env` file at your project root:
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
 
-```bash
+Create a `.env` at the root of your project and add your Mistral API key:
+
+```
 MISTRAL_API_KEY=your-mistral-api-key
 ```
-
-Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 ### What you need before starting
 
 - A working `client` (see [Recipe 1](#1-initialize-the-client))
-- An existing connector — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one
+- An existing connector — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full example of the connector lifecycle, or create one in [Studio](https://console.mistral.ai)
 
 ---
 
@@ -79,7 +79,7 @@ For scenarios where the model should autonomously pick which tools to call, use 
 
 ```python
 import os
-from mistralai.client import Mistral
+from mistralai import Mistral
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 ```
@@ -124,7 +124,7 @@ export BASE_URL="https://api.mistral.ai"
 
 ```python
 import asyncio
-from mistralai.client import Mistral
+from mistralai import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -186,7 +186,7 @@ Name: my_deepwiki
 ```
 
 **How it works:**
-- See the [Connectors Management Cookbook](./01-connectors-management.md) for full details on creating, updating, and deleting connectors.
+- See [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full walkthrough of creating, updating, and deleting connectors.
 - The connector must be created before you can call its tools.
 
 **Common errors & fixes:**
@@ -215,7 +215,7 @@ Name: my_deepwiki
 
 ```python
 import asyncio
-from mistralai.client import Mistral
+from mistralai import Mistral
 
 client = Mistral(api_key="your-api-key")
 
@@ -300,7 +300,7 @@ Tool output:
 
 ```python
 import asyncio
-from mistralai.client import Mistral
+from mistralai import Mistral
 
 client = Mistral(api_key="your-api-key")
 

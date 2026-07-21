@@ -42,6 +42,18 @@ This cookbook covers two authentication patterns:
 
 ### Prerequisites (Bearer)
 
+#### Install
+
+```bash
+# Python
+pip install mistralai
+# or with uv
+uv add mistralai
+```
+
+
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
 ```bash
 MISTRAL_API_KEY=your-mistral-api-key
 GITHUB_PAT_FULL=ghp_yourFullAccessToken
@@ -435,7 +447,7 @@ Credentials 'github-pat-limited' deleted successfully
 MISTRAL_API_KEY=your-mistral-api-key
 ```
 
-- The `outlook_calendar` connector must be enabled in your workspace. Enable it in the [Mistral Console](https://console.mistral.ai/connectors).
+- The `outlook_calendar` connector must be enabled in your workspace. Enable it in [Studio](https://console.mistral.ai/connectors).
 - You need two Microsoft accounts to authenticate separately.
 
 **Script:** `python/src/scripts/08_multiple_oauth_authentication.py`

@@ -44,17 +44,19 @@ npm install @mistralai/mistralai
 
 ### Required environment variables
 
-```bash
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
+Create a `.env` at the root of your project and add your Mistral API key:
+
+```
 MISTRAL_API_KEY=your-mistral-api-key
 ```
-
-Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 ### What you need before starting
 
 Most recipes assume:
 - A valid `MISTRAL_API_KEY`
-- An existing connector for custom-connector recipes — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one
+- An existing connector for custom-connector recipes — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai)
 
 ---
 
@@ -387,7 +389,7 @@ Here's a beautiful sunset over the ocean as requested.
 - Connecting domain-specific capabilities to the model in a chat completion context
 
 **Prereqs:**
-- An existing connector — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one
+- An existing connector — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai)
 
 **Python:**
 
@@ -444,7 +446,7 @@ async function main(): Promise<void> {
     tools: [
       {
         type: "connector",
-        connector_id: "my_deepwiki", // name or UUID
+        connectorId: "my_deepwiki", // name or UUID
       },
     ],
   });
@@ -559,7 +561,7 @@ async function main(): Promise<void> {
       { type: "image_generation" },
       {
         type: "connector",
-        connector_id: "my_deepwiki",
+        connectorId: "my_deepwiki",
       },
     ],
   });
@@ -1104,7 +1106,7 @@ async function main(): Promise<void> {
         },
       ],
       tools: [
-        { type: "connector", connector_id: "completions_deepwiki" },
+        { type: "connector", connectorId: "completions_deepwiki" },
       ],
     });
     console.log("\nChat completion response:");
