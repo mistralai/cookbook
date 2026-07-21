@@ -98,26 +98,6 @@ main().catch(console.error);
 
 ---
 
-## Summary
-
-This script demonstrated the full Mistral Connector lifecycle — create, list, use, update, and delete — using the DeepWiki Connector to let the model read actual GitHub repository source code and produce a data-driven database recommendation.
-
-**What you built:**
-- Three named Connectors pointing at the DeepWiki MCP server
-- An agent (Database Showdown Judge) with all three Connectors attached
-- A conversation that produced a structured recommendation, updated the winner's Connector, and cleaned up the rest
-
-**Mistral features used:**
-- Connectors (beta)
-- Agents API (beta)
-- Conversations API (beta)
-
-**Other services:**
-- [DeepWiki](https://deepwiki.com) — MCP server for reading public GitHub repositories
-
-View your Connectors in [Studio](https://console.mistral.ai/build/connectors).
----
-
 ## Step 2 — Create one connector per candidate
 
 Each connector points at the DeepWiki MCP server, which lets Mistral read and reason about any public GitHub repository. Three named connectors — one per database — give the agent independent slots to query.
@@ -445,3 +425,24 @@ async function main(): Promise<void> {
 
 main().catch(console.error);
 ```
+
+---
+
+## Summary
+
+This script demonstrated the full Mistral Connector lifecycle — create, list, use, update, and delete — using the DeepWiki Connector to let the model read actual GitHub repository source code and produce a data-driven database recommendation.
+
+**What you built:**
+- Three named Connectors pointing at the DeepWiki MCP server
+- An agent (Database Showdown Judge) with all three Connectors attached
+- A conversation that produced a structured recommendation, updated the winner's Connector, and cleaned up the rest
+
+**Mistral features used:**
+- Connectors (beta)
+- Agents API (beta)
+- Conversations API (beta)
+
+**Other services:**
+- [DeepWiki](https://deepwiki.com) — MCP server for reading public GitHub repositories
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).

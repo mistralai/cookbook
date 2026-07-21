@@ -51,7 +51,7 @@ Flag as **Critical** if `## Prerequisites` contains installation instructions, e
 
 The `## Environment setup` section contains everything the reader needs to run the code: package installation, API key setup, and (for standalone scripts) a run command. See the API key setup standard below for exact wording.
 
-The `## Summary` section must appear at the end of every cookbook. It must contain:
+The `## Summary` section must be the **last section** in the file — no content, headings, or sections may follow it. It must contain:
 
 1. **1–2 sentence overview** of what the cookbook covered and what was built or demonstrated.
 2. **What you built** (or **What this cookbook covers**) — a bullet list.
@@ -62,7 +62,7 @@ The `## Summary` section must appear at the end of every cookbook. It must conta
    - A known documentation URL
    - If you don't know the right destination, use: `[View the documentation]() <!-- TODO: add link to relevant documentation -->`
 
-Flag as **Critical** if the `## Summary` section is missing entirely.
+Flag as **Critical** if the `## Summary` section is missing entirely or if it is not the last section in the file.
 Flag as **Moderate** if the CTA link is empty and has no `TODO` comment, or if any of the four required elements (overview, what was built, Mistral features, CTA) is absent.
 
 Each **recipe or example** inside the main section must include:
