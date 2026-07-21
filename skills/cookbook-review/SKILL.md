@@ -88,6 +88,15 @@ Each **recipe or example** inside the main section must include:
 | Troubleshooting guide | When common runtime errors need extended explanations |
 | Error codes reference table | When the API returns many distinct HTTP error codes |
 
+### Install section standard
+
+The `### Install` section must open with an introductory sentence before the first code block. The sentence should orient the reader to what follows.
+
+- TypeScript: "Use one of the following methods to install the Mistral TypeScript SDK:"
+- Python: "Install the Mistral Python SDK:" or "Run the following command to install the Mistral Python SDK:"
+
+Flag as **Moderate** if the `### Install` section opens directly with a code block and has no introductory sentence.
+
 ### API key setup standard
 
 Every cookbook that requires a Mistral API key must follow this exact wording and structure. Flag any deviation as a **Critical** issue.
