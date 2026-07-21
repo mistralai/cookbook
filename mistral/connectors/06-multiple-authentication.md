@@ -10,34 +10,6 @@ This cookbook covers two authentication patterns:
 
 ---
 
-## Table of Contents
-
-- [Part 1: Multiple Bearer Token Credentials (GitHub MCP)](#part-1-multiple-bearer-token-credentials-github-mcp)
-  - [Prerequisites](#prerequisites-bearer)
-  - [When to Use Multiple Bearer Credentials](#when-to-use-multiple-bearer-credentials)
-  - [1. Initialize the Client](#1-initialize-the-client)
-  - [2. Create a GitHub MCP Connector](#2-create-a-github-mcp-connector)
-  - [3. Get Authentication Methods](#3-get-authentication-methods)
-  - [4. Store Bearer Credentials](#4-store-bearer-credentials)
-  - [5. List Credentials](#5-list-credentials)
-  - [6. Call a Tool with Specific Credentials](#6-call-a-tool-with-specific-credentials)
-  - [7. Delete Credentials](#7-delete-credentials)
-- [Part 2: Multiple OAuth2 Credentials (Outlook Calendar MCP)](#part-2-multiple-oauth2-credentials-outlook-calendar-mcp)
-  - [Prerequisites](#prerequisites-oauth2)
-  - [When to Use Multiple OAuth2 Credentials](#when-to-use-multiple-oauth2-credentials)
-  - [1. Get the Outlook Calendar Connector](#1-get-the-outlook-calendar-connector)
-  - [2. Get Authentication Methods](#2-get-authentication-methods-1)
-  - [3. Authenticate Accounts via OAuth2](#3-authenticate-accounts-via-oauth2)
-  - [4. List Credentials](#4-list-credentials-1)
-  - [5. Call a Tool with Specific Credentials](#5-call-a-tool-with-specific-credentials)
-  - [6. Promote Credentials to Default](#6-promote-credentials-to-default)
-  - [7. Delete Credentials](#7-delete-credentials-1)
-- [Naming Conventions](#naming-conventions)
-- [Troubleshooting](#troubleshooting)
-- [Error Codes Reference](#error-codes-reference)
-
----
-
 ## Part 1: Multiple Bearer Token Credentials (GitHub MCP)
 
 ### Prerequisites (Bearer)

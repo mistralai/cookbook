@@ -6,26 +6,6 @@ Use MCP connectors, built-in tools, and agents with the Chat Completions API (`/
 
 ---
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Conversations vs Completions — When to Use Which](#conversations-vs-completions--when-to-use-which)
-- [Reading Completion Responses](#reading-completion-responses)
-- [Recipes](#recipes)
-  - [1. Hello World — Basic Chat Completion](#1-hello-world--basic-chat-completion)
-  - [2. Completion with Image Generation](#2-completion-with-image-generation)
-  - [3. Completion with a Custom Connector](#3-completion-with-a-custom-connector)
-  - [4. Combining Multiple Tools](#4-combining-multiple-tools)
-  - [5. Creating an Agent with Connectors](#5-creating-an-agent-with-connectors)
-  - [6. Agent Completions](#6-agent-completions)
-  - [7. OAuth-Authenticated Connectors (Gmail)](#7-oauth-authenticated-connectors-gmail)
-  - [8. Full Example — Create, Complete, and Clean Up](#8-full-example--create-complete-and-clean-up)
-- [Python / TypeScript Naming Conventions](#python--typescript-naming-conventions)
-- [Troubleshooting](#troubleshooting)
-- [Error Codes Reference](#error-codes-reference)
-
----
-
 ## Prerequisites
 
 ### Install

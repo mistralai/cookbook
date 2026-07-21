@@ -6,21 +6,6 @@ Call individual tools on an MCP connector directly, without going through a conv
 
 ---
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [When to Use Direct Tool Calling](#when-to-use-direct-tool-calling)
-- [Recipes](#recipes)
-  - [1. Initialize the Client](#1-initialize-the-client)
-  - [2. Create a Connector](#2-create-a-connector)
-  - [3. Call a Tool on a Connector](#3-call-a-tool-on-a-connector)
-  - [4. Full Example — Create, Call a Tool, and Clean Up](#4-full-example--create-call-a-tool-and-clean-up)
-- [Python / TypeScript Naming Conventions](#python--typescript-naming-conventions)
-- [Troubleshooting](#troubleshooting)
-- [Error Codes Reference](#error-codes-reference)
-
----
-
 ## Prerequisites
 
 ### Install

@@ -55,7 +55,6 @@ Each **recipe or example** inside the main section must include:
 
 | Section | When to include |
 |---|---|
-| Table of Contents | Cookbooks with 5+ recipes or 400+ lines |
 | Comparison table (e.g., API A vs. API B) | When two similar options exist and choice matters |
 | Named helper function section | When recipes share a utility function |
 | Python / TypeScript naming conventions | When SDK field names differ between languages |
@@ -145,7 +144,8 @@ Do not include these in a cookbook:
 - **Closing promotional statements** — No "Start building today!" or "Unlock the full potential."
 - **Theory-only sections without code** — Concepts must be paired with a concrete example.
 - **Repeated prerequisites** — State install instructions once; don't repeat them per recipe.
-- **Nested TOC duplication** — Don't list recipe sub-steps in the table of contents.
+- **Table of Contents** — The documentation UI does not render TOC links, so they add noise without benefit. Remove any `## Table of Contents` section entirely.
+- **Nested TOC duplication** — Don't list recipe sub-steps in a table of contents.
 - **Empty sections** — Remove any heading with no content beneath it.
 - **Changelog or version history** — Belongs in release notes, not cookbooks.
 - **Contributing guidelines** — Use the repo's CONTRIBUTING_GUIDE.md instead.

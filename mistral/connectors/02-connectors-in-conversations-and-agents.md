@@ -6,25 +6,6 @@ Use MCP connectors, built-in tools, and agents in Mistral AI conversations.
 
 ---
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Reading Conversation Responses](#reading-conversation-responses)
-- [Recipes](#recipes)
-  - [1. Hello world — first conversation](#1-hello-world--first-conversation)
-  - [2. Conversation with web search](#2-conversation-with-web-search)
-  - [3. Conversation with a custom connector](#3-conversation-with-a-custom-connector)
-  - [4. Combining multiple tools in one conversation](#4-combining-multiple-tools-in-one-conversation)
-  - [5. Filtering connector tools — include / exclude](#5-filtering-connector-tools--include--exclude)
-  - [6. Creating an agent with connectors](#6-creating-an-agent-with-connectors)
-  - [7. OAuth-authenticated connectors (Gmail)](#7-oauth-authenticated-connectors-gmail)
-  - [8. Full example — create a connector, chat, and clean up](#8-full-example--create-a-connector-chat-and-clean-up)
-- [Python / TypeScript Naming Conventions](#python--typescript-naming-conventions)
-- [Troubleshooting](#troubleshooting)
-- [Error Codes Reference](#error-codes-reference)
-
----
-
 ## Prerequisites
 
 ### Install

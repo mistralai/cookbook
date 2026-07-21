@@ -6,17 +6,6 @@ Add approval flows to tool calls so users can review and confirm or reject actio
 
 ---
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Concepts](#concepts)
-- [Recipes](#recipes)
-  - [1. Local Functions with Confirmation](#1-local-functions-with-confirmation)
-  - [2. Connector (Gmail) with Confirmation](#2-connector-gmail-with-confirmation)
-  - [3. Stateless / API-Friendly — Serialize and Resume](#3-stateless--api-friendly--serialize-and-resume)
-
----
-
 ## Prerequisites
 
 ### Install

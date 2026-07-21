@@ -6,15 +6,6 @@ Use MCP connectors inside Mistral Workflows — declare connector dependencies o
 
 ---
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Create a Worker with Connectors](#create-a-worker-with-connectors)
-- [Execute a Workflow with Connectors](#execute-a-workflow-with-connectors)
-- [Execute a Workflow via AI Studio](#execute-a-workflow-via-ai-studio)
-
----
-
 ## Prerequisites
 
 This cookbook covers two separate roles:
