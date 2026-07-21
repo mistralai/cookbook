@@ -1,6 +1,6 @@
 # Build a Database Advisor Agent with the DeepWiki Connector (TypeScript)
 
-You need a database for write-heavy local analytics. SQLite, DuckDB, and LevelDB are all strong contenders, but which one actually fits? Rather than reading documentation by hand, this script lets Mistral read their actual source code via the [DeepWiki](https://deepwiki.com) Connector and decide.
+You need a database for write-heavy local analytics. SQLite, DuckDB, and LevelDB are all strong contenders, but which one actually fits? Rather than reading documentation by hand, this script lets a Mistral Agent read their actual source code via the [DeepWiki](https://deepwiki.com) Connector and decide.
 
 This script demonstrates the full [Mistral Connector](https://docs.mistral.ai/studio-api/connectors) lifecycle:
 
@@ -20,7 +20,7 @@ A Python version of the same agent is also available [here](./01-build-a-databas
 
 ## Prerequisites
 
-To complete this tutorial, you will need:
+To complete this cookbook, you will need:
 - Node.js and a package manager (npm, pnpm, or yarn)
 - A Mistral account and API key
 
