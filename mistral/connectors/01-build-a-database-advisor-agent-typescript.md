@@ -2,7 +2,7 @@
 
 You need a database for write-heavy local analytics. SQLite, DuckDB, and LevelDB are all strong contenders, but which one actually fits? Rather than reading documentation by hand, this script lets Mistral read their actual source code via the [DeepWiki](https://deepwiki.com) Connector and decide.
 
-This script demonstrates the full Mistral Connector lifecycle:
+This script demonstrates the full [Mistral Connector](https://docs.mistral.ai/studio-api/connectors) lifecycle:
 
 | Step | Operation | What happens |
 |---|---|---|
@@ -86,6 +86,26 @@ async function main(): Promise<void> {
 main().catch(console.error);
 ```
 
+---
+
+## Summary
+
+This script demonstrated the full Mistral Connector lifecycle — create, list, use, update, and delete — using the DeepWiki Connector to let the model read actual GitHub repository source code and produce a data-driven database recommendation.
+
+**What you built:**
+- Three named Connectors pointing at the DeepWiki MCP server
+- An agent (Database Showdown Judge) with all three Connectors attached
+- A conversation that produced a structured recommendation, updated the winner's Connector, and cleaned up the rest
+
+**Mistral features used:**
+- Connectors (beta)
+- Agents API (beta)
+- Conversations API (beta)
+
+**Other services:**
+- [DeepWiki](https://deepwiki.com) — MCP server for reading public GitHub repositories
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).
 ---
 
 ## Step 2 — Create one connector per candidate

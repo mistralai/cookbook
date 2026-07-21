@@ -422,3 +422,23 @@ curl -X POST "${BASE_URL}/v1/connectors/toolcall_deepwiki/call_tool" \
 curl -X DELETE "${BASE_URL}/v1/connectors/${CONNECTOR_ID}" \
   -H "Authorization: Bearer ${MISTRAL_API_KEY}"
 ```
+
+---
+
+## Summary
+
+This cookbook covered how to call individual tools on a Connector directly — without the model deciding which tool to invoke. Direct tool calling is useful when you already know which tool you need and want raw, structured output for programmatic use.
+
+**What this cookbook covers:**
+- Initializing the Mistral client
+- Creating a Connector
+- Calling a specific tool on a Connector and getting the raw result
+- Full lifecycle: create a Connector, call a tool, and clean up
+
+**Mistral features used:**
+- Connectors API — direct tool calling (beta)
+
+**Other services:**
+- [DeepWiki](https://deepwiki.com) — MCP server for GitHub repository exploration
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).

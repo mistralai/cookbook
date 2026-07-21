@@ -36,7 +36,23 @@ Every cookbook file must include these sections, in this order:
 ### Required environment variables ← H3
 
 ## [Main content section]          ← H2 (e.g., "Recipes", section name varies by cookbook)
+
+## Summary                         ← H2: closing summary (required)
 ```
+
+The `## Summary` section must appear at the end of every cookbook. It must contain:
+
+1. **1–2 sentence overview** of what the cookbook covered and what was built or demonstrated.
+2. **What you built** (or **What this cookbook covers**) — a bullet list.
+3. **Mistral features used** — a bullet list of Mistral APIs, products, and tools referenced (e.g., Connectors, Conversations API, Agents API, Workflows, Chat Completions API, built-in tools).
+4. **Other services** (optional) — a bullet list of third-party tools or MCP servers used. Omit this heading if there are none.
+5. **One CTA** — a single link to relevant documentation or a Studio page. Use one of:
+   - A known Studio URL (e.g., `View your Connectors in [Studio](https://console.mistral.ai/build/connectors).`)
+   - A known documentation URL
+   - If you don't know the right destination, use: `[View the documentation]() <!-- TODO: add link to relevant documentation -->`
+
+Flag as **Critical** if the `## Summary` section is missing entirely.
+Flag as **Moderate** if the CTA link is empty and has no `TODO` comment, or if any of the four required elements (overview, what was built, Mistral features, CTA) is absent.
 
 Each **recipe or example** inside the main section must include:
 
@@ -304,6 +320,7 @@ Write the review as a Markdown document with the following structure:
 | Example output per recipe | ✅ / ❌ / ⚠️ | |
 | How it works per recipe | ✅ / ❌ / ⚠️ | |
 | Common errors table per recipe | ✅ / ❌ / ⚠️ | |
+| Closing summary | ✅ / ❌ / ⚠️ | |
 | No forbidden sections | ✅ / ❌ | |
 ```
 

@@ -755,3 +755,25 @@ curl -X DELETE "${BASE_URL}/v1/connectors/outlook_calendar/user/credentials/pers
 | `404 Not Found` | Credentials name or connector does not exist | Verify names with `list_user_credentials` |
 | `409 Conflict` | Connector name already taken, or deleting the active default | Rename the connector or promote a different credentials to default first |
 | `422 Unprocessable Entity` | Invalid credentials name format | Use alphanumeric characters and hyphens only |
+
+---
+
+## Summary
+
+This cookbook covered how to store and manage multiple sets of credentials for a single Connector — both bearer tokens (GitHub PATs) and OAuth2 (Outlook Calendar) — and how to route specific tool calls to specific credentials at runtime.
+
+**What this cookbook covers:**
+- Storing multiple bearer token credentials for a GitHub MCP Connector
+- Storing multiple OAuth2 credentials for an Outlook Calendar MCP Connector
+- Listing, selecting, and deleting credentials
+- Promoting credentials to default
+- Calling tools with a specific named credential
+
+**Mistral features used:**
+- Connectors API — credentials management (beta)
+
+**Other services:**
+- GitHub MCP — bearer-authenticated Connector (personal access tokens)
+- Outlook Calendar MCP — OAuth2-authenticated Connector
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).

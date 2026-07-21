@@ -417,3 +417,27 @@ When credentials are not specified, the worker will use your default credentials
 If you have no credentials for a given connector and the connector is OAuth2, the worker triggers an auth flow — you will receive an event in the execution panel prompting you to authenticate (an orange key icon indicates an action is required).
 
 Once you complete the flow, the newly created credentials are stored as your default and the workflow resumes automatically.
+
+---
+
+## Summary
+
+This cookbook covered how to use Connectors inside Mistral Workflows — declaring connector slots, calling Connector tools from activities, and executing workflows with automatic OAuth handling from a client script or from Studio.
+
+**What this cookbook covers:**
+- Declaring connector slots on a Workflows worker
+- Writing activities that call Connector tools via `ToolCallClient`
+- Defining a workflow class with `@uses_connectors`
+- Running a worker and executing a workflow
+- Client-side execution with automatic OAuth flow handling
+- Triggering a workflow from Studio
+
+**Mistral features used:**
+- Workflows (beta)
+- Connectors (beta)
+
+**Other services:**
+- GitHub MCP — bearer-authenticated Connector
+- Notion — OAuth2-authenticated Connector
+
+[View the documentation]() <!-- TODO: add link to relevant documentation -->

@@ -1146,3 +1146,31 @@ Cleaned up connector: Connector deleted successfully
 - The `try/finally` pattern ensures the connector is always deleted, even if the conversation fails.
 - This recipe combines connector CRUD (demonstrated in full in [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb)) with conversation usage.
 - The second conversation demonstrates the model intelligently routing between web search and the custom connector within a single request.
+
+---
+
+## Summary
+
+This cookbook covered eight recipes for using Connectors, built-in tools, and agents in Mistral AI conversations — from a basic hello world to OAuth-authenticated Connectors and a full create-chat-cleanup lifecycle example.
+
+**What this cookbook covers:**
+- Starting a conversation with the Conversations API
+- Adding web search to a conversation
+- Using a custom Connector in a conversation
+- Combining multiple tools in one conversation
+- Filtering which tools a Connector exposes
+- Creating an agent with Connectors
+- OAuth-authenticated Connectors (Gmail)
+- Full lifecycle: create a Connector, use it in a conversation, and clean up
+
+**Mistral features used:**
+- Conversations API (beta)
+- Agents API (beta)
+- Connectors (beta)
+- Web search built-in tool
+
+**Other services:**
+- [DeepWiki](https://deepwiki.com) — MCP server for GitHub repository exploration
+- Gmail — OAuth2-authenticated Connector
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).

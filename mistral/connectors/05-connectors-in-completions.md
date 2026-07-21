@@ -1229,3 +1229,32 @@ Deleted connector: c3d4e5f6-...
 | `500` | Internal Server Error | Server-side issue, retry with backoff |
 | `502` | Bad Gateway | MCP server unreachable or returned an error |
 | `504` | Gateway Timeout | MCP server took too long to respond |
+
+---
+
+## Summary
+
+This cookbook covered eight recipes for using Connectors, built-in tools, and agents with the Chat Completions and Agent Completions APIs — from a basic completion to OAuth-authenticated Connectors and a full create-complete-cleanup lifecycle example.
+
+**What this cookbook covers:**
+- Basic chat completion
+- Completion with image generation
+- Completion with a custom Connector
+- Combining multiple tools in one completion
+- Creating an agent with Connectors for use with completions
+- Agent completions
+- OAuth-authenticated Connectors (Gmail)
+- Full lifecycle: create a Connector, complete, and clean up
+
+**Mistral features used:**
+- Chat Completions API
+- Agent Completions API
+- Agents API (beta)
+- Connectors (beta)
+- Image generation built-in tool
+
+**Other services:**
+- [DeepWiki](https://deepwiki.com) — MCP server for GitHub repository exploration
+- Gmail — OAuth2-authenticated Connector
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).
