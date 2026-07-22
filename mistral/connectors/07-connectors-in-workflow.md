@@ -1,17 +1,8 @@
 # Connectors in Workflows Cookbook
 
-Use MCP connectors inside Mistral Workflows — declare connector dependencies on a worker, call connector tools from activities with specific credentials, and execute workflows with automatic OAuth handling.
+Use Connectors inside Workflows — declare connector dependencies on a worker, call connector tools from activities with specific credentials, and execute workflows with automatic OAuth handling.
 
 > **API status:** The workflow connector integration uses `mistralai-workflows-plugins-mistralai`. These are **beta** features and may change.
-
----
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Create a Worker with Connectors](#create-a-worker-with-connectors)
-- [Execute a Workflow with Connectors](#execute-a-workflow-with-connectors)
-- [Execute a Workflow via AI Studio](#execute-a-workflow-via-ai-studio)
 
 ---
 
@@ -27,8 +18,10 @@ This cookbook covers two separate roles:
 
 ### What you need before starting
 
-- Dedicate a Mistral workspace to run your workflow. Note that execution of your workflow needs to use the same workspace as the workflow.
-- At least one registered Connector. See the [Connectors Management Cookbook](./01-connectors-management.md) to create one, use of of the registered connectors in Studio, or create your own in Studio.
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
+- Dedicate a Mistral workspace to run your workflow. Workflow execution must use the same workspace as the workflow definition.
+- At least one registered Connector. See [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one directly in [Studio](https://console.mistral.ai).
 - For OAuth-authenticated connectors like Notion and Gmail: no pre-existing credentials are needed — the auth flow is triggered automatically at workflow execution time; for bearer-authenticated connectors (e.g. GitHub PAT), credentials must be stored in the Mistral console before running the workflow.
 
 ---
@@ -42,11 +35,11 @@ A workflow that uses connectors has three building blocks:
 
 | Building block | What it does |
 |---|---|
-| `connector(name)` | Declares a named connector slot — a dependency on an MCP connector |
+| `connector(name)` | Declares a named connector slot — a dependency on a Connector |
 | `@uses_connectors(slot, ...)` | Attaches declared slots to a workflow class so the runtime knows which connectors to authenticate |
 | `ToolCallClient` | Activity-level client for calling connector tools, injected via `Depends` |
 
-The `ConnectorAuthInterceptor` is automatically registered by the plugin when `run_worker` starts. It runs an auth preflight before every workflow execution: if valid credentials exist (matching `credentials_name` if specified, else if default credentials exist) the workflow proceeds immediately; if not, it triggers an OAuth flow and waits for the user to authenticate. Note that bearer on the fly authentication is not supported yet.
+The `ConnectorAuthInterceptor` is automatically registered by the plugin when `run_worker` starts. It runs an auth preflight before every workflow execution: if valid credentials exist (matching `credentials_name` if specified, else if default credentials exist) the workflow proceeds immediately; if not, it triggers an OAuth flow and waits for the user to authenticate. Bearer on-the-fly authentication is not currently supported.
 
 ### Worker and example client install
 
@@ -79,7 +72,7 @@ notion_connector = connector("notion")
 
 | Parameter | Default | Description |
 |---|---|---|
-| `name` | — | Connector name or ID as registered in the Mistral dashboard |
+| `name` | — | Connector name or ID as registered in Studio |
 | `auto_auth` | `True` | Run OAuth preflight before the workflow starts |
 | `credentials_name` | `None` | Pin to a specific shared credential name (ex: workspace scoped). Not supported yet, only runtime credentials are supported |
 
@@ -119,7 +112,7 @@ async def create_github_issue(
     )
 ```
 
-`call_tool(tool_name, arguments)` dispatches the call to the MCP connector and returns the raw tool response.
+`call_tool(tool_name, arguments)` dispatches the call to the Connector and returns the raw tool response.
 
 ---
 
@@ -276,7 +269,7 @@ import asyncio
 import os
 
 import pydantic
-from mistralai.client import Mistral
+from mistralai import Mistral
 from mistralai.extra.workflows.connector_auth import (
     ConnectorAuthTaskState,
     execute_with_connector_auth_async,
@@ -413,14 +406,38 @@ Once the user authenticates in their browser, the worker detects the new credent
 
 ---
 
-## Execute a Workflow via AI Studio
+## Execute a workflow via Studio
 
-When credentials are not specified, the worker will try to use your default credentials.
+When credentials are not specified, the worker will use your default credentials.
 
 > To promote credentials to default, see the [Multiple Authentication Cookbook](./06-multiple-authentication.md).
 
 ### OAuth flow in the execution panel
 
-If you have no credentials for a given connector and the connector is OAuth2, the worker will trigger an auth flow on the fly — you will receive an event in the execution panel prompting you to authenticate (an orange key icon indicates an action is required).
+If you have no credentials for a given connector and the connector is OAuth2, the worker triggers an auth flow — you will receive an event in the execution panel prompting you to authenticate (an orange key icon indicates an action is required).
 
 Once you complete the flow, the newly created credentials are stored as your default and the workflow resumes automatically.
+
+---
+
+## Summary
+
+This cookbook covered how to use Connectors inside Mistral Workflows — declaring connector slots, calling Connector tools from activities, and executing workflows with automatic OAuth handling from a client script or from Studio.
+
+**What this cookbook covers:**
+- Declaring connector slots on a Workflows worker
+- Writing activities that call Connector tools via `ToolCallClient`
+- Defining a workflow class with `@uses_connectors`
+- Running a worker and executing a workflow
+- Client-side execution with automatic OAuth flow handling
+- Triggering a workflow from Studio
+
+**Mistral features used:**
+- Workflows (beta)
+- Connectors (beta)
+
+**Other services:**
+- GitHub MCP — bearer-authenticated Connector
+- Notion — OAuth2-authenticated Connector
+
+[View the documentation]() <!-- TODO: add link to relevant documentation -->

@@ -29,38 +29,77 @@ Every cookbook file must include these sections, in this order:
 [One-sentence description]         ← immediately under title, no heading
 > [Status/note callout]            ← blockquote for beta APIs or important constraints
 
-## Prerequisites                   ← H2
+[Introduction text]                ← optional ## Introduction heading, or prose directly under the description
+
+## Prerequisites                   ← H2: "To complete this cookbook, you will need:" + bullet list only
+
+## Environment setup               ← H2
 
 ### Install                        ← H3
 
 ### Required environment variables ← H3
 
-## [Main content section]          ← H2 (e.g., "Recipes", section name varies by cookbook)
+## [Step heading]                  ← H2: one or more step sections (numbered or unnumbered)
+...
+
+## Clean up                        ← H2 (optional but suggested): remove resources created during the tutorial
+
+## Summary                         ← H2: closing summary (required, must be last)
 ```
 
-Each **recipe or example** inside the main section must include:
+**Step headings** are H2 and may be numbered or unnumbered — both forms are acceptable:
+- `## 1. Create the connector`
+- `## Create the connector`
 
-| Sub-element | Required | Notes |
-|---|---|---|
-| `**Goal:**` | Yes | One sentence. What this recipe accomplishes. |
-| `**When to use:**` | Yes | Bullet list of scenarios. |
-| Code block — Python | Yes (if SDK supports it) | Language-tagged ` ```python ``` ` |
-| Code block — TypeScript | Yes (if SDK supports it) | Language-tagged ` ```typescript ``` ` |
-| Code block — curl | Yes | Language-tagged ` ```bash ``` ` |
-| `**Example of output:**` or `**Output:**` | Yes | Fenced code block showing realistic output |
-| `**How it works:**` | Yes | Bullet list explaining the key mechanics |
-| `**Common errors & fixes:**` | Yes | Table with columns: Error \| Cause \| Fix |
+Each step section must open with at least one sentence before any code block, table, or list (see section content standard below).
+
+The `## Prerequisites` section must contain only the sentence "To complete this cookbook, you will need:" followed by a bulleted list. List items should appear in this order:
+1. Language runtime and tooling (e.g., "Python 3.9 or later", "Node.js and a package manager")
+2. A Mistral account and API key (nearly always required)
+3. Any other accounts, tokens, or external services needed
+
+Flag as **Critical** if `## Prerequisites` contains installation instructions, environment variable setup, or code blocks — those belong in `## Environment setup`.
+
+The `## Environment setup` section contains everything the reader needs to run the code: package installation, API key setup, and (for standalone scripts) a run command. See the API key setup standard below for exact wording.
+
+The `## Summary` section must be the **last section** in the file — no content, headings, or sections may follow it. It must contain:
+
+1. **1–2 sentence overview** of what the cookbook covered and what was built or demonstrated.
+2. **What you built** (or **What this cookbook covers**) — a bullet list.
+3. **Mistral features used** — a bullet list of Mistral APIs, products, and tools referenced (e.g., Connectors, Conversations API, Agents API, Workflows, Chat Completions API, built-in tools).
+4. **Other services** (optional) — a bullet list of third-party tools or MCP servers used. Omit this heading if there are none.
+5. **One CTA** — a single link to relevant documentation or a Studio page. Use one of:
+   - A known Studio URL (e.g., `View your Connectors in [Studio](https://console.mistral.ai/build/connectors).`)
+   - A known documentation URL
+   - If you don't know the right destination, use: `[View the documentation]() <!-- TODO: add link to relevant documentation -->`
+
+Flag as **Critical** if the `## Summary` section is missing entirely or if it is not the last section in the file.
+Flag as **Moderate** if the CTA link is empty and has no `TODO` comment, or if any of the four required elements (overview, what was built, Mistral features, CTA) is absent.
 
 ### Optional sections (include when relevant)
 
 | Section | When to include |
 |---|---|
-| Table of Contents | Cookbooks with 5+ recipes or 400+ lines |
 | Comparison table (e.g., API A vs. API B) | When two similar options exist and choice matters |
-| Named helper function section | When recipes share a utility function |
-| Python / TypeScript naming conventions | When SDK field names differ between languages |
 | Troubleshooting guide | When common runtime errors need extended explanations |
 | Error codes reference table | When the API returns many distinct HTTP error codes |
+
+### Section content standard
+
+Every heading — at any level — must be followed by at least one sentence of body text before any code block, table, or list. The sentence should tell the reader what they're looking at or what to do.
+
+Flag as **Moderate** if any heading is followed immediately by a code block, table, or list with no introductory sentence.
+
+**Examples:**
+
+`### Install` — must have an intro sentence before the first code block:
+- TypeScript: "Use one of the following methods to install the Mistral TypeScript SDK:"
+- Python: "Install the Mistral Python SDK:" or "Run the following command to install the Mistral Python SDK:"
+
+`### Run` — must explain what the command does before showing it:
+- "Once your `.env` file is in place, run the script:"
+
+Apply the same rule to all other headings: `### Required environment variables`, recipe headings, step headings, and so on.
 
 ### API key setup standard
 
@@ -68,7 +107,7 @@ Every cookbook that requires a Mistral API key must follow this exact wording an
 
 #### Getting the key
 
-The "Prerequisites" section must include this sentence verbatim (Markdown links intact):
+The "Environment setup" section must include this sentence verbatim (Markdown links intact):
 
 > To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
 
@@ -144,8 +183,9 @@ Do not include these in a cookbook:
 - **Generic introductions** — No "In today's world of AI..." or "As AI becomes more important..."
 - **Closing promotional statements** — No "Start building today!" or "Unlock the full potential."
 - **Theory-only sections without code** — Concepts must be paired with a concrete example.
-- **Repeated prerequisites** — State install instructions once; don't repeat them per recipe.
-- **Nested TOC duplication** — Don't list recipe sub-steps in the table of contents.
+- **Repeated prerequisites** — State install instructions once; don't repeat them in individual steps.
+- **Table of Contents** — The documentation UI does not render TOC links, so they add noise without benefit. Remove any `## Table of Contents` section entirely.
+- **Nested TOC duplication** — Don't list recipe sub-steps in a table of contents.
 - **Empty sections** — Remove any heading with no content beneath it.
 - **Changelog or version history** — Belongs in release notes, not cookbooks.
 - **Contributing guidelines** — Use the repo's CONTRIBUTING_GUIDE.md instead.
@@ -194,6 +234,7 @@ Based on the Mistral Writing Style Guide (see reference files below).
   - Bad mix: `## Create a connector`, `## Listing connectors`, `## How to delete a connector`
   - Good: `## Create a connector`, `## List connectors`, `## Delete a connector`
 - **Avoid two headings in a row** without body text in between.
+- **Never open a section with a code block, table, or list.** Every heading must be followed by at least one sentence before any code or structured content. See the section content standard above.
 
 ### Lists
 
@@ -220,7 +261,7 @@ Based on the Mistral Writing Style Guide (see reference files below).
 - **Compile and test all code.** Verify that every example runs without errors.
 - **Prioritize frequently used elements.** Start with the simplest useful example; build toward complex.
 - **Placeholders must be obvious.** Any value the reader must replace should be clearly marked (e.g., `<your-connector-id>` or `"your-agent-id"`).
-- **Keep language parity.** If you show a Python example, show the equivalent TypeScript and curl unless a clear reason exists to omit one.
+- **Match the language to the tutorial.** A TypeScript tutorial shows TypeScript; a Python notebook shows Python. Don't mix languages within the same tutorial unless the cookbook explicitly compares them.
 
 ### Accessibility and inclusive language
 
@@ -243,6 +284,7 @@ See [`inclusive-language.md`](./inclusive-language.md) for the full guide.
 
 | Avoid | Use instead |
 |---|---|
+| MCP connectors / mcp connectors (referring to the product) | Connectors (capital C) |
 | utilize | use |
 | initiate / instantiate (in prose) | start, create |
 | leverage (as a verb) | use, take advantage of |
@@ -295,14 +337,14 @@ Write the review as a Markdown document with the following structure:
 | H1 title | ✅ / ❌ / ⚠️ | |
 | One-sentence description | ✅ / ❌ / ⚠️ | |
 | Status/note callout (if applicable) | ✅ / ❌ / N/A | |
-| Prerequisites > Install | ✅ / ❌ / ⚠️ | |
-| Prerequisites > Environment variables | ✅ / ❌ / ⚠️ | |
-| Goal per recipe | ✅ / ❌ / ⚠️ | |
-| When to use per recipe | ✅ / ❌ / ⚠️ | |
-| Code blocks (Python / TS / curl) | ✅ / ❌ / ⚠️ | |
-| Example output per recipe | ✅ / ❌ / ⚠️ | |
-| How it works per recipe | ✅ / ❌ / ⚠️ | |
-| Common errors table per recipe | ✅ / ❌ / ⚠️ | |
+| Prerequisites (bullet list only) | ✅ / ❌ / ⚠️ | |
+| Environment setup > Install | ✅ / ❌ / ⚠️ | |
+| Environment setup > Environment variables | ✅ / ❌ / ⚠️ | |
+| Step sections (H2, at least one) | ✅ / ❌ / ⚠️ | |
+| Intro sentence before code in each step | ✅ / ❌ / ⚠️ | |
+| Code blocks have language tags | ✅ / ❌ / ⚠️ | |
+| Clean up section (optional) | ✅ / N/A | |
+| Closing summary (last section) | ✅ / ❌ / ⚠️ | |
 | No forbidden sections | ✅ / ❌ | |
 ```
 
