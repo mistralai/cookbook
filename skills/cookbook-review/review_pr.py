@@ -256,7 +256,8 @@ Respond with a single, valid JSON object — no text before or after. Use this e
 RULES
 - verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the file looks good.
 - line_comments[].line: must be an integer matching a line number in the numbered input. Do not guess.
-- Use line_comments for every issue you can tie to a specific line. Use file_comments ONLY for issues with no applicable line — for example, an entire required section is completely absent from the file.
+- For Markdown files, use line_comments for EVERY issue where you can see the problematic text in the numbered content. If you can read the offending text on a numbered line, it must be a line_comment — never a file_comment.
+- Use file_comments ONLY for structural absences where there is no line to point to — for example, a required section (## Prerequisites, ## Summary) is entirely missing from the file with no heading or content at all.
 - Limit the total issues across both arrays to the 8 most impactful.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
@@ -297,8 +298,9 @@ Respond with a single, valid JSON object — no text before or after. Use this e
       "cell": <integer cell number from the input, or null for file-wide issues>,
       "issue": "<concise label, max 10 words>",
       "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
-      "body": "<description referencing the specific cell and quoting the problematic text>",
-      "suggestion": "<the corrected replacement for the specific phrase or sentence only — omit if structural or multi-line>"
+      "body": "<description of what is wrong>",
+      "quote": "<the exact verbatim phrase or sentence from the cell that is wrong — copy it character-for-character>",
+      "suggestion": "<the corrected replacement for the quoted text only — omit if structural or multi-line>"
     }}
   ]
 }}
@@ -311,17 +313,10 @@ RULES
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
-SUGGESTION RULES
-The suggestion contains the corrected version of the specific phrase or sentence that is wrong — nothing surrounding it.
-
-Omit the "suggestion" key entirely if ANY of the following are true:
-- The fix requires adding content that does not exist yet (e.g. a missing section, a missing sentence).
-- The fix requires changing more than one sentence.
-- The issue is structural (e.g. a heading in the wrong order, a missing block).
-
-When you DO include a suggestion:
-- Replace ONLY the specific word, phrase, or sentence that is wrong.
-- Keep all other text in the cell exactly as it is.
+QUOTE AND SUGGESTION RULES
+- quote: copy the exact phrase or sentence that is wrong, verbatim from the cell content. This helps the reader find it. Omit quote if the issue is structural (e.g. a missing section) — there is nothing to quote.
+- suggestion: the corrected replacement for the quoted text only — nothing surrounding it.
+- Omit suggestion if the fix requires adding new content, changing more than one sentence, or is structural.
 """
 
 _SYSTEM_PROMPT_MD_DIFF = """\
@@ -346,8 +341,9 @@ Respond with a single, valid JSON object — no text before or after. Use this e
       "severity": "critical" | "moderate" | "minor",
       "issue": "<concise label, max 10 words>",
       "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
-      "body": "<description quoting the specific '+' line being flagged>",
-      "suggestion": "<the corrected replacement for the specific phrase or value only — omit if structural or multi-line>"
+      "body": "<description of what is wrong>",
+      "quote": "<the exact verbatim text from the '+' line that is wrong — copy it character-for-character>",
+      "suggestion": "<the corrected replacement for the quoted text only — omit if the flagged line is a heading, if the fix adds content, or if the fix spans multiple lines>"
     }}
   ]
 }}
@@ -359,17 +355,10 @@ RULES
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
-SUGGESTION RULES
-The suggestion contains the corrected version of the specific phrase or value that is wrong — nothing surrounding it.
-
-Omit the "suggestion" key entirely if ANY of the following are true:
-- The flagged line is a Markdown heading (starts with one or more `#` characters).
-- The fix requires adding content that does not yet exist on that line.
-- The fix spans more than one line.
-
-When you DO include a suggestion:
-- Replace ONLY the specific word or phrase that is wrong.
-- Keep everything else on the line exactly as it appears.
+QUOTE AND SUGGESTION RULES
+- quote: copy the exact phrase or sentence that is wrong, verbatim from the '+' line. Omit if the issue is structural with nothing to quote.
+- suggestion: the corrected replacement for the quoted text only.
+- Never include a suggestion if the flagged line is a heading, the fix adds new content, or the fix spans multiple lines.
 """
 
 _SYSTEM_PROMPT_IPYNB_DIFF = """\
@@ -395,8 +384,9 @@ Respond with a single, valid JSON object — no text before or after. Use this e
       "cell": <integer cell number from the input, or null for notebook-wide issues>,
       "issue": "<concise label, max 10 words>",
       "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
-      "body": "<description referencing the specific cell and quoting the problematic text>",
-      "suggestion": "<the corrected replacement for the specific phrase or sentence only — omit if structural or multi-line>"
+      "body": "<description of what is wrong>",
+      "quote": "<the exact verbatim phrase or sentence from the cell that is wrong — copy it character-for-character>",
+      "suggestion": "<the corrected replacement for the quoted text only — omit if structural or multi-line>"
     }}
   ]
 }}
@@ -409,17 +399,10 @@ RULES
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
-SUGGESTION RULES
-The suggestion contains the corrected version of the specific phrase or sentence that is wrong — nothing surrounding it.
-
-Omit the "suggestion" key entirely if ANY of the following are true:
-- The fix requires adding content that does not exist yet (e.g. a missing section, a missing sentence).
-- The fix requires changing more than one sentence.
-- The issue is structural (e.g. a heading in the wrong order, a missing block).
-
-When you DO include a suggestion:
-- Replace ONLY the specific word, phrase, or sentence that is wrong.
-- Keep all other text in the cell exactly as it is.
+QUOTE AND SUGGESTION RULES
+- quote: copy the exact phrase or sentence that is wrong, verbatim from the cell content. Omit if the issue is structural (e.g. a missing section) — there is nothing to quote.
+- suggestion: the corrected replacement for the quoted text only — nothing surrounding it.
+- Omit suggestion if the fix requires adding new content, changing more than one sentence, or is structural.
 """
 
 
@@ -512,6 +495,8 @@ def _build_file_comment_body(filepath: str, fc: dict) -> str:
     cell = fc.get("cell")
     reasoning = fc.get("reasoning", "")
     body = fc.get("body", "")
+    quote = fc.get("quote", "")
+    suggestion = fc.get("suggestion", "")
 
     location = f"Cell {cell} — " if cell is not None else ""
     parts = [f"`{filepath}` — {prefix} — {location}{issue}"]
@@ -521,9 +506,10 @@ def _build_file_comment_body(filepath: str, fc: dict) -> str:
     if body and body != reasoning:
         parts += ["", body]
 
-    suggestion = fc.get("suggestion")
+    if quote:
+        parts += ["", "**Current text:**", f"> {quote}"]
     if suggestion:
-        parts += ["", "**Suggested fix:**", "```", suggestion, "```"]
+        parts += ["", "**Replace with:**", f"> {suggestion}"]
 
     return "\n".join(parts)
 
