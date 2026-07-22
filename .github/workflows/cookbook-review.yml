@@ -32,9 +32,19 @@ jobs:
       - name: Detect changed cookbook files
         id: detect
         run: |
-          # A = Added (new files), M = Modified (existing files changed in this PR).
+          # On synchronize (new push to existing PR), review only the files changed
+          # in this push by diffing from the previous HEAD of the PR branch.
+          # On opened/reopened, review everything changed since the PR base.
+          if [ "${{ github.event.action }}" = "synchronize" ]; then
+            COMPARE_BASE="${{ github.event.before }}"
+          else
+            COMPARE_BASE="${{ github.event.pull_request.base.sha }}"
+          fi
+          echo "compare_base=${COMPARE_BASE}" >> "$GITHUB_OUTPUT"
+
+          # A = Added (new files), M = Modified (existing files changed in this push).
           git diff --diff-filter=AM --name-only \
-            "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" \
+            "${COMPARE_BASE}" "${{ github.sha }}" \
             -- 'mistral/**/*.md' 'mistral/**/*.ipynb' > changed_cookbooks.txt
 
           count=$(wc -l < changed_cookbooks.txt | tr -d ' ')
@@ -55,5 +65,5 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.sha }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_SHA: ${{ steps.detect.outputs.compare_base }}
         run: python skills/cookbook-review/review_pr.py changed_cookbooks.txt
