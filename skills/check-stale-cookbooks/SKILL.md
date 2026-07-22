@@ -76,23 +76,30 @@ python skills/check-stale-cookbooks/check_stale.py --dir mistral --use-llm --out
 | `MistralClient(` | `deprecated_class` | [client-python](https://github.com/mistralai/client-python/blob/main/README.md) |
 | `ChatMessage(` | `deprecated_class` | [client-python](https://github.com/mistralai/client-python/blob/main/README.md) |
 | `client.chat(` (without `.complete`) | `deprecated_method` | [client-python](https://github.com/mistralai/client-python/blob/main/README.md) |
-| `client.embeddings(` (without `.create`) | `deprecated_method` | [client-python](https://github.com/mistralai/client-python/blob/main/README.md) |
-| `pip install mistralai==0.` | `outdated_version` | [client-python](https://github.com/mistralai/client-python/blob/main/README.md) |
-| `@mistralai/mistralai@0.` | `outdated_version` | [client-ts](https://github.com/mistralai/client-ts/blob/main/README.md) |
-| `"mistral-tiny"` | `deprecated_model` | [openapi.yaml](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) |
-| `"mistral-medium"` | `deprecated_model` | [openapi.yaml](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) |
-| `"open-mistral-7b"` | `verify_model` | [openapi.yaml](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) |
-| `"open-mixtral-8x7b"` | `verify_model` | [openapi.yaml](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) |
-| `"open-mixtral-8x22b"` | `verify_model` | [openapi.yaml](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) |
-| Model IDs with dated versions (`-2309`, `-2402`) | `pinned_model_version` | [openapi.yaml](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) |
+| `client.embeddings(` (without `.create`) | `deprecated_method` | [client-python README](https://github.com/mistralai/client-python/blob/main/README.md) |
+| `client.fine_tuning` | `deprecated_api` | [Fine-tuning docs](https://docs.mistral.ai/capabilities/fine-tuning/) |
+| `/v1/fine_tuning/` in curl/REST calls | `deprecated_api` | [Fine-tuning docs](https://docs.mistral.ai/capabilities/fine-tuning/) |
+| `pip install mistralai==0.` | `outdated_version` | [client-python README](https://github.com/mistralai/client-python/blob/main/README.md) |
+| `@mistralai/mistralai@0.` | `outdated_version` | [client-ts README](https://github.com/mistralai/client-ts/blob/main/README.md) |
+| `"mistral-tiny"` | `deprecated_model` | [Model list](https://docs.mistral.ai/getting-started/models/models_overview/) |
+| `"mistral-medium"` | `deprecated_model` | [Model list](https://docs.mistral.ai/getting-started/models/models_overview/) |
+| `"open-mistral-7b"` | `verify_model` | [Model list](https://docs.mistral.ai/getting-started/models/models_overview/) |
+| `"open-mixtral-8x7b"` | `verify_model` | [Model list](https://docs.mistral.ai/getting-started/models/models_overview/) |
+| `"open-mixtral-8x22b"` | `verify_model` | [Model list](https://docs.mistral.ai/getting-started/models/models_overview/) |
+| Model IDs with dated versions (`-2309`, `-2402`) | `pinned_model_version` | [Model list](https://docs.mistral.ai/getting-started/models/models_overview/) |
 
 ### Dynamic model check (requires network, skipped with `--no-fetch`)
 
-Fetches the live `openapi.yaml` from `platform-docs-public` and extracts the current model ID enum. Any model ID used in an API call context (`model="..."`) that isn't in that list is flagged as `unknown_model`.
+Fetches the live model list from `/v1/models` and flags any Mistral model ID used in an API call (`model="..."`) that isn't in that list as `unknown_model`.
 
 ### LLM-assisted check (requires `--use-llm` and `MISTRAL_API_KEY`)
 
-Sends each flagged file's code content to `mistral-small-latest` for deeper semantic review. Catches issues that pattern matching misses: renamed parameters, changed response structures, removed features, outdated best practices.
+Sends each file's code content and excerpts from the fetched reference docs to `mistral-medium-latest` for deeper semantic review. Catches issues pattern matching misses: renamed parameters, changed response structures, removed features, outdated best practices.
+
+The LLM is explicitly instructed:
+- `_async` suffix methods (`create_async`, `list_async`, `start_async`, etc.) are **valid** — never flag them
+- Fine-tuning jobs API (`client.fine_tuning`) is deprecated
+- Every flagged issue must include a `quote` field with text from the reference that confirms the deprecation
 
 ## Suppressing false positives
 
@@ -168,7 +175,6 @@ This works in Python files, notebook code cells, and code blocks in Markdown.
 
 `.github/workflows/check-stale-cookbooks.yml` runs this script automatically:
 - **Weekly** on Monday at 9am UTC
-- **On every push to `main`**
 - **Manually** via `workflow_dispatch`
 
 For each file with issues, it creates a GitHub issue (if one doesn't already exist) with a `stale-cookbook` label. When a previously stale file is clean on the next run, the action comments on and closes the existing issue.
@@ -177,6 +183,7 @@ Required secret in the repository: `MISTRAL_API_KEY`.
 
 ## Reference repositories
 
-- [mistralai/platform-docs-public](https://github.com/mistralai/platform-docs-public) — OpenAPI spec (`openapi.yaml`)
-- [mistralai/client-python](https://github.com/mistralai/client-python) — Python SDK
-- [mistralai/client-ts](https://github.com/mistralai/client-ts) — TypeScript SDK
+- [mistralai/platform-docs-public](https://github.com/mistralai/platform-docs-public) — deprecation notices, fine-tuning docs, changelogs
+- [mistralai/client-python](https://github.com/mistralai/client-python) — Python SDK README (fetched and passed to LLM as actual content)
+- [mistralai/client-ts](https://github.com/mistralai/client-ts) — TypeScript SDK README (fetched and passed to LLM as actual content)
+- [docs.mistral.ai](https://docs.mistral.ai) — model list, fine-tuning deprecation notices

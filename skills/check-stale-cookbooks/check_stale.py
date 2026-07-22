@@ -3,9 +3,10 @@
 check_stale.py — Scan Mistral AI cookbooks for outdated content.
 
 Checks against:
-  - openapi.yaml from mistralai/platform-docs-public (valid model IDs)
+  - /v1/models API (valid model IDs)
   - README from mistralai/client-python (current Python SDK patterns)
   - README from mistralai/client-ts (current TypeScript SDK patterns)
+  - Selected pages from mistralai/platform-docs-public (deprecation notices)
 
 Usage:
     python check_stale.py [options]
@@ -50,24 +51,27 @@ import nbformat  # noqa: E402
 
 # ─── Reference URLs ────────────────────────────────────────────────────────────
 
-OPENAPI_RAW_URL = (
-    "https://raw.githubusercontent.com/mistralai/platform-docs-public/main/openapi.yaml"
-)
 PYTHON_README_RAW_URL = (
     "https://raw.githubusercontent.com/mistralai/client-python/main/README.md"
 )
 TS_README_RAW_URL = (
     "https://raw.githubusercontent.com/mistralai/client-ts/main/README.md"
 )
+PLATFORM_DOCS_RAW_BASE = (
+    "https://raw.githubusercontent.com/mistralai/platform-docs-public/main"
+)
 
 # Human-readable links used in issue bodies
 OPENAPI_URL = "https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml"
 PYTHON_SDK_URL = "https://github.com/mistralai/client-python/blob/main/README.md"
 TS_SDK_URL = "https://github.com/mistralai/client-ts/blob/main/README.md"
+DOCS_FINE_TUNING_URL = "https://docs.mistral.ai/capabilities/fine-tuning/"
+DOCS_MODELS_URL = "https://docs.mistral.ai/getting-started/models/models_overview/"
 
 
 # ─── Static deprecated patterns ────────────────────────────────────────────────
-# Each entry: pattern (regex), type, detail, reference_url
+# Each entry: pattern (regex), type, detail, reference_url,
+#             reference_search (optional text to find in ref doc for #L anchor)
 # Add # stale-check: ignore on any source line to suppress a match.
 
 DEPRECATED_PATTERNS: list[dict] = [
@@ -80,6 +84,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `from mistralai import Mistral` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "from mistralai import Mistral",
     },
     {
         "pattern": r"from mistralai import MistralClient",
@@ -89,6 +94,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `from mistralai import Mistral` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "from mistralai import Mistral",
     },
     {
         "pattern": r"from mistralai\.models",
@@ -99,6 +105,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use plain dicts — `{\"role\": \"user\", \"content\": \"...\"}` — or new SDK types."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "from mistralai import Mistral",
     },
     # ── Python SDK v0 client class ─────────────────────────────────────────────
     {
@@ -109,6 +116,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `Mistral(api_key=...)` from the `mistralai` package instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "Mistral(api_key",
     },
     {
         "pattern": r"\bChatMessage\s*\(",
@@ -118,6 +126,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use plain dicts: `{\"role\": \"user\", \"content\": \"...\"}`."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "role",
     },
     # ── Python SDK v0 method signatures ───────────────────────────────────────
     # Matches  client.chat(  but NOT  client.chat.complete(
@@ -129,6 +138,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `client.chat.complete(...)` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "chat.complete(",
     },
     {
         "pattern": r"\.embeddings\s*\(\s*(?!.*\.create)",
@@ -138,6 +148,26 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `client.embeddings.create(...)` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "embeddings.create(",
+    },
+    # ── Fine-tuning API (deprecated) ───────────────────────────────────────────
+    {
+        "pattern": r"client\.fine_tuning\b",
+        "type": "deprecated_api",
+        "detail": (
+            "The fine-tuning jobs API (`client.fine_tuning`) is deprecated. "
+            "See the current fine-tuning documentation for the supported approach."
+        ),
+        "reference_url": DOCS_FINE_TUNING_URL,
+    },
+    {
+        "pattern": r"/v1/fine[_-]tuning/",
+        "type": "deprecated_api",
+        "detail": (
+            "The `/v1/fine_tuning/` REST endpoint is deprecated. "
+            "See the current fine-tuning documentation for the supported approach."
+        ),
+        "reference_url": DOCS_FINE_TUNING_URL,
     },
     # ── Pinned old package versions ────────────────────────────────────────────
     {
@@ -148,6 +178,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Update to the current version: `pip install mistralai` (or `uv add mistralai`)."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_search": "pip install mistralai",
     },
     {
         "pattern": r"@mistralai/mistralai@0\.",
@@ -157,6 +188,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Update to the current version: `npm add @mistralai/mistralai`."
         ),
         "reference_url": TS_SDK_URL,
+        "reference_search": "npm add @mistralai/mistralai",
     },
     # ── Deprecated model names ─────────────────────────────────────────────────
     {
@@ -164,9 +196,9 @@ DEPRECATED_PATTERNS: list[dict] = [
         "type": "deprecated_model",
         "detail": (
             "`mistral-tiny` is deprecated. "
-            "Check the OpenAPI spec for the current model list."
+            "Check the current model list for a replacement."
         ),
-        "reference_url": OPENAPI_URL,
+        "reference_url": DOCS_MODELS_URL,
     },
     {
         "pattern": r"""['"](mistral-medium)['"]""",
@@ -175,34 +207,34 @@ DEPRECATED_PATTERNS: list[dict] = [
             "`mistral-medium` is deprecated. "
             "Use `mistral-medium-latest` or a current equivalent."
         ),
-        "reference_url": OPENAPI_URL,
+        "reference_url": DOCS_MODELS_URL,
     },
     {
         "pattern": r"""['"](open-mistral-7b)['"]""",
         "type": "verify_model",
         "detail": (
             "`open-mistral-7b` may be deprecated. "
-            "Verify against the current model list in the OpenAPI spec."
+            "Verify against the current model list."
         ),
-        "reference_url": OPENAPI_URL,
+        "reference_url": DOCS_MODELS_URL,
     },
     {
         "pattern": r"""['"](open-mixtral-8x7b)['"]""",
         "type": "verify_model",
         "detail": (
             "`open-mixtral-8x7b` may be deprecated. "
-            "Verify against the current model list in the OpenAPI spec."
+            "Verify against the current model list."
         ),
-        "reference_url": OPENAPI_URL,
+        "reference_url": DOCS_MODELS_URL,
     },
     {
         "pattern": r"""['"](open-mixtral-8x22b)['"]""",
         "type": "verify_model",
         "detail": (
             "`open-mixtral-8x22b` may be deprecated. "
-            "Verify against the current model list in the OpenAPI spec."
+            "Verify against the current model list."
         ),
-        "reference_url": OPENAPI_URL,
+        "reference_url": DOCS_MODELS_URL,
     },
     # ── Pinned model versions (prefer -latest aliases) ─────────────────────────
     {
@@ -212,7 +244,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "References a pinned dated model version (e.g. `-2309`, `-2402`). "
             "Consider using a `-latest` alias so cookbooks stay current automatically."
         ),
-        "reference_url": OPENAPI_URL,
+        "reference_url": DOCS_MODELS_URL,
     },
 ]
 
@@ -229,12 +261,44 @@ def fetch_url(url: str, label: str) -> Optional[str]:
         return None
 
 
-def fetch_valid_models(api_key: Optional[str]) -> set[str]:
-    """Fetch the current model list from the Mistral /v1/models API.
+def fetch_reference_content() -> dict[str, str]:
+    """Fetch all reference docs and return as a dict of label → text.
 
-    Returns an empty set (disabling dynamic model checks) if no API key is
-    available or the request fails — avoids false positives.
+    Content is passed to the LLM so it can verify claims against actual source,
+    and used to compute #L anchors for static pattern reference URLs.
     """
+    content: dict[str, str] = {}
+
+    print("Fetching Python SDK README ...", file=sys.stderr)
+    python_readme = fetch_url(PYTHON_README_RAW_URL, "client-python README")
+    if python_readme:
+        content["python"] = python_readme
+
+    print("Fetching TypeScript SDK README ...", file=sys.stderr)
+    ts_readme = fetch_url(TS_README_RAW_URL, "client-ts README")
+    if ts_readme:
+        content["typescript"] = ts_readme
+
+    # Fetch platform-docs-public pages that cover deprecations / API changes
+    docs_pages = [
+        ("fine_tuning", "docs/capabilities/fine-tuning.mdx"),
+        ("fine_tuning_alt", "docs/api/fine_tuning.mdx"),
+        ("changelog", "CHANGELOG.md"),
+        ("deprecations", "docs/deprecations.md"),
+        ("migration", "docs/migration.md"),
+    ]
+    for label, path in docs_pages:
+        url = f"{PLATFORM_DOCS_RAW_BASE}/{path}"
+        doc = fetch_url(url, f"platform-docs-public/{path}")
+        if doc:
+            content[label] = doc
+            print(f"  Fetched platform-docs-public/{path}", file=sys.stderr)
+
+    return content
+
+
+def fetch_valid_models(api_key: Optional[str]) -> set[str]:
+    """Fetch the current model list from the Mistral /v1/models API."""
     if not api_key:
         print("  No MISTRAL_API_KEY available — skipping dynamic model validation.",
               file=sys.stderr)
@@ -253,6 +317,35 @@ def fetch_valid_models(api_key: Optional[str]) -> set[str]:
     except Exception as exc:
         print(f"Warning: could not fetch model list from /v1/models: {exc}", file=sys.stderr)
         return set()
+
+
+# ─── Reference URL enrichment ──────────────────────────────────────────────────
+
+def line_anchored_url(base_url: str, content: str, search_text: str) -> str:
+    """Return a GitHub URL with a #L<n> anchor if search_text is found in content."""
+    for i, line in enumerate(content.splitlines(), 1):
+        if search_text in line:
+            return f"{base_url}#L{i}"
+    return base_url
+
+
+def enrich_reference_url(issue: dict, ref_content: dict[str, str]) -> dict:
+    """Try to add a #L anchor to the issue's reference_url using fetched content."""
+    search = issue.get("reference_search", "")
+    if not search:
+        return issue
+
+    ref_url = issue.get("reference_url", "")
+    if "client-python" in ref_url and "python" in ref_content:
+        enriched = line_anchored_url(PYTHON_SDK_URL, ref_content["python"], search)
+        if enriched != PYTHON_SDK_URL:
+            issue = {**issue, "reference_url": enriched}
+    elif "client-ts" in ref_url and "typescript" in ref_content:
+        enriched = line_anchored_url(TS_SDK_URL, ref_content["typescript"], search)
+        if enriched != TS_SDK_URL:
+            issue = {**issue, "reference_url": enriched}
+
+    return issue
 
 
 # ─── Code extraction ───────────────────────────────────────────────────────────
@@ -293,7 +386,9 @@ _MODEL_IN_CALL = re.compile(
 _MODEL_KEYWORDS = ("mistral", "codestral", "pixtral", "mixtral", "ministral")
 
 
-def check_patterns(text: str, location: str) -> list[dict]:
+def check_patterns(
+    text: str, location: str, ref_content: dict[str, str]
+) -> list[dict]:
     """Run all static deprecated patterns against a block of text."""
     issues: list[dict] = []
     lines = text.splitlines()
@@ -303,13 +398,18 @@ def check_patterns(text: str, location: str) -> list[dict]:
             if "stale-check: ignore" in line:
                 continue
             if compiled.search(line):
-                issues.append({
+                issue = {
                     "type": info["type"],
                     "detail": info["detail"],
                     "location": f"{location}, line {lineno}" if location else f"line {lineno}",
                     "matched_line": line.strip()[:200],
                     "reference_url": info["reference_url"],
-                })
+                    "reference_search": info.get("reference_search", ""),
+                }
+                issue = enrich_reference_url(issue, ref_content)
+                # Don't expose reference_search in the output
+                issue.pop("reference_search", None)
+                issues.append(issue)
     return issues
 
 
@@ -331,12 +431,12 @@ def check_unknown_models(text: str, valid_models: set[str], location: str) -> li
             issues.append({
                 "type": "unknown_model",
                 "detail": (
-                    f"`{model_id}` is not in the current model list from the OpenAPI spec. "
+                    f"`{model_id}` is not in the current model list from `/v1/models`. "
                     "It may be deprecated or renamed."
                 ),
                 "location": f"{location}, line {lineno}" if location else f"line {lineno}",
                 "matched_line": line.strip()[:200],
-                "reference_url": OPENAPI_URL,
+                "reference_url": DOCS_MODELS_URL,
             })
     return issues
 
@@ -345,21 +445,84 @@ def check_unknown_models(text: str, valid_models: set[str], location: str) -> li
 
 _LLM_SYSTEM = """\
 You are a technical reviewer checking Mistral AI cookbook files for outdated content.
-You know the current Mistral Python and TypeScript SDKs well.
+Your job is to find patterns that are genuinely deprecated or removed — not things that
+look unfamiliar to you.
 
-Current SDK facts (as of your knowledge):
-- Python: `from mistralai import Mistral`; client = `Mistral(api_key=...)`
-- Python methods: `client.chat.complete(...)`, `client.embeddings.create(...)`, `client.agents.complete(...)`
-- TypeScript: `import Mistral from "@mistralai/mistralai"` (ESM only)
-- Deprecated: `MistralClient`, `ChatMessage`, `client.chat()`, `client.embeddings()` (all v0)
+## Current SDK facts
+
+Python SDK (v1+):
+- Import: `from mistralai import Mistral`
+- Client init: `client = Mistral(api_key=...)`
+- Sync methods: `client.chat.complete(...)`, `client.embeddings.create(...)`,
+  `client.agents.complete(...)`, `client.beta.connectors.create(...)`, etc.
+- Async methods: append `_async` — e.g. `client.chat.complete_async(...)`,
+  `client.beta.connectors.create_async(...)`, `client.beta.agents.list_async(...)`, etc.
+
+  ⚠️  CRITICAL: `_async` suffix methods are VALID and NOT deprecated.
+  Do NOT flag `create_async`, `list_async`, `start_async`, `delete_async`,
+  `get_async`, `update_async`, `run_async`, `complete_async`, or any other
+  `_async` variant as deprecated. They are the correct async API.
+
+TypeScript SDK (v1+):
+- Import: `import Mistral from "@mistralai/mistralai"` (ESM default export)
+- Client init: `new Mistral({ apiKey: ... })`
+
+## Known deprecated features
+
+Flag these if you see them:
+- `MistralClient(` class → use `Mistral(api_key=...)`
+- `ChatMessage(` class → use plain dicts `{"role": "user", "content": "..."}`
+- `client.chat(` without `.complete` → use `client.chat.complete(...)`
+- `client.embeddings(` without `.create` → use `client.embeddings.create(...)`
+- `from mistralai.models import ...` → removed in SDK v1
+- `from mistralai.client import ...` → removed in SDK v1
+- `client.fine_tuning` (fine-tuning jobs API) → deprecated
+- `/v1/fine_tuning/` REST endpoint → deprecated
+- `pip install mistralai==0.` → outdated SDK v0
+
+## Rules for flagging
+
+1. Only flag things you are CERTAIN are deprecated based on the provided reference content
+   or the known-deprecated list above.
+2. NEVER flag `_async` suffix methods. They are valid.
+3. Do not fabricate reference URLs. Only use URLs from the list provided in the user message.
+4. For each issue, include a `quote` field: copy the exact line from the provided reference
+   content that proves the deprecation. Use empty string if no direct quote is available.
+5. If you are uncertain, return [].
+
+## Response format
 
 Respond ONLY with a JSON array. Each element must have:
   type: string (snake_case label)
-  detail: string (one sentence explaining the issue and the correct replacement)
-  reference_url: string (one of the three repo URLs provided)
+  detail: string (one sentence: what is wrong and what to use instead)
+  reference_url: string (most specific URL from those provided, including a #L anchor if known)
+  quote: string (exact text from the reference that confirms the deprecation, or "")
 
 Return [] if you find nothing beyond what was already flagged.\
 """
+
+
+def _build_ref_context(ref_content: dict[str, str]) -> str:
+    """Build a reference context block to include in the LLM user message."""
+    parts: list[str] = []
+
+    if "python" in ref_content:
+        # Include the first 3 000 chars of the Python README — enough to cover
+        # the client init, basic method signatures, and any migration notes.
+        excerpt = ref_content["python"][:3000]
+        parts.append(f"Python SDK README (excerpt):\n```\n{excerpt}\n```")
+
+    if "typescript" in ref_content:
+        excerpt = ref_content["typescript"][:1500]
+        parts.append(f"TypeScript SDK README (excerpt):\n```\n{excerpt}\n```")
+
+    # Include any deprecation/fine-tuning docs we managed to fetch
+    for label in ("fine_tuning", "fine_tuning_alt", "changelog", "deprecations", "migration"):
+        if label in ref_content:
+            excerpt = ref_content[label][:2000]
+            parts.append(f"platform-docs-public/{label} (excerpt):\n```\n{excerpt}\n```")
+
+    return "\n\n".join(parts)
 
 
 def llm_analyze(
@@ -367,24 +530,35 @@ def llm_analyze(
     content: str,
     known_issues: list[dict],
     api_key: str,
+    ref_content: dict[str, str],
 ) -> list[dict]:
-    """Call mistral-small-latest to find issues that pattern matching missed."""
+    """Call mistral-medium-latest to find issues that pattern matching missed."""
     known_summary = ""
     if known_issues:
         known_summary = "\n\nAlready flagged by pattern matching:\n" + "\n".join(
             f"- {i['type']}: {i['detail']}" for i in known_issues
         )
 
+    ref_context = _build_ref_context(ref_content)
+
     user_msg = (
         f"File: {file_path}\n\n"
-        f"Code content (truncated to 5000 chars):\n```\n{content[:5000]}\n```"
+        f"Code content (truncated to 5 000 chars):\n```\n{content[:5000]}\n```"
         f"{known_summary}\n\n"
-        f"Reference repos:\n"
-        f"- OpenAPI spec (model IDs): {OPENAPI_URL}\n"
-        f"- Python SDK: {PYTHON_SDK_URL}\n"
-        f"- TypeScript SDK: {TS_SDK_URL}\n\n"
-        "List any additional stale patterns NOT already flagged above. Return [] if none."
+        f"Reference URLs:\n"
+        f"- Python SDK README: {PYTHON_SDK_URL}\n"
+        f"- TypeScript SDK README: {TS_SDK_URL}\n"
+        f"- Mistral model list: {DOCS_MODELS_URL}\n"
+        f"- Fine-tuning docs: {DOCS_FINE_TUNING_URL}\n\n"
     )
+
+    if ref_context:
+        user_msg += (
+            f"Reference content (use this to verify and quote from):\n\n"
+            f"{ref_context}\n\n"
+        )
+
+    user_msg += "List any additional stale patterns NOT already flagged above. Return [] if none."
 
     try:
         resp = requests.post(
@@ -394,15 +568,16 @@ def llm_analyze(
                 "Content-Type": "application/json",
             },
             json={
-                "model": "mistral-small-latest",
+                "model": "mistral-medium-latest",
                 "messages": [
                     {"role": "system", "content": _LLM_SYSTEM},
                     {"role": "user", "content": user_msg},
                 ],
                 "temperature": 0.1,
-                "max_tokens": 800,
+                "max_tokens": 1000,
+                "response_format": {"type": "json_object"},
             },
-            timeout=40,
+            timeout=60,
         )
         resp.raise_for_status()
     except Exception as exc:
@@ -414,12 +589,24 @@ def llm_analyze(
     raw = re.sub(r"^```(?:json)?\n?", "", raw).strip()
     raw = re.sub(r"\n?```$", "", raw).strip()
 
+    # response_format: json_object may wrap the array in an object key
     try:
-        result = json.loads(raw)
-        if not isinstance(result, list):
+        parsed = json.loads(raw)
+        if isinstance(parsed, dict):
+            # Find the first list value
+            result = next((v for v in parsed.values() if isinstance(v, list)), [])
+        elif isinstance(parsed, list):
+            result = parsed
+        else:
             return []
+
         for item in result:
             item.setdefault("location", "LLM analysis (no specific line)")
+            item.setdefault("quote", "")
+            # Strip any _async false positives that slipped through
+            detail = item.get("detail", "")
+            if re.search(r"\b\w+_async\b", item.get("type", "") + detail):
+                continue
         return result
     except json.JSONDecodeError as exc:
         print(f"Warning: could not parse LLM response for {file_path}: {exc}", file=sys.stderr)
@@ -433,6 +620,7 @@ def scan_file(
     valid_models: set[str],
     use_llm: bool,
     api_key: Optional[str],
+    ref_content: dict[str, str],
 ) -> Optional[dict]:
     """Scan a single file. Returns issue dict or None if file is clean."""
     suffix = path.suffix.lower()
@@ -442,7 +630,7 @@ def scan_file(
     if suffix == ".ipynb":
         for cell_idx, source in extract_notebook_cells(path):
             loc = f"Cell {cell_idx}"
-            all_issues += check_patterns(source, loc)
+            all_issues += check_patterns(source, loc, ref_content)
             all_issues += check_unknown_models(source, valid_models, loc)
             llm_content += f"\n# Cell {cell_idx}\n{source}\n"
 
@@ -456,7 +644,7 @@ def scan_file(
             if lang not in _CODE_LANGS:
                 continue
             loc = f"Code block {block_idx} ({lang})"
-            all_issues += check_patterns(code, loc)
+            all_issues += check_patterns(code, loc, ref_content)
             all_issues += check_unknown_models(code, valid_models, loc)
             llm_content += f"\n# Code block {block_idx} ({lang})\n{code}\n"
 
@@ -466,7 +654,7 @@ def scan_file(
         except OSError as exc:
             print(f"Warning: could not read {path}: {exc}", file=sys.stderr)
             return None
-        all_issues += check_patterns(text, "")
+        all_issues += check_patterns(text, "", ref_content)
         all_issues += check_unknown_models(text, valid_models, "")
         llm_content = text
 
@@ -476,7 +664,7 @@ def scan_file(
     # LLM pass — only runs if requested and there's code to analyze
     llm_issues: list[dict] = []
     if use_llm and api_key and llm_content.strip():
-        llm_issues = llm_analyze(str(path), llm_content, all_issues, api_key)
+        llm_issues = llm_analyze(str(path), llm_content, all_issues, api_key, ref_content)
 
     combined = all_issues + llm_issues
     if not combined:
@@ -494,6 +682,7 @@ def scan_directory(
     valid_models: set[str],
     use_llm: bool,
     api_key: Optional[str],
+    ref_content: dict[str, str],
 ) -> list[dict]:
     """Recursively scan all cookbooks in a directory."""
     results: list[dict] = []
@@ -503,7 +692,7 @@ def scan_directory(
         if path.suffix.lower() not in _SCAN_EXTS or not path.is_file():
             continue
         print(f"  Scanning {path} ...", file=sys.stderr)
-        result = scan_file(path, valid_models, use_llm, api_key)
+        result = scan_file(path, valid_models, use_llm, api_key, ref_content)
         if result:
             results.append(result)
     return results
@@ -528,7 +717,6 @@ def to_markdown(report: dict) -> str:
 
     for file_info in files:
         lines += [f"---", "", f"## `{file_info['path']}`", ""]
-        # Group by type
         by_type: dict[str, list[dict]] = {}
         for issue in file_info["issues"]:
             by_type.setdefault(issue["type"], []).append(issue)
@@ -541,6 +729,8 @@ def to_markdown(report: dict) -> str:
                     lines.append(f"  - **Location:** `{issue['location']}`")
                 if issue.get("matched_line"):
                     lines.append(f"  - **Found:** `{issue['matched_line']}`")
+                if issue.get("quote"):
+                    lines.append(f"  - **Reference quote:** _{issue['quote']}_")
                 lines.append(f"  - **Reference:** [{issue['reference_url']}]({issue['reference_url']})")
             lines.append("")
     return "\n".join(lines)
@@ -583,27 +773,24 @@ def main() -> None:
     # ── Fetch reference data ───────────────────────────────────────────────────
     valid_models: set[str] = set()
     references_checked: list[str] = []
+    ref_content: dict[str, str] = {}
 
     if not args.no_fetch:
-        # Fetch the live model list from /v1/models (requires API key).
-        # The openapi.yaml does not define model IDs as enums — use the API instead.
+        ref_content = fetch_reference_content()
+
+        if "python" in ref_content:
+            references_checked.append("client-python/README.md")
+        if "typescript" in ref_content:
+            references_checked.append("client-ts/README.md")
+        for label in ("fine_tuning", "fine_tuning_alt", "changelog", "deprecations", "migration"):
+            if label in ref_content:
+                references_checked.append(f"platform-docs-public/{label}")
+
         print("Fetching current model list from /v1/models ...", file=sys.stderr)
         fetch_key = api_key or os.environ.get("MISTRAL_API_KEY")
         valid_models = fetch_valid_models(fetch_key)
         if valid_models:
             references_checked.append("api.mistral.ai/v1/models")
-
-        print("Fetching Python SDK README ...", file=sys.stderr)
-        if fetch_url(PYTHON_README_RAW_URL, "client-python README"):
-            references_checked.append("client-python/README.md")
-
-        print("Fetching TypeScript SDK README ...", file=sys.stderr)
-        if fetch_url(TS_README_RAW_URL, "client-ts README"):
-            references_checked.append("client-ts/README.md")
-
-        print("Fetching OpenAPI spec (for reference links) ...", file=sys.stderr)
-        if fetch_url(OPENAPI_RAW_URL, "openapi.yaml"):
-            references_checked.append("platform-docs-public/openapi.yaml")
     else:
         print("Skipping reference data fetch (--no-fetch).", file=sys.stderr)
 
@@ -617,7 +804,7 @@ def main() -> None:
             print(f"Error: {path} does not exist.", file=sys.stderr)
             sys.exit(2)
         print(f"Scanning {path} ...", file=sys.stderr)
-        result = scan_file(path, valid_models, use_llm, api_key)
+        result = scan_file(path, valid_models, use_llm, api_key, ref_content)
         if result:
             stale_files.append(result)
     else:
@@ -626,7 +813,7 @@ def main() -> None:
             print(f"Error: directory '{directory}' does not exist.", file=sys.stderr)
             sys.exit(2)
         print(f"Scanning {directory}/ ...", file=sys.stderr)
-        stale_files = scan_directory(directory, valid_models, use_llm, api_key)
+        stale_files = scan_directory(directory, valid_models, use_llm, api_key, ref_content)
 
     # ── Build report ──────────────────────────────────────────────────────────
     report = {
@@ -636,20 +823,17 @@ def main() -> None:
         "files": stale_files,
     }
 
-    # Write JSON file if requested
     if args.output:
         out_path = Path(args.output)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
         print(f"\nJSON report written to {args.output}", file=sys.stderr)
 
-    # Print to stdout
     if args.format == "json":
         print(json.dumps(report, indent=2))
     else:
         print(to_markdown(report))
 
-    # Exit 1 if any issues found (useful for CI scripts)
     sys.exit(1 if stale_files else 0)
 
 
