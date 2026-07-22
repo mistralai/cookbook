@@ -141,9 +141,9 @@ jobs:
 
             // ── Summary ────────────────────────────────────────────────────────
             core.info('');
-            core.info(`Stale files found:  ${report.files.length}`);
-            core.info(`Valid model IDs:    ${report.valid_models_count}`);
-            core.info(`References checked: ${report.references_checked.join(', ') || 'none'}`);
+            core.info(`Stale files found:      ${report.files.length}`);
+            core.info(`Deprecated models found: ${report.deprecated_models_count}`);
+            core.info(`References checked:     ${report.references_checked.join(', ') || 'none'}`);
 
             // ── Helper: build issue body ───────────────────────────────────────
             function buildIssueBody(fileInfo, scannedAt) {

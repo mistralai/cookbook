@@ -2,11 +2,12 @@
 """
 check_stale.py — Scan Mistral AI cookbooks for outdated content.
 
-Checks against:
-  - /v1/models API (valid model IDs)
-  - README from mistralai/client-python (current Python SDK patterns)
-  - README from mistralai/client-ts (current TypeScript SDK patterns)
-  - Selected pages from mistralai/platform-docs-public (deprecation notices)
+Reference sources:
+  - /v1/models API (deprecation field per model)
+  - mistralai/client-python README (current Python SDK patterns)
+  - mistralai/client-ts README (current TypeScript SDK patterns)
+  - platform-docs-public models overview page (legacy/deprecated model list)
+  - platform-docs-public deprecation/migration pages
 
 Usage:
     python check_stale.py [options]
@@ -61,18 +62,31 @@ PLATFORM_DOCS_RAW_BASE = (
     "https://raw.githubusercontent.com/mistralai/platform-docs-public/main"
 )
 
-# Human-readable links used in issue bodies
-OPENAPI_URL = "https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml"
-PYTHON_SDK_URL = "https://github.com/mistralai/client-python/blob/main/README.md"
-TS_SDK_URL = "https://github.com/mistralai/client-ts/blob/main/README.md"
+# Human-readable links
+PYTHON_SDK_URL     = "https://github.com/mistralai/client-python/blob/main/README.md"
+TS_SDK_URL         = "https://github.com/mistralai/client-ts/blob/main/README.md"
+DOCS_MODELS_URL    = "https://docs.mistral.ai/getting-started/models/models_overview/"
+DOCS_LEGACY_URL    = "https://docs.mistral.ai/getting-started/models/models_overview/#legacy-models"
 DOCS_FINE_TUNING_URL = "https://docs.mistral.ai/capabilities/fine-tuning/"
-DOCS_MODELS_URL = "https://docs.mistral.ai/getting-started/models/models_overview/"
+PLATFORM_DOCS_URL  = "https://github.com/mistralai/platform-docs-public"
+
+# Keys for the ref_content dict
+_KEY_PYTHON = "python"
+_KEY_TS     = "typescript"
+
+# Deprecation signal words — used to validate LLM evidence quotes
+_DEPRECATION_SIGNALS = frozenset({
+    "deprecated", "deprecation", "legacy", "removed", "no longer supported",
+    "end of life", "end-of-life", "will be removed", "not recommended",
+    "use instead", "replaced by", "superseded",
+})
+
+# Model ID prefixes we care about
+_MODEL_KEYWORDS = ("mistral", "codestral", "pixtral", "mixtral", "ministral")
 
 
 # ─── Static deprecated patterns ────────────────────────────────────────────────
-# Each entry: pattern (regex), type, detail, reference_url,
-#             reference_search (optional text to find in ref doc for #L anchor)
-# Add # stale-check: ignore on any source line to suppress a match.
+# reference_search: text to look for in the fetched reference to compute a #L anchor.
 
 DEPRECATED_PATTERNS: list[dict] = [
     # ── Python SDK v0 imports ──────────────────────────────────────────────────
@@ -84,6 +98,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `from mistralai import Mistral` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "from mistralai import Mistral",
     },
     {
@@ -94,6 +109,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `from mistralai import Mistral` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "from mistralai import Mistral",
     },
     {
@@ -105,6 +121,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use plain dicts — `{\"role\": \"user\", \"content\": \"...\"}` — or new SDK types."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "from mistralai import Mistral",
     },
     # ── Python SDK v0 client class ─────────────────────────────────────────────
@@ -113,23 +130,24 @@ DEPRECATED_PATTERNS: list[dict] = [
         "type": "deprecated_class",
         "detail": (
             "Deprecated `MistralClient` class (SDK v0). "
-            "Use `Mistral(api_key=...)` from the `mistralai` package instead."
+            "Use `Mistral(api_key=...)` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "Mistral(api_key",
     },
     {
         "pattern": r"\bChatMessage\s*\(",
         "type": "deprecated_class",
         "detail": (
-            "Deprecated `ChatMessage` class removed in SDK v1. "
+            "Deprecated `ChatMessage` class (removed in SDK v1). "
             "Use plain dicts: `{\"role\": \"user\", \"content\": \"...\"}`."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "role",
     },
     # ── Python SDK v0 method signatures ───────────────────────────────────────
-    # Matches  client.chat(  but NOT  client.chat.complete(
     {
         "pattern": r"\.chat\s*\(\s*(?!.*\.complete)",
         "type": "deprecated_method",
@@ -138,6 +156,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `client.chat.complete(...)` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "chat.complete(",
     },
     {
@@ -148,6 +167,7 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Use `client.embeddings.create(...)` instead."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "embeddings.create(",
     },
     # ── Fine-tuning API (deprecated) ───────────────────────────────────────────
@@ -156,7 +176,7 @@ DEPRECATED_PATTERNS: list[dict] = [
         "type": "deprecated_api",
         "detail": (
             "The fine-tuning jobs API (`client.fine_tuning`) is deprecated. "
-            "See the current fine-tuning documentation for the supported approach."
+            "See the fine-tuning documentation for the current approach."
         ),
         "reference_url": DOCS_FINE_TUNING_URL,
     },
@@ -165,7 +185,7 @@ DEPRECATED_PATTERNS: list[dict] = [
         "type": "deprecated_api",
         "detail": (
             "The `/v1/fine_tuning/` REST endpoint is deprecated. "
-            "See the current fine-tuning documentation for the supported approach."
+            "See the fine-tuning documentation for the current approach."
         ),
         "reference_url": DOCS_FINE_TUNING_URL,
     },
@@ -175,9 +195,10 @@ DEPRECATED_PATTERNS: list[dict] = [
         "type": "outdated_version",
         "detail": (
             "Pinned to SDK v0. "
-            "Update to the current version: `pip install mistralai` (or `uv add mistralai`)."
+            "Update to the current version: `pip install mistralai`."
         ),
         "reference_url": PYTHON_SDK_URL,
+        "reference_key": _KEY_PYTHON,
         "reference_search": "pip install mistralai",
     },
     {
@@ -188,53 +209,8 @@ DEPRECATED_PATTERNS: list[dict] = [
             "Update to the current version: `npm add @mistralai/mistralai`."
         ),
         "reference_url": TS_SDK_URL,
+        "reference_key": _KEY_TS,
         "reference_search": "npm add @mistralai/mistralai",
-    },
-    # ── Deprecated model names ─────────────────────────────────────────────────
-    {
-        "pattern": r"""['"](mistral-tiny)['"]""",
-        "type": "deprecated_model",
-        "detail": (
-            "`mistral-tiny` is deprecated. "
-            "Check the current model list for a replacement."
-        ),
-        "reference_url": DOCS_MODELS_URL,
-    },
-    {
-        "pattern": r"""['"](mistral-medium)['"]""",
-        "type": "deprecated_model",
-        "detail": (
-            "`mistral-medium` is deprecated. "
-            "Use `mistral-medium-latest` or a current equivalent."
-        ),
-        "reference_url": DOCS_MODELS_URL,
-    },
-    {
-        "pattern": r"""['"](open-mistral-7b)['"]""",
-        "type": "verify_model",
-        "detail": (
-            "`open-mistral-7b` may be deprecated. "
-            "Verify against the current model list."
-        ),
-        "reference_url": DOCS_MODELS_URL,
-    },
-    {
-        "pattern": r"""['"](open-mixtral-8x7b)['"]""",
-        "type": "verify_model",
-        "detail": (
-            "`open-mixtral-8x7b` may be deprecated. "
-            "Verify against the current model list."
-        ),
-        "reference_url": DOCS_MODELS_URL,
-    },
-    {
-        "pattern": r"""['"](open-mixtral-8x22b)['"]""",
-        "type": "verify_model",
-        "detail": (
-            "`open-mixtral-8x22b` may be deprecated. "
-            "Verify against the current model list."
-        ),
-        "reference_url": DOCS_MODELS_URL,
     },
     # ── Pinned model versions (prefer -latest aliases) ─────────────────────────
     {
@@ -242,7 +218,7 @@ DEPRECATED_PATTERNS: list[dict] = [
         "type": "pinned_model_version",
         "detail": (
             "References a pinned dated model version (e.g. `-2309`, `-2402`). "
-            "Consider using a `-latest` alias so cookbooks stay current automatically."
+            "Consider using a `-latest` alias so the cookbook stays current automatically."
         ),
         "reference_url": DOCS_MODELS_URL,
     },
@@ -262,67 +238,189 @@ def fetch_url(url: str, label: str) -> Optional[str]:
 
 
 def fetch_reference_content() -> dict[str, str]:
-    """Fetch all reference docs and return as a dict of label → text.
+    """Fetch all reference docs. Returns label → text.
 
-    Content is passed to the LLM so it can verify claims against actual source,
-    and used to compute #L anchors for static pattern reference URLs.
+    Content is sent to the LLM so it can ground claims in real source text,
+    and used to compute #L anchors for reference URLs.
     """
     content: dict[str, str] = {}
 
     print("Fetching Python SDK README ...", file=sys.stderr)
-    python_readme = fetch_url(PYTHON_README_RAW_URL, "client-python README")
-    if python_readme:
-        content["python"] = python_readme
+    if text := fetch_url(PYTHON_README_RAW_URL, "client-python README"):
+        content[_KEY_PYTHON] = text
 
     print("Fetching TypeScript SDK README ...", file=sys.stderr)
-    ts_readme = fetch_url(TS_README_RAW_URL, "client-ts README")
-    if ts_readme:
-        content["typescript"] = ts_readme
+    if text := fetch_url(TS_README_RAW_URL, "client-ts README"):
+        content[_KEY_TS] = text
 
-    # Fetch platform-docs-public pages that cover deprecations / API changes
-    docs_pages = [
-        ("fine_tuning", "docs/capabilities/fine-tuning.mdx"),
-        ("fine_tuning_alt", "docs/api/fine_tuning.mdx"),
-        ("changelog", "CHANGELOG.md"),
-        ("deprecations", "docs/deprecations.md"),
-        ("migration", "docs/migration.md"),
+    # Docs pages that contain legacy model lists and deprecation notices.
+    # Try several candidate paths — platform-docs-public uses different extensions.
+    docs_candidates: list[tuple[str, str]] = [
+        ("models_overview", "docs/getting-started/models/models_overview.mdx"),
+        ("models_overview", "docs/getting-started/models/models_overview.md"),
+        ("fine_tuning",     "docs/capabilities/fine-tuning.mdx"),
+        ("fine_tuning",     "docs/capabilities/fine-tuning.md"),
+        ("changelog",       "CHANGELOG.md"),
+        ("deprecations",    "docs/deprecations.md"),
+        ("deprecations",    "docs/deprecations.mdx"),
     ]
-    for label, path in docs_pages:
+    seen_keys: set[str] = set()
+    for label, path in docs_candidates:
+        if label in seen_keys:
+            continue  # already fetched a variant for this key
         url = f"{PLATFORM_DOCS_RAW_BASE}/{path}"
-        doc = fetch_url(url, f"platform-docs-public/{path}")
-        if doc:
-            content[label] = doc
+        if text := fetch_url(url, f"platform-docs-public/{path}"):
+            content[label] = text
+            seen_keys.add(label)
             print(f"  Fetched platform-docs-public/{path}", file=sys.stderr)
 
     return content
 
 
-def fetch_valid_models(api_key: Optional[str]) -> set[str]:
-    """Fetch the current model list from the Mistral /v1/models API."""
-    if not api_key:
-        print("  No MISTRAL_API_KEY available — skipping dynamic model validation.",
-              file=sys.stderr)
-        return set()
-    try:
-        resp = requests.get(
-            "https://api.mistral.ai/v1/models",
-            headers={"Authorization": f"Bearer {api_key}"},
-            timeout=20,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        ids = {m["id"] for m in data.get("data", []) if isinstance(m.get("id"), str)}
-        print(f"  Found {len(ids)} valid model IDs from /v1/models.", file=sys.stderr)
-        return ids
-    except Exception as exc:
-        print(f"Warning: could not fetch model list from /v1/models: {exc}", file=sys.stderr)
-        return set()
+# ─── Deprecated model detection ────────────────────────────────────────────────
+
+def _model_id_pattern() -> re.Pattern[str]:
+    kw = "|".join(_MODEL_KEYWORDS)
+    return re.compile(rf"\b(?:{kw})[\w\-\.]+\b", re.IGNORECASE)
+
+_MODEL_ID_RE = _model_id_pattern()
+_MODEL_IN_CALL = re.compile(
+    r"""(?:model\s*=\s*|"model"\s*:\s*)['"]([\w\-\.]+)['"]"""
+)
+
+
+def parse_deprecated_model_ids(content: str) -> dict[str, str]:
+    """Extract model IDs from legacy/deprecated sections of a docs page.
+
+    Returns a dict of model_id → section_anchor for use in reference URLs.
+    Looks for headings containing 'legacy' or 'deprecated', then extracts
+    Mistral model IDs from the text beneath them.
+    """
+    deprecated: dict[str, str] = {}
+
+    # Split the document on headings (##, ###, etc.)
+    sections = re.split(r"(?m)^#{1,4}\s+(.+)$", content)
+    # sections alternates: [text_before_first_heading, heading1, body1, heading2, body2, ...]
+    i = 0
+    while i < len(sections):
+        chunk = sections[i]
+        if i + 1 < len(sections):
+            heading = sections[i]       # might be body text before first heading
+            # The actual heading text is at odd indices after the split
+        i += 1
+
+    # Simpler approach: walk line by line, track whether we're inside a legacy section
+    in_legacy_section = False
+    anchor = ""
+    for line in content.splitlines():
+        # Detect heading lines
+        m = re.match(r"^#{1,4}\s+(.+)$", line)
+        if m:
+            heading_text = m.group(1).strip().lower()
+            if any(w in heading_text for w in ("legacy", "deprecated", "deprecat")):
+                in_legacy_section = True
+                # Build a GitHub-style anchor from the heading
+                anchor = "#" + re.sub(r"[^a-z0-9\-]", "", heading_text.replace(" ", "-"))
+            else:
+                in_legacy_section = False
+        elif in_legacy_section:
+            for model_id in _MODEL_ID_RE.findall(line):
+                deprecated[model_id] = anchor
+
+    return deprecated
+
+
+def fetch_model_data(
+    api_key: Optional[str],
+    ref_content: dict[str, str],
+) -> tuple[set[str], dict[str, str]]:
+    """Return (all_valid_ids, deprecated_id_to_ref_url).
+
+    Deprecated IDs come from two sources:
+    - `deprecated`/`deprecation` field in the /v1/models API response
+    - The legacy/deprecated sections of the models overview docs page
+    """
+    all_ids: set[str] = set()
+    deprecated: dict[str, str] = {}
+
+    # ── /v1/models API ────────────────────────────────────────────────────────
+    if api_key:
+        try:
+            resp = requests.get(
+                "https://api.mistral.ai/v1/models",
+                headers={"Authorization": f"Bearer {api_key}"},
+                timeout=20,
+            )
+            resp.raise_for_status()
+            for m in resp.json().get("data", []):
+                mid = m.get("id")
+                if not isinstance(mid, str):
+                    continue
+                all_ids.add(mid)
+                # The API may expose a deprecation date or boolean
+                if m.get("deprecated") or m.get("deprecation"):
+                    deprecated[mid] = DOCS_LEGACY_URL
+            print(f"  Found {len(all_ids)} model IDs from /v1/models "
+                  f"({len(deprecated)} deprecated).", file=sys.stderr)
+        except Exception as exc:
+            print(f"Warning: could not fetch /v1/models: {exc}", file=sys.stderr)
+
+    # ── Docs legacy section ───────────────────────────────────────────────────
+    if "models_overview" in ref_content:
+        docs_deprecated = parse_deprecated_model_ids(ref_content["models_overview"])
+        for mid, anchor in docs_deprecated.items():
+            ref_url = DOCS_LEGACY_URL if not anchor else f"{DOCS_MODELS_URL}{anchor}"
+            deprecated.setdefault(mid, ref_url)  # API deprecation field takes precedence
+        if docs_deprecated:
+            print(f"  Found {len(docs_deprecated)} deprecated model ID(s) in docs.",
+                  file=sys.stderr)
+
+    return all_ids, deprecated
+
+
+def check_deprecated_models(
+    text: str,
+    deprecated_models: dict[str, str],
+    location: str,
+) -> list[dict]:
+    """Flag model IDs that are explicitly listed as deprecated in official sources.
+
+    Only flags models that appear in `deprecated_models` — a dict populated from
+    the /v1/models API deprecation field and/or the docs legacy-models section.
+    Does NOT flag unrecognized models: absence from the list is not evidence of
+    deprecation.
+    """
+    if not deprecated_models:
+        return []
+    issues: list[dict] = []
+    lines = text.splitlines()
+    for lineno, line in enumerate(lines, 1):
+        if "stale-check: ignore" in line:
+            continue
+        for m in _MODEL_IN_CALL.finditer(line):
+            model_id = m.group(1)
+            if not any(kw in model_id.lower() for kw in _MODEL_KEYWORDS):
+                continue
+            if model_id in deprecated_models:
+                issues.append({
+                    "type": "deprecated_model",
+                    "detail": (
+                        f"`{model_id}` is listed as a deprecated/legacy model. "
+                        "Replace it with a current model."
+                    ),
+                    "location": f"{location}, line {lineno}" if location else f"line {lineno}",
+                    "matched_line": line.strip()[:200],
+                    "reference_url": deprecated_models[model_id],
+                })
+    return issues
 
 
 # ─── Reference URL enrichment ──────────────────────────────────────────────────
 
 def line_anchored_url(base_url: str, content: str, search_text: str) -> str:
-    """Return a GitHub URL with a #L<n> anchor if search_text is found in content."""
+    """Return a GitHub #L<n> URL if search_text is found in content."""
+    if not content or not search_text:
+        return base_url
     for i, line in enumerate(content.splitlines(), 1):
         if search_text in line:
             return f"{base_url}#L{i}"
@@ -330,28 +428,21 @@ def line_anchored_url(base_url: str, content: str, search_text: str) -> str:
 
 
 def enrich_reference_url(issue: dict, ref_content: dict[str, str]) -> dict:
-    """Try to add a #L anchor to the issue's reference_url using fetched content."""
+    """Add a #L anchor to the issue's reference_url using fetched content."""
     search = issue.get("reference_search", "")
-    if not search:
+    key = issue.get("reference_key", "")
+    if not search or key not in ref_content:
         return issue
-
-    ref_url = issue.get("reference_url", "")
-    if "client-python" in ref_url and "python" in ref_content:
-        enriched = line_anchored_url(PYTHON_SDK_URL, ref_content["python"], search)
-        if enriched != PYTHON_SDK_URL:
-            issue = {**issue, "reference_url": enriched}
-    elif "client-ts" in ref_url and "typescript" in ref_content:
-        enriched = line_anchored_url(TS_SDK_URL, ref_content["typescript"], search)
-        if enriched != TS_SDK_URL:
-            issue = {**issue, "reference_url": enriched}
-
+    base_url = issue.get("reference_url", "")
+    enriched = line_anchored_url(base_url, ref_content[key], search)
+    if enriched != base_url:
+        return {**issue, "reference_url": enriched}
     return issue
 
 
 # ─── Code extraction ───────────────────────────────────────────────────────────
 
 def extract_notebook_cells(path: Path) -> list[tuple[int, str]]:
-    """Return (cell_number, source) for every code cell in a notebook."""
     try:
         nb = nbformat.read(str(path), as_version=4)
     except Exception as exc:
@@ -365,7 +456,6 @@ def extract_notebook_cells(path: Path) -> list[tuple[int, str]]:
 
 
 def extract_md_code_blocks(text: str) -> list[tuple[int, str, str]]:
-    """Return (block_number, language, code) for fenced code blocks in markdown."""
     blocks = []
     for i, m in enumerate(re.finditer(r"```(\w+)?\n(.*?)```", text, re.DOTALL), 1):
         lang = m.group(1) or "unknown"
@@ -379,17 +469,10 @@ def extract_md_code_blocks(text: str) -> list[tuple[int, str, str]]:
 
 _CODE_LANGS = {"python", "typescript", "javascript", "bash", "shell", "sh", "unknown"}
 
-# Matches model IDs in API call context: model="..." or "model": "..."
-_MODEL_IN_CALL = re.compile(
-    r"""(?:model\s*=\s*|"model"\s*:\s*)['"]([\w\-\.]+)['"]"""
-)
-_MODEL_KEYWORDS = ("mistral", "codestral", "pixtral", "mixtral", "ministral")
-
 
 def check_patterns(
     text: str, location: str, ref_content: dict[str, str]
 ) -> list[dict]:
-    """Run all static deprecated patterns against a block of text."""
     issues: list[dict] = []
     lines = text.splitlines()
     for info in DEPRECATED_PATTERNS:
@@ -405,124 +488,99 @@ def check_patterns(
                     "matched_line": line.strip()[:200],
                     "reference_url": info["reference_url"],
                     "reference_search": info.get("reference_search", ""),
+                    "reference_key": info.get("reference_key", ""),
                 }
                 issue = enrich_reference_url(issue, ref_content)
-                # Don't expose reference_search in the output
                 issue.pop("reference_search", None)
+                issue.pop("reference_key", None)
                 issues.append(issue)
-    return issues
-
-
-def check_unknown_models(text: str, valid_models: set[str], location: str) -> list[dict]:
-    """Flag model IDs used in API calls that aren't in the valid set."""
-    if not valid_models:
-        return []
-    issues: list[dict] = []
-    lines = text.splitlines()
-    for lineno, line in enumerate(lines, 1):
-        if "stale-check: ignore" in line:
-            continue
-        for m in _MODEL_IN_CALL.finditer(line):
-            model_id = m.group(1)
-            if not any(kw in model_id.lower() for kw in _MODEL_KEYWORDS):
-                continue
-            if model_id in valid_models:
-                continue
-            issues.append({
-                "type": "unknown_model",
-                "detail": (
-                    f"`{model_id}` is not in the current model list from `/v1/models`. "
-                    "It may be deprecated or renamed."
-                ),
-                "location": f"{location}, line {lineno}" if location else f"line {lineno}",
-                "matched_line": line.strip()[:200],
-                "reference_url": DOCS_MODELS_URL,
-            })
     return issues
 
 
 # ─── LLM-assisted analysis ─────────────────────────────────────────────────────
 
 _LLM_SYSTEM = """\
-You are a technical reviewer checking Mistral AI cookbook files for outdated content.
-Your job is to find patterns that are genuinely deprecated or removed — not things that
-look unfamiliar to you.
+You are a technical reviewer. Your job is to find deprecated patterns in Mistral AI
+cookbook code — but ONLY when you have explicit evidence of the deprecation in the
+provided reference content.
 
-## Current SDK facts
+## Your process
 
-Python SDK (v1+):
-- Import: `from mistralai import Mistral`
-- Client init: `client = Mistral(api_key=...)`
-- Sync methods: `client.chat.complete(...)`, `client.embeddings.create(...)`,
-  `client.agents.complete(...)`, `client.beta.connectors.create(...)`, etc.
-- Async methods: append `_async` — e.g. `client.chat.complete_async(...)`,
-  `client.beta.connectors.create_async(...)`, `client.beta.agents.list_async(...)`, etc.
+1. Read the reference content provided in the user message.
+2. Find explicit deprecation notices in that content: text that says "deprecated",
+   "legacy", "removed", "no longer supported", "replaced by", or similar.
+3. Check whether the cookbook code uses any of those deprecated things.
+4. Flag ONLY issues where BOTH are true:
+   a. The reference content explicitly says the thing is deprecated.
+   b. The cookbook code uses that deprecated thing.
 
-  ⚠️  CRITICAL: `_async` suffix methods are VALID and NOT deprecated.
-  Do NOT flag `create_async`, `list_async`, `start_async`, `delete_async`,
-  `get_async`, `update_async`, `run_async`, `complete_async`, or any other
-  `_async` variant as deprecated. They are the correct async API.
+## What NOT to flag
 
-TypeScript SDK (v1+):
-- Import: `import Mistral from "@mistralai/mistralai"` (ESM default export)
-- Client init: `new Mistral({ apiKey: ... })`
+- Do NOT flag things based on what looks unusual or unfamiliar to you.
+- Do NOT flag a pattern just because you don't see it in the reference — absence
+  of a pattern in the reference is NOT evidence of deprecation.
+- The `_async` suffix (e.g. `create_async`, `list_async`, `start_async`,
+  `complete_async`, `delete_async`) is a valid part of the Mistral Python SDK.
+  If you see these used in the reference content, that is proof they are NOT
+  deprecated. Do not flag them.
 
-## Known deprecated features
+## Required response format
 
-Flag these if you see them:
-- `MistralClient(` class → use `Mistral(api_key=...)`
-- `ChatMessage(` class → use plain dicts `{"role": "user", "content": "..."}`
-- `client.chat(` without `.complete` → use `client.chat.complete(...)`
-- `client.embeddings(` without `.create` → use `client.embeddings.create(...)`
-- `from mistralai.models import ...` → removed in SDK v1
-- `from mistralai.client import ...` → removed in SDK v1
-- `client.fine_tuning` (fine-tuning jobs API) → deprecated
-- `/v1/fine_tuning/` REST endpoint → deprecated
-- `pip install mistralai==0.` → outdated SDK v0
+Respond ONLY with a JSON object with a single key "issues" whose value is an array.
+Each element must have:
 
-## Rules for flagging
-
-1. Only flag things you are CERTAIN are deprecated based on the provided reference content
-   or the known-deprecated list above.
-2. NEVER flag `_async` suffix methods. They are valid.
-3. Do not fabricate reference URLs. Only use URLs from the list provided in the user message.
-4. For each issue, include a `quote` field: copy the exact line from the provided reference
-   content that proves the deprecation. Use empty string if no direct quote is available.
-5. If you are uncertain, return [].
-
-## Response format
-
-Respond ONLY with a JSON array. Each element must have:
-  type: string (snake_case label)
+  type: string (snake_case label for the issue category)
   detail: string (one sentence: what is wrong and what to use instead)
-  reference_url: string (most specific URL from those provided, including a #L anchor if known)
-  quote: string (exact text from the reference that confirms the deprecation, or "")
+  reference_url: string (the most specific URL from those listed in the user message,
+    including a #L anchor or section anchor if you can determine one)
+  quote: string (the EXACT sentence or phrase from the provided reference content that
+    explicitly states the deprecation — not an example of the method being used,
+    but the actual deprecation notice)
 
-Return [] if you find nothing beyond what was already flagged.\
+If you cannot provide a quote from the reference content that explicitly states the
+deprecation, do not include that issue.
+
+Return {"issues": []} if you find nothing beyond what was already flagged.\
 """
 
 
 def _build_ref_context(ref_content: dict[str, str]) -> str:
-    """Build a reference context block to include in the LLM user message."""
+    """Build the reference content block to include in the LLM user message."""
     parts: list[str] = []
-
-    if "python" in ref_content:
-        # Include the first 3 000 chars of the Python README — enough to cover
-        # the client init, basic method signatures, and any migration notes.
-        excerpt = ref_content["python"][:3000]
-        parts.append(f"Python SDK README (excerpt):\n```\n{excerpt}\n```")
-
-    if "typescript" in ref_content:
-        excerpt = ref_content["typescript"][:1500]
-        parts.append(f"TypeScript SDK README (excerpt):\n```\n{excerpt}\n```")
-
-    # Include any deprecation/fine-tuning docs we managed to fetch
-    for label in ("fine_tuning", "fine_tuning_alt", "changelog", "deprecations", "migration"):
+    if _KEY_PYTHON in ref_content:
+        excerpt = ref_content[_KEY_PYTHON][:3000]
+        parts.append(f"Python SDK README (first 3 000 chars):\n```\n{excerpt}\n```")
+    if _KEY_TS in ref_content:
+        excerpt = ref_content[_KEY_TS][:1500]
+        parts.append(f"TypeScript SDK README (first 1 500 chars):\n```\n{excerpt}\n```")
+    for label in ("models_overview", "fine_tuning", "changelog", "deprecations"):
         if label in ref_content:
             excerpt = ref_content[label][:2000]
-            parts.append(f"platform-docs-public/{label} (excerpt):\n```\n{excerpt}\n```")
-
+            parts.append(f"platform-docs-public/{label} (first 2 000 chars):\n```\n{excerpt}\n```")
     return "\n\n".join(parts)
+
+
+def _is_deprecation_evidence(quote: str, ref_content: dict[str, str]) -> bool:
+    """Return True only if the quote appears in the reference content AND is surrounded
+    by deprecation language.
+
+    This validates LLM claims: if the model quotes text that exists in the reference
+    but isn't actually a deprecation notice, we discard the issue.
+    """
+    if not quote or not quote.strip():
+        return False  # no quote = no evidence
+
+    all_ref = "\n".join(ref_content.values()).lower()
+    q = quote.strip().lower()
+
+    if q not in all_ref:
+        return False  # quote not found in any reference — fabricated
+
+    # Find the quote's position and check for deprecation language in the surrounding
+    # ~300 characters on either side.
+    idx = all_ref.find(q)
+    window = all_ref[max(0, idx - 300): idx + len(q) + 300]
+    return any(signal in window for signal in _DEPRECATION_SIGNALS)
 
 
 def llm_analyze(
@@ -545,20 +603,25 @@ def llm_analyze(
         f"File: {file_path}\n\n"
         f"Code content (truncated to 5 000 chars):\n```\n{content[:5000]}\n```"
         f"{known_summary}\n\n"
-        f"Reference URLs:\n"
+        f"Reference URLs (use the most specific one you can determine):\n"
         f"- Python SDK README: {PYTHON_SDK_URL}\n"
         f"- TypeScript SDK README: {TS_SDK_URL}\n"
-        f"- Mistral model list: {DOCS_MODELS_URL}\n"
+        f"- Mistral model overview: {DOCS_MODELS_URL}\n"
+        f"- Mistral legacy models: {DOCS_LEGACY_URL}\n"
         f"- Fine-tuning docs: {DOCS_FINE_TUNING_URL}\n\n"
     )
 
     if ref_context:
         user_msg += (
-            f"Reference content (use this to verify and quote from):\n\n"
+            "Reference content — search this for explicit deprecation notices:\n\n"
             f"{ref_context}\n\n"
         )
 
-    user_msg += "List any additional stale patterns NOT already flagged above. Return [] if none."
+    user_msg += (
+        "List any additional stale patterns NOT already flagged. "
+        "Every issue must include a `quote` that is the exact deprecation notice "
+        "from the reference content above. Return {\"issues\": []} if none."
+    )
 
     try:
         resp = requests.post(
@@ -585,44 +648,54 @@ def llm_analyze(
         return []
 
     raw = resp.json()["choices"][0]["message"]["content"].strip()
-    # Strip any accidental markdown fences
     raw = re.sub(r"^```(?:json)?\n?", "", raw).strip()
     raw = re.sub(r"\n?```$", "", raw).strip()
 
-    # response_format: json_object may wrap the array in an object key
     try:
         parsed = json.loads(raw)
         if isinstance(parsed, dict):
-            # Find the first list value
-            result = next((v for v in parsed.values() if isinstance(v, list)), [])
+            result = parsed.get("issues", [])
+            if not isinstance(result, list):
+                # Fallback: find first list value
+                result = next((v for v in parsed.values() if isinstance(v, list)), [])
         elif isinstance(parsed, list):
             result = parsed
         else:
             return []
-
-        for item in result:
-            item.setdefault("location", "LLM analysis (no specific line)")
-            item.setdefault("quote", "")
-            # Strip any _async false positives that slipped through
-            detail = item.get("detail", "")
-            if re.search(r"\b\w+_async\b", item.get("type", "") + detail):
-                continue
-        return result
     except json.JSONDecodeError as exc:
         print(f"Warning: could not parse LLM response for {file_path}: {exc}", file=sys.stderr)
         return []
+
+    # ── Evidence filter ────────────────────────────────────────────────────────
+    # Discard any issue whose quote is not found in the reference content in a
+    # deprecation context. This catches hallucinated references and cases where
+    # the LLM quotes a usage example instead of an actual deprecation notice.
+    validated: list[dict] = []
+    for item in result:
+        item.setdefault("location", "LLM analysis (no specific line)")
+        item.setdefault("quote", "")
+        quote = item.get("quote", "")
+        if not _is_deprecation_evidence(quote, ref_content):
+            print(
+                f"  LLM issue discarded (no deprecation evidence in reference): "
+                f"{item.get('type', '?')} — quote: {quote[:80]!r}",
+                file=sys.stderr,
+            )
+            continue
+        validated.append(item)
+
+    return validated
 
 
 # ─── File scanning ─────────────────────────────────────────────────────────────
 
 def scan_file(
     path: Path,
-    valid_models: set[str],
+    deprecated_models: dict[str, str],
     use_llm: bool,
     api_key: Optional[str],
     ref_content: dict[str, str],
 ) -> Optional[dict]:
-    """Scan a single file. Returns issue dict or None if file is clean."""
     suffix = path.suffix.lower()
     all_issues: list[dict] = []
     llm_content = ""
@@ -631,7 +704,7 @@ def scan_file(
         for cell_idx, source in extract_notebook_cells(path):
             loc = f"Cell {cell_idx}"
             all_issues += check_patterns(source, loc, ref_content)
-            all_issues += check_unknown_models(source, valid_models, loc)
+            all_issues += check_deprecated_models(source, deprecated_models, loc)
             llm_content += f"\n# Cell {cell_idx}\n{source}\n"
 
     elif suffix == ".md":
@@ -645,7 +718,7 @@ def scan_file(
                 continue
             loc = f"Code block {block_idx} ({lang})"
             all_issues += check_patterns(code, loc, ref_content)
-            all_issues += check_unknown_models(code, valid_models, loc)
+            all_issues += check_deprecated_models(code, deprecated_models, loc)
             llm_content += f"\n# Code block {block_idx} ({lang})\n{code}\n"
 
     elif suffix == ".py":
@@ -655,22 +728,18 @@ def scan_file(
             print(f"Warning: could not read {path}: {exc}", file=sys.stderr)
             return None
         all_issues += check_patterns(text, "", ref_content)
-        all_issues += check_unknown_models(text, valid_models, "")
+        all_issues += check_deprecated_models(text, deprecated_models, "")
         llm_content = text
 
     else:
-        return None  # unsupported extension
+        return None
 
-    # LLM pass — only runs if requested and there's code to analyze
     llm_issues: list[dict] = []
     if use_llm and api_key and llm_content.strip():
         llm_issues = llm_analyze(str(path), llm_content, all_issues, api_key, ref_content)
 
     combined = all_issues + llm_issues
-    if not combined:
-        return None
-
-    return {"path": str(path), "issues": combined}
+    return {"path": str(path), "issues": combined} if combined else None
 
 
 _SKIP_DIRS = {".git", "__pycache__", "node_modules", ".ipynb_checkpoints", ".venv", "venv"}
@@ -679,12 +748,11 @@ _SCAN_EXTS = {".ipynb", ".md", ".py"}
 
 def scan_directory(
     directory: Path,
-    valid_models: set[str],
+    deprecated_models: dict[str, str],
     use_llm: bool,
     api_key: Optional[str],
     ref_content: dict[str, str],
 ) -> list[dict]:
-    """Recursively scan all cookbooks in a directory."""
     results: list[dict] = []
     for path in sorted(directory.rglob("*")):
         if any(part in _SKIP_DIRS for part in path.parts):
@@ -692,7 +760,7 @@ def scan_directory(
         if path.suffix.lower() not in _SCAN_EXTS or not path.is_file():
             continue
         print(f"  Scanning {path} ...", file=sys.stderr)
-        result = scan_file(path, valid_models, use_llm, api_key, ref_content)
+        result = scan_file(path, deprecated_models, use_llm, api_key, ref_content)
         if result:
             results.append(result)
     return results
@@ -707,7 +775,7 @@ def to_markdown(report: dict) -> str:
         "",
         f"**Scanned at:** {report['scanned_at']}  ",
         f"**Files with issues:** {len(files)}  ",
-        f"**Valid models found:** {report['valid_models_count']}  ",
+        f"**Deprecated models found in docs/API:** {report['deprecated_models_count']}  ",
         f"**References checked:** {', '.join(report['references_checked']) or 'none (offline mode)'}",
         "",
     ]
@@ -716,7 +784,7 @@ def to_markdown(report: dict) -> str:
         return "\n".join(lines)
 
     for file_info in files:
-        lines += [f"---", "", f"## `{file_info['path']}`", ""]
+        lines += ["---", "", f"## `{file_info['path']}`", ""]
         by_type: dict[str, list[dict]] = {}
         for issue in file_info["issues"]:
             by_type.setdefault(issue["type"], []).append(issue)
@@ -730,7 +798,7 @@ def to_markdown(report: dict) -> str:
                 if issue.get("matched_line"):
                     lines.append(f"  - **Found:** `{issue['matched_line']}`")
                 if issue.get("quote"):
-                    lines.append(f"  - **Reference quote:** _{issue['quote']}_")
+                    lines.append(f"  - **Evidence:** _{issue['quote']}_")
                 lines.append(f"  - **Reference:** [{issue['reference_url']}]({issue['reference_url']})")
             lines.append("")
     return "\n".join(lines)
@@ -743,20 +811,13 @@ def build_parser() -> argparse.ArgumentParser:
         description="Scan Mistral AI cookbooks for stale content.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    p.add_argument("--dir", default="mistral", metavar="DIR",
-                   help="Directory to scan (default: mistral)")
-    p.add_argument("--file", metavar="FILE",
-                   help="Scan a single file instead of a directory")
-    p.add_argument("--output", metavar="FILE",
-                   help="Write JSON report to this path")
-    p.add_argument("--format", choices=["markdown", "json"], default="markdown",
-                   help="stdout format: markdown (default) or json")
-    p.add_argument("--no-fetch", action="store_true",
-                   help="Skip fetching reference data (pattern-only, works offline)")
-    p.add_argument("--use-llm", action="store_true",
-                   help="Use Mistral API for deeper semantic analysis (requires MISTRAL_API_KEY)")
-    p.add_argument("--no-llm", action="store_true",
-                   help="Disable LLM analysis even if MISTRAL_API_KEY is set")
+    p.add_argument("--dir", default="mistral", metavar="DIR")
+    p.add_argument("--file", metavar="FILE")
+    p.add_argument("--output", metavar="FILE")
+    p.add_argument("--format", choices=["markdown", "json"], default="markdown")
+    p.add_argument("--no-fetch", action="store_true")
+    p.add_argument("--use-llm", action="store_true")
+    p.add_argument("--no-llm", action="store_true")
     return p
 
 
@@ -766,35 +827,33 @@ def main() -> None:
     use_llm = args.use_llm and not args.no_llm
     api_key: Optional[str] = os.environ.get("MISTRAL_API_KEY") if use_llm else None
     if use_llm and not api_key:
-        print("Warning: --use-llm set but MISTRAL_API_KEY is not in environment. Skipping LLM pass.",
+        print("Warning: --use-llm set but MISTRAL_API_KEY not in environment. Skipping LLM pass.",
               file=sys.stderr)
         use_llm = False
 
-    # ── Fetch reference data ───────────────────────────────────────────────────
-    valid_models: set[str] = set()
-    references_checked: list[str] = []
     ref_content: dict[str, str] = {}
+    deprecated_models: dict[str, str] = {}
+    references_checked: list[str] = []
 
     if not args.no_fetch:
         ref_content = fetch_reference_content()
 
-        if "python" in ref_content:
+        if _KEY_PYTHON in ref_content:
             references_checked.append("client-python/README.md")
-        if "typescript" in ref_content:
+        if _KEY_TS in ref_content:
             references_checked.append("client-ts/README.md")
-        for label in ("fine_tuning", "fine_tuning_alt", "changelog", "deprecations", "migration"):
+        for label in ("models_overview", "fine_tuning", "changelog", "deprecations"):
             if label in ref_content:
                 references_checked.append(f"platform-docs-public/{label}")
 
-        print("Fetching current model list from /v1/models ...", file=sys.stderr)
+        print("Fetching model data from /v1/models ...", file=sys.stderr)
         fetch_key = api_key or os.environ.get("MISTRAL_API_KEY")
-        valid_models = fetch_valid_models(fetch_key)
-        if valid_models:
+        _all_ids, deprecated_models = fetch_model_data(fetch_key, ref_content)
+        if _all_ids:
             references_checked.append("api.mistral.ai/v1/models")
     else:
         print("Skipping reference data fetch (--no-fetch).", file=sys.stderr)
 
-    # ── Scan files ────────────────────────────────────────────────────────────
     print("", file=sys.stderr)
     stale_files: list[dict] = []
 
@@ -804,7 +863,7 @@ def main() -> None:
             print(f"Error: {path} does not exist.", file=sys.stderr)
             sys.exit(2)
         print(f"Scanning {path} ...", file=sys.stderr)
-        result = scan_file(path, valid_models, use_llm, api_key, ref_content)
+        result = scan_file(path, deprecated_models, use_llm, api_key, ref_content)
         if result:
             stale_files.append(result)
     else:
@@ -813,13 +872,12 @@ def main() -> None:
             print(f"Error: directory '{directory}' does not exist.", file=sys.stderr)
             sys.exit(2)
         print(f"Scanning {directory}/ ...", file=sys.stderr)
-        stale_files = scan_directory(directory, valid_models, use_llm, api_key, ref_content)
+        stale_files = scan_directory(directory, deprecated_models, use_llm, api_key, ref_content)
 
-    # ── Build report ──────────────────────────────────────────────────────────
     report = {
         "scanned_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "references_checked": references_checked,
-        "valid_models_count": len(valid_models),
+        "deprecated_models_count": len(deprecated_models),
         "files": stale_files,
     }
 
