@@ -144,23 +144,28 @@ Flag as Moderate:
 
 #### Notebook (.ipynb) API key cell
 
-Jupyter notebooks must load the key from the environment via dotenv. The first code cell (or the first cell that touches the API key) must follow this pattern:
+Jupyter notebooks must use the following pattern for the API key. It checks for an existing environment variable first, and falls back to a secure `getpass` prompt so readers can enter their key directly in the notebook without setting up a `.env` file:
 
 ```python
-from dotenv import load_dotenv
+import getpass
 import os
 
-load_dotenv()
-api_key = os.environ["MISTRAL_API_KEY"]
+if not os.environ.get("MISTRAL_API_KEY"):
+    os.environ["MISTRAL_API_KEY"] = getpass.getpass("Mistral API key: ")
 ```
+
+The client is then initialized with `os.environ["MISTRAL_API_KEY"]`. `getpass` is part of the Python standard library — no extra dependency needed. The prompt is masked like a password field and works in Jupyter, Colab, and Kaggle.
+
+The `## Environment setup` section in the notebook must explain both options:
+1. Set `MISTRAL_API_KEY` as an environment variable before running (for local use)
+2. Leave it unset and enter the key when prompted by the cell above
 
 Flag these as Critical:
 - Hard-coded API key strings in any cell
 - `MISTRAL_KEY` instead of `MISTRAL_API_KEY`
-- Using `os.getenv("MISTRAL_API_KEY")` without a fallback or error — prefer `os.environ["MISTRAL_API_KEY"]` so the notebook fails loudly if the key is missing
+- Using `os.getenv("MISTRAL_API_KEY")` without a fallback — prefer `os.environ["MISTRAL_API_KEY"]` or the `getpass` pattern so the notebook fails loudly if the key is missing
 
 Flag as Moderate:
-- Missing `load_dotenv()` call when a `.env` file is expected
 - `api_key = os.environ["MISTRAL_API_KEY"]` defined but never passed to the client constructor
 
 #### Shell / curl cookbooks
