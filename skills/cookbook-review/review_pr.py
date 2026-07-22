@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -91,18 +92,46 @@ def load_style_guide() -> str:
 MAX_REVIEW_CELLS = 40  # truncate notebooks at this many cells
 
 
-def read_numbered(filepath: str) -> tuple[str, int]:
+def get_added_line_numbers(filepath: str) -> set[int]:
+    """
+    Return the 1-based line numbers added in this push by parsing the unified diff.
+
+    Used to mark new lines in a modified file so the model reviews only
+    what changed while still having full-file line numbers for inline suggestions.
+    """
+    result = subprocess.run(
+        ["git", "diff", "-U0", BASE_SHA, HEAD_SHA, "--", filepath],
+        capture_output=True, text=True,
+    )
+    added: set[int] = set()
+    for line in result.stdout.splitlines():
+        m = re.match(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@", line)
+        if m:
+            start = int(m.group(1))
+            count = int(m.group(2)) if m.group(2) is not None else 1
+            added.update(range(start, start + count))
+    return added
+
+
+def read_numbered(filepath: str, added_lines: set[int] | None = None) -> tuple[str, int]:
     """
     Return (numbered_content, total_line_count).
 
     Lines are prepended with their 1-based line number so the model can
     reference exact locations. Content is truncated at MAX_REVIEW_LINES.
+
+    When added_lines is provided, lines in that set are marked [NEW] so
+    the model knows which lines were changed in this push.
     """
     lines = Path(filepath).read_text().splitlines()
     total = len(lines)
     visible = lines[:MAX_REVIEW_LINES]
 
-    numbered = "\n".join(f"{i + 1:4}: {line}" for i, line in enumerate(visible))
+    def fmt(i: int, line: str) -> str:
+        marker = "[NEW] " if added_lines and (i + 1) in added_lines else "      "
+        return f"{i + 1:4}: {marker}{line}"
+
+    numbered = "\n".join(fmt(i, line) for i, line in enumerate(visible))
 
     if total > MAX_REVIEW_LINES:
         numbered += (
@@ -406,7 +435,13 @@ QUOTE AND SUGGESTION RULES
 """
 
 
-def call_mistral(filepath: str, content: str, style_guide: str, is_diff: bool = False) -> dict:
+def call_mistral(
+    filepath: str,
+    content: str,
+    style_guide: str,
+    is_diff: bool = False,
+    modified: bool = False,
+) -> dict:
     """Call the Mistral API and return the parsed review as a Python dict."""
     is_notebook = filepath.endswith(".ipynb")
     if is_diff:
@@ -417,10 +452,28 @@ def call_mistral(filepath: str, content: str, style_guide: str, is_diff: bool = 
 
     if is_diff:
         content_label = "Changed notebook cells" if is_notebook else "Unified diff of changes"
+        preamble = ""
+    elif modified:
+        content_label = "File content with line numbers"
+        preamble = (
+            "Lines marked [NEW] were added in this push. "
+            "Flag issues on [NEW] lines only — read surrounding lines for context, "
+            "but do not flag issues on unmarked lines.\n\n"
+            "Before flagging an issue, read the actual content of the identified line "
+            "in the numbered input to confirm the problem exists. Do not flag a line "
+            "that already satisfies the rule you are checking.\n\n"
+        )
     else:
         content_label = "Notebook cells" if is_notebook else "File content with line numbers"
+        preamble = (
+            "Before flagging an issue, read the actual content of the identified line "
+            "in the numbered input to confirm the problem exists. Do not flag a line "
+            "that already satisfies the rule you are checking.\n\n"
+        )
+
     user = (
         f"Review this file: `{filepath}`\n\n"
+        f"{preamble}"
         f"{content_label}:\n```\n{content}\n```"
     )
 
@@ -453,22 +506,22 @@ _SEVERITY_PREFIX = {
 
 def _sanitize_line_comments(line_comments: list[dict], file_lines: list[str]) -> list[dict]:
     """
-    Strip suggestions from any comment whose target line is a Markdown heading.
+    Strip or remove suggestions that are invalid or identical to the existing line.
 
-    Heading lines (starting with #) are structural — a suggestion that replaces
-    a heading with body text is always wrong, regardless of what the model returns.
+    - Removes suggestions on Markdown heading lines (structural, never valid).
+    - Removes suggestions that are identical to the current line content (no-op).
     """
     sanitized = []
     for lc in line_comments:
         line = lc.get("line")
-        if (
-            "suggestion" in lc
-            and isinstance(line, int)
-            and 1 <= line <= len(file_lines)
-            and file_lines[line - 1].lstrip().startswith("#")
-        ):
-            print(f"    Stripping suggestion on heading line {line}.")
-            lc = {k: v for k, v in lc.items() if k != "suggestion"}
+        if "suggestion" in lc and isinstance(line, int) and 1 <= line <= len(file_lines):
+            actual = file_lines[line - 1]
+            if actual.lstrip().startswith("#"):
+                print(f"    Stripping suggestion on heading line {line}.")
+                lc = {k: v for k, v in lc.items() if k != "suggestion"}
+            elif lc["suggestion"].strip() == actual.strip():
+                print(f"    Stripping no-op suggestion on line {line} (identical to current text).")
+                lc = {k: v for k, v in lc.items() if k != "suggestion"}
         sanitized.append(lc)
     return sanitized
 
@@ -508,7 +561,7 @@ def _build_file_comment_body(filepath: str, fc: dict) -> str:
 
     if quote:
         parts += ["", "**Current text:**", f"> {quote}"]
-    if suggestion:
+    if suggestion and suggestion.strip() != quote.strip():
         parts += ["", "**Replace with:**", f"> {suggestion}"]
 
     return "\n".join(parts)
@@ -648,34 +701,49 @@ def main() -> None:
 
         is_notebook = filepath.endswith(".ipynb")
         status = get_file_status(filepath)
-        is_diff = status == "M"
+        is_modified = status == "M"
+        is_modified_md = is_modified and not is_notebook
 
-        if is_diff:
-            kind = "cells" if is_notebook else "lines"
-            print(f"  Modified file — reviewing only changed {kind}.")
-            if is_notebook:
-                content, total = read_changed_cells(filepath)
-            else:
-                content, total = read_changed_lines(filepath)
+        raw_lines: list[str] | None = None
+
+        if is_modified and is_notebook:
+            # Modified notebook: show only changed cells (no line numbers available).
+            print("  Modified notebook — reviewing changed cells.")
+            content, total = read_changed_cells(filepath)
             if total == 0:
                 print("  No content changes detected — skipping review.")
                 continue
-            print(f"  {total} changed {kind}.")
+            print(f"  {total} changed cell(s).")
+        elif is_modified_md:
+            # Modified Markdown: full file with [NEW] markers so the model can produce
+            # inline line_comments with committable suggestions.
+            added_lines_set = get_added_line_numbers(filepath)
+            if not added_lines_set:
+                print("  No new lines detected — skipping review.")
+                continue
+            content, total = read_numbered(filepath, added_lines_set)
+            raw_lines = Path(filepath).read_text().splitlines()
+            print(
+                f"  Modified file — {total} line(s) total, "
+                f"{len(added_lines_set)} new line(s) marked [NEW]."
+            )
         elif is_notebook:
             content, total = read_notebook(filepath)
             print(f"  New file — {total} cell(s), reviewing up to {MAX_REVIEW_CELLS}.")
         else:
             content, total = read_numbered(filepath)
-            print(f"  New file — {total} total line(s), reviewing up to {MAX_REVIEW_LINES}.")
-
-        # Keep raw lines for suggestion sanitization (Markdown new files only).
-        raw_lines: list[str] | None = None
-        if not is_notebook and not is_diff:
             raw_lines = Path(filepath).read_text().splitlines()
+            print(f"  New file — {total} total line(s), reviewing up to {MAX_REVIEW_LINES}.")
 
         print("  Calling Mistral API ...")
         try:
-            review = call_mistral(filepath, content, style_guide, is_diff=is_diff)
+            review = call_mistral(
+                filepath,
+                content,
+                style_guide,
+                is_diff=(is_modified and is_notebook),
+                modified=is_modified_md,
+            )
         except Exception as exc:
             print(f"  Mistral API call failed: {exc}")
             exit_code = 1
@@ -691,7 +759,7 @@ def main() -> None:
 
         print("  Posting GitHub PR review ...")
         try:
-            post_review(filepath, review, 0 if (is_notebook or is_diff) else total, raw_lines)
+            post_review(filepath, review, 0 if is_notebook else total, raw_lines)
         except requests.HTTPError as exc:
             print(f"  Failed to post review: {exc}")
             print(f"  Response body: {exc.response.text[:500]}")
