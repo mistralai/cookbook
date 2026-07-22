@@ -261,12 +261,19 @@ RULES
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 SUGGESTION RULES
-The suggestion field replaces the full content of that one line. Be SURGICAL:
-- Change ONLY the specific word, phrase, or value that violates the rule.
-- Preserve all surrounding text exactly as it appears on that line.
-- Do NOT rewrite an entire sentence when only one word needs changing.
-- Do NOT include surrounding lines, backticks, or code fences in the suggestion value.
-- Omit the "suggestion" key entirely if the fix requires changing multiple lines, or if no minimal single-line replacement is possible.
+Before writing a suggestion, look up the exact text of the identified line in the numbered input.
+Your suggestion replaces that entire line — nothing more, nothing less.
+
+Omit the "suggestion" key entirely if ANY of the following are true:
+- The identified line is a Markdown heading (starts with one or more `#` characters).
+- The fix requires adding content that does not exist on that line yet (e.g. a missing CTA, a missing section, a missing sentence).
+- The fix requires changing more than one existing line.
+- The replacement would not be recognizable as a modification of the original line text.
+
+When you DO include a suggestion:
+- Change ONLY the specific word, phrase, or value that is wrong on that line.
+- Keep all other text on the line exactly as it appears in the numbered content.
+- Do not include surrounding lines, backticks, or fences in the suggestion value.
 """
 
 _SYSTEM_PROMPT_IPYNB = """\
@@ -305,9 +312,16 @@ RULES
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 SUGGESTION RULES
-- The suggestion contains ONLY the corrected version of the specific phrase or sentence that is wrong.
-- Do not rewrite the entire cell when only a few words need changing.
-- Omit the "suggestion" key if the fix is structural (e.g. adding a missing section) or spans multiple sentences.
+The suggestion contains the corrected version of the specific phrase or sentence that is wrong — nothing surrounding it.
+
+Omit the "suggestion" key entirely if ANY of the following are true:
+- The fix requires adding content that does not exist yet (e.g. a missing section, a missing sentence).
+- The fix requires changing more than one sentence.
+- The issue is structural (e.g. a heading in the wrong order, a missing block).
+
+When you DO include a suggestion:
+- Replace ONLY the specific word, phrase, or sentence that is wrong.
+- Keep all other text in the cell exactly as it is.
 """
 
 _SYSTEM_PROMPT_MD_DIFF = """\
@@ -346,9 +360,16 @@ RULES
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 SUGGESTION RULES
-- The suggestion contains ONLY the corrected version of the specific phrase or value that is wrong.
-- Do not rewrite the full line when only a word or phrase needs changing.
-- Omit the "suggestion" key if the fix spans multiple lines.
+The suggestion contains the corrected version of the specific phrase or value that is wrong — nothing surrounding it.
+
+Omit the "suggestion" key entirely if ANY of the following are true:
+- The flagged line is a Markdown heading (starts with one or more `#` characters).
+- The fix requires adding content that does not yet exist on that line.
+- The fix spans more than one line.
+
+When you DO include a suggestion:
+- Replace ONLY the specific word or phrase that is wrong.
+- Keep everything else on the line exactly as it appears.
 """
 
 _SYSTEM_PROMPT_IPYNB_DIFF = """\
@@ -389,9 +410,16 @@ RULES
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 SUGGESTION RULES
-- The suggestion contains ONLY the corrected version of the specific phrase or sentence that is wrong.
-- Do not rewrite the entire cell when only a few words need changing.
-- Omit the "suggestion" key if the fix is structural or spans multiple sentences.
+The suggestion contains the corrected version of the specific phrase or sentence that is wrong — nothing surrounding it.
+
+Omit the "suggestion" key entirely if ANY of the following are true:
+- The fix requires adding content that does not exist yet (e.g. a missing section, a missing sentence).
+- The fix requires changing more than one sentence.
+- The issue is structural (e.g. a heading in the wrong order, a missing block).
+
+When you DO include a suggestion:
+- Replace ONLY the specific word, phrase, or sentence that is wrong.
+- Keep all other text in the cell exactly as it is.
 """
 
 
@@ -438,6 +466,28 @@ _SEVERITY_PREFIX = {
     "moderate": "**Moderate**",
     "minor": "Minor",
 }
+
+
+def _sanitize_line_comments(line_comments: list[dict], file_lines: list[str]) -> list[dict]:
+    """
+    Strip suggestions from any comment whose target line is a Markdown heading.
+
+    Heading lines (starting with #) are structural — a suggestion that replaces
+    a heading with body text is always wrong, regardless of what the model returns.
+    """
+    sanitized = []
+    for lc in line_comments:
+        line = lc.get("line")
+        if (
+            "suggestion" in lc
+            and isinstance(line, int)
+            and 1 <= line <= len(file_lines)
+            and file_lines[line - 1].lstrip().startswith("#")
+        ):
+            print(f"    Stripping suggestion on heading line {line}.")
+            lc = {k: v for k, v in lc.items() if k != "suggestion"}
+        sanitized.append(lc)
+    return sanitized
 
 
 def _build_line_comment_body(lc: dict) -> str:
@@ -537,7 +587,7 @@ def post_pr_comment(body: str) -> None:
     resp.raise_for_status()
 
 
-def post_review(filepath: str, review: dict, total_lines: int) -> None:
+def post_review(filepath: str, review: dict, total_lines: int, file_lines: list[str] | None = None) -> None:
     """
     Post the review as separate comments:
     1. One lightweight verdict review (summary only, no bundled comments).
@@ -549,9 +599,13 @@ def post_review(filepath: str, review: dict, total_lines: int) -> None:
 
     post_verdict_review(filepath, summary, verdict)
 
+    line_comments = review.get("line_comments", [])
+    if file_lines:
+        line_comments = _sanitize_line_comments(line_comments, file_lines)
+
     n_inline = 0
     n_fallback = 0
-    for lc in review.get("line_comments", []):
+    for lc in line_comments:
         line = lc.get("line")
         body = _build_line_comment_body(lc)
         if isinstance(line, int) and 1 <= line <= total_lines:
@@ -628,6 +682,11 @@ def main() -> None:
             content, total = read_numbered(filepath)
             print(f"  New file — {total} total line(s), reviewing up to {MAX_REVIEW_LINES}.")
 
+        # Keep raw lines for suggestion sanitization (Markdown new files only).
+        raw_lines: list[str] | None = None
+        if not is_notebook and not is_diff:
+            raw_lines = Path(filepath).read_text().splitlines()
+
         print("  Calling Mistral API ...")
         try:
             review = call_mistral(filepath, content, style_guide, is_diff=is_diff)
@@ -646,7 +705,7 @@ def main() -> None:
 
         print("  Posting GitHub PR review ...")
         try:
-            post_review(filepath, review, 0 if (is_notebook or is_diff) else total)
+            post_review(filepath, review, 0 if (is_notebook or is_diff) else total, raw_lines)
         except requests.HTTPError as exc:
             print(f"  Failed to post review: {exc}")
             print(f"  Response body: {exc.response.text[:500]}")
