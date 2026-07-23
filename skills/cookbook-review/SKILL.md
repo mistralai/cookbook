@@ -107,9 +107,13 @@ Every cookbook that requires a Mistral API key must follow this exact wording an
 
 #### Getting the key
 
-The "Environment setup" section must include this sentence verbatim (Markdown links intact):
+The "Environment setup" section must include this base sentence (Markdown links intact):
 
 > To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
+Some tutorials require additional context within this sentence — for example, specifying an API key scope. This is permitted as long as the base links, Studio name, and overall structure are preserved:
+
+> To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys), choose **Private and shared connectors** for **Connector access scope** and create a new API key.
 
 Flag these as Critical and suggest the standard sentence:
 - Any other URL for creating an API key (e.g., `/api-keys`, `/dashboard`, or a bare `console.mistral.ai` link without the profile dialog deep-link)

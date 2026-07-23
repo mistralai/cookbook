@@ -28,17 +28,21 @@ To complete this cookbook, you will need:
 
 ### Install
 
-Use one of the following methods to install the Mistral TypeScript SDK:
+Use one of the following methods to install the Mistral TypeScript SDK and `dotenv` for loading your API key from a `.env` file:
 
+**npm**:
 ```bash
-# npm
-npm install @mistralai/mistralai
+npm install @mistralai/mistralai dotenv
+```
 
-# pnpm
-pnpm add @mistralai/mistralai
+**pnpm**:
+```bash
+pnpm add @mistralai/mistralai dotenv
+```
 
-# yarn
-yarn add @mistralai/mistralai
+**yarn**:
+```bash
+yarn add @mistralai/mistralai dotenv
 ```
 
 ### Required environment variables
@@ -51,24 +55,23 @@ Create a `.env` at the root of your project and add your Mistral API key:
 MISTRAL_API_KEY=your-mistral-api-key
 ```
 
-### Run
-
-Once your `.env` file is in place, run the script:
-
-```bash
-npx tsx build-a-database-advisor-agent.ts
-```
-
 ---
 
 ## Step 1 — Setup
 
-Create `build-a-database-advisor-agent.ts` and add the client, the DeepWiki server URL, the list of candidates, and the response schema. The remaining steps fill in the `main` function's `try` and `finally` blocks.
+Create `build-a-database-advisor-agent.ts` in your project directory:
+
+```bash
+touch build-a-database-advisor-agent.ts
+```
+
+Open the file and add the client, the DeepWiki server URL, the list of candidates, and the response schema. The remaining steps fill in the `main` function's `try` and `finally` blocks.
 
 The response schema defines the exact JSON structure the agent must return. Defining it as a typed constant means it serves as both the TypeScript type source and the schema passed to the API — no duplication.
 
 ```typescript
-import Mistral from "@mistralai/mistralai";
+import "dotenv/config";
+import { Mistral } from "@mistralai/mistralai";
 
 const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 
@@ -317,7 +320,7 @@ Replace `// Step 6 — Promote the winner, retire the rest` with:
 
     const updated = await client.beta.connectors.update({
       connectorId: connectorIds[winnerName],
-      connectorMCPUpdate: {
+      updateConnectorRequest: {
         description: `[SELECTED] ${winnerDescription}`,
       },
     });
@@ -359,12 +362,25 @@ Delete the agent when done. Replace `// Cleanup — delete the agent` in the `fi
 
 ---
 
+## Run
+
+Once all steps are in place, run the script:
+
+```bash
+npx tsx build-a-database-advisor-agent.ts
+```
+
+Or with `npm start` if you have `tsx` installed as a dev dependency.
+
+---
+
 ## Complete script
 
-For reference, here is the full script with all steps combined.
+For reference, here is the full script with all steps combined. You can also view the complete project [on GitHub](https://github.com/mistralai/cookbook/mistral/connectors/database-advisor-agent)
 
 ```typescript
-import Mistral from "@mistralai/mistralai";
+import "dotenv/config";
+import { Mistral } from "@mistralai/mistralai";
 
 const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 
@@ -539,7 +555,7 @@ async function main(): Promise<void> {
 
     const updated = await client.beta.connectors.update({
       connectorId: connectorIds[winnerName],
-      connectorMCPUpdate: {
+      updateConnectorRequest: {
         description: `[SELECTED] ${winnerDescription}`,
       },
     });

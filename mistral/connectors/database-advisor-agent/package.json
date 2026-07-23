@@ -1,0 +1,17 @@
+{
+  "name": "database-advisor-agent",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx build-a-database-advisor-agent.ts"
+  },
+  "dependencies": {
+    "@mistralai/mistralai": "latest",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
