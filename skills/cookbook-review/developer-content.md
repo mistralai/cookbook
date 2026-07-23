@@ -46,6 +46,44 @@ Many developers copy example code from documentation directly into their project
 - Keep language parity: if you show Python, show TypeScript and curl too, unless there's a clear reason not to.
 - Show realistic output—not just "response printed" but the actual structure of the response.
 
+### Package manager install commands
+
+When showing install commands for multiple package managers, give each its own labeled code block. Do not combine them in a single block with `#` comments.
+
+**Correct:**
+
+```
+**npm**:
+```bash
+npm install @mistralai/mistralai
+```
+
+**pnpm**:
+```bash
+pnpm add @mistralai/mistralai
+```
+
+**yarn**:
+```bash
+yarn add @mistralai/mistralai
+```
+```
+
+**Incorrect:**
+
+```
+```bash
+# npm
+npm install @mistralai/mistralai
+
+# pnpm
+pnpm add @mistralai/mistralai
+
+# yarn
+yarn add @mistralai/mistralai
+```
+```
+
 ---
 
 ## Formatting developer text elements
