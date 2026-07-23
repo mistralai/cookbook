@@ -570,8 +570,19 @@ def _build_file_comment_body(filepath: str, fc: dict) -> str:
 # ── GitHub posting ────────────────────────────────────────────────────────────
 
 
-def post_verdict_review(filepath: str, summary: str, verdict: str) -> None:
-    """Post a lightweight review event with just the summary — no bundled inline comments."""
+def post_verdict_review(
+    filepath: str,
+    summary: str,
+    verdict: str,
+    bundled_comments: list[dict] | None = None,
+) -> bool:
+    """
+    Post a review event with optional bundled inline comments.
+
+    Returns True on success, False if GitHub rejects the payload (HTTP 422).
+    Bundled inline comments must reference lines that are present in the diff;
+    a single invalid line causes the entire request to be rejected.
+    """
     event_map = {
         "approve": "APPROVE",
         "request_changes": "REQUEST_CHANGES",
@@ -589,12 +600,18 @@ def post_verdict_review(filepath: str, summary: str, verdict: str) -> None:
         "commit_id": HEAD_SHA,
         "body": body,
         "event": gh_event,
-        "comments": [],
+        "comments": bundled_comments or [],
     }
     url = f"{GITHUB_API}/repos/{REPO}/pulls/{PR_NUMBER}/reviews"
     resp = requests.post(url, headers=GH_HEADERS, json=payload, timeout=30)
+    if resp.status_code == 422:
+        n = len(bundled_comments) if bundled_comments else 0
+        print(f"  Review with {n} bundled comment(s) got HTTP 422 — retrying without them.")
+        return False
     resp.raise_for_status()
-    print(f"  Posted {gh_event} verdict review.")
+    n = len(bundled_comments) if bundled_comments else 0
+    print(f"  Posted {gh_event} review with {n} bundled inline comment(s).")
+    return True
 
 
 def post_line_comment(path: str, line: int, body: str) -> bool:
@@ -626,43 +643,108 @@ def post_pr_comment(body: str) -> None:
     resp.raise_for_status()
 
 
-def post_review(filepath: str, review: dict, total_lines: int, file_lines: list[str] | None = None) -> None:
+def _strip_suggestion_block(body: str) -> str:
     """
-    Post the review as separate comments:
-    1. One lightweight verdict review (summary only, no bundled comments).
-    2. One separate inline comment per line_comment issue.
-    3. One separate PR comment per file_comment issue.
+    Remove ```suggestion ... ``` fences from a comment body.
+
+    Suggestion blocks only render as Apply buttons inside PR review inline
+    comments. In PR conversation comments they display as plain code, which
+    is misleading. Replace the fence with a plain "Suggested fix:" label.
+    """
+    lines = body.splitlines()
+    result: list[str] = []
+    in_suggestion = False
+    suggestion_lines: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped == "```suggestion":
+            in_suggestion = True
+            suggestion_lines = []
+        elif in_suggestion and stripped == "```":
+            in_suggestion = False
+            if suggestion_lines:
+                result.append("**Suggested fix:** " + suggestion_lines[0])
+                result.extend(suggestion_lines[1:])
+        elif in_suggestion:
+            suggestion_lines.append(line)
+        else:
+            result.append(line)
+    return "\n".join(result)
+
+
+def post_review(
+    filepath: str,
+    review: dict,
+    total_lines: int,
+    file_lines: list[str] | None = None,
+    added_lines_set: set[int] | None = None,
+) -> None:
+    """
+    Post the review, maximising the chance of inline Apply-button suggestions.
+
+    Strategy:
+    1. Bundle all valid inline comments into a single POST /pulls/.../reviews
+       request. Bundled review inline comments render Apply buttons reliably.
+    2. Only include a line if it is confirmed to be in the diff. For modified
+       files pass added_lines_set; for new files pass None (all lines are new).
+    3. If the bundled review is rejected (HTTP 422), retry without the bundled
+       comments, then try each inline comment individually with post_line_comment.
+    4. Any comment that cannot be posted inline is posted to the PR conversation
+       via post_pr_comment with the suggestion block stripped — suggestion fences
+       render as plain code in conversation comments, not as Apply buttons.
     """
     verdict = review.get("verdict", "comment")
     summary = review.get("summary", "")
-
-    post_verdict_review(filepath, summary, verdict)
 
     line_comments = review.get("line_comments", [])
     if file_lines:
         line_comments = _sanitize_line_comments(line_comments, file_lines)
 
-    n_inline = 0
-    n_fallback = 0
+    # Split into bundleable comments (line confirmed in diff) and fallback.
+    bundled: list[dict] = []
+    fallback_lcs: list[dict] = []
+
     for lc in line_comments:
         line = lc.get("line")
-        body = _build_line_comment_body(lc)
-        if isinstance(line, int) and 1 <= line <= total_lines:
-            if post_line_comment(filepath, line, body):
-                n_inline += 1
-                continue
-        else:
-            print(f"    Out-of-range line={line!r} — posting as PR comment.")
-        post_pr_comment(body)
-        n_fallback += 1
+        if not isinstance(line, int) or line < 1 or (total_lines > 0 and line > total_lines):
+            print(f"    Out-of-range line={line!r} — will post as PR comment.")
+            fallback_lcs.append(lc)
+            continue
+        if added_lines_set is not None and line not in added_lines_set:
+            print(f"    Line {line} not in diff — will post as PR comment.")
+            fallback_lcs.append(lc)
+            continue
+        bundled.append({
+            "path": filepath,
+            "line": line,
+            "side": "RIGHT",
+            "body": _build_line_comment_body(lc),
+        })
 
+    # Post the verdict review with all bundled inline comments in one request.
+    ok = post_verdict_review(filepath, summary, verdict, bundled)
+
+    if not ok:
+        # Retry verdict review without inline comments.
+        post_verdict_review(filepath, summary, verdict, [])
+        # Attempt each previously-bundled comment individually.
+        for bc in bundled:
+            if not post_line_comment(bc["path"], bc["line"], bc["body"]):
+                post_pr_comment(_strip_suggestion_block(bc["body"]))
+
+    # Post fallback comments (line not in diff) without suggestion blocks.
+    n_fallback = len(fallback_lcs)
+    for lc in fallback_lcs:
+        post_pr_comment(_strip_suggestion_block(_build_line_comment_body(lc)))
+
+    # Post file-level and cell-level comments.
     n_file = 0
     for fc in review.get("file_comments", []):
         post_pr_comment(_build_file_comment_body(filepath, fc))
         n_file += 1
 
     print(
-        f"  {n_inline} inline comment(s), "
+        f"  {len(bundled)} bundled inline comment(s), "
         f"{n_fallback} fallback PR comment(s), "
         f"{n_file} file-level PR comment(s)."
     )
@@ -705,6 +787,7 @@ def main() -> None:
         is_modified_md = is_modified and not is_notebook
 
         raw_lines: list[str] | None = None
+        added_lines_set: set[int] | None = None
 
         if is_modified and is_notebook:
             # Modified notebook: show only changed cells (no line numbers available).
@@ -716,7 +799,9 @@ def main() -> None:
             print(f"  {total} changed cell(s).")
         elif is_modified_md:
             # Modified Markdown: full file with [NEW] markers so the model can produce
-            # inline line_comments with committable suggestions.
+            # inline line_comments with committable suggestions. Track which lines are
+            # in the diff so we only bundle those — bundling a non-diff line causes a
+            # 422 that rejects the entire review request.
             added_lines_set = get_added_line_numbers(filepath)
             if not added_lines_set:
                 print("  No new lines detected — skipping review.")
@@ -759,7 +844,7 @@ def main() -> None:
 
         print("  Posting GitHub PR review ...")
         try:
-            post_review(filepath, review, 0 if is_notebook else total, raw_lines)
+            post_review(filepath, review, 0 if is_notebook else total, raw_lines, added_lines_set)
         except requests.HTTPError as exc:
             print(f"  Failed to post review: {exc}")
             print(f"  Response body: {exc.response.text[:500]}")
