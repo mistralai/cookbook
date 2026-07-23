@@ -148,6 +148,8 @@ main().catch(console.error);
 
 Each connector points at the DeepWiki MCP server, which lets Mistral read and reason about any public GitHub repository. Three named connectors — one per database — give the agent independent slots to query.
 
+After creating each connector, `createOrUpdateUserCredentials` registers credentials for it. DeepWiki is a public server that requires no authentication, so `credentials` is an empty object — but the credentials record must still exist before the connector can be queried.
+
 Replace `// Step 2 — Create one connector per candidate` with:
 
 ```typescript
@@ -161,6 +163,15 @@ Replace `// Step 2 — Create one connector per candidate` with:
       });
       connectorIds[c.name] = connector.id;
       console.log(`Created: ${connector.name}  (id=${connector.id})`);
+      await client.beta.connectors.createOrUpdateUserCredentials({
+        connectorIdOrName: connector.name,
+        credentialsCreateOrUpdate: {
+          name: `${connector.name}-default`,
+          credentials: { headers: {} },
+          isDefault: true,
+        },
+      });
+      console.log(`  Credentials registered for ${connector.name}`);
     }
 ```
 
@@ -170,7 +181,7 @@ View your registered Connectors in [Studio](https://console.mistral.ai/build/con
 
 ## Step 3 — List to verify
 
-Confirm all three connectors are registered before proceeding.
+Confirm all three connectors are registered, then call `listTools` on each one to verify the credentials are working and see what tools the connector exposes.
 
 Replace `// Step 3 — List to verify` with:
 
@@ -183,6 +194,12 @@ Replace `// Step 3 — List to verify` with:
     console.log(`${showdown.length} showdown connectors registered:`);
     for (const c of showdown) {
       console.log(`  ${(c.name ?? "").padEnd(22)}  ${c.description}`);
+      const tools = await client.beta.connectors.listTools({
+        connectorIdOrName: c.name ?? "",
+      });
+      for (const tool of tools) {
+        console.log(`    - ${tool.name}: ${tool.description}`);
+      }
     }
 ```
 
@@ -229,52 +246,38 @@ View your agents in [Studio](https://console.mistral.ai/build/agents).
 
 ## Step 5 — Run the comparison
 
-Ask the agent to evaluate all three databases. Before replying, the agent will call each DeepWiki connector with a natural-language question — this may take a minute.
-
-The response loop does two things: it logs any non-message outputs (connector calls, internal steps) so you can confirm the connectors are being invoked, and it collects the final message text for JSON parsing.
+Ask the agent to evaluate all three databases. The response is streamed, so you can watch connector calls appear in real time before the final JSON arrives. Each non-text event is printed as it comes in — `tool.execution.started` shows which connector is being queried, and `tool.execution.done` confirms the result was received.
 
 Replace `// Step 5 — Run the comparison` with:
 
 ```typescript
     // Step 5 — Run the comparison
-    const response = await client.beta.conversations.start({
-      agentId: agent.id,
-      inputs: [
-        {
-          role: "user",
-          content:
-            "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
-            "local analytics workload. Evaluate storage model, ACID guarantees, query " +
-            "capabilities, write throughput, and Python API simplicity. Recommend one.",
-        },
-      ],
-    });
+    const stream = await client.beta.conversations.startStream(
+      {
+        agentId: agent.id,
+        inputs: [
+          {
+            role: "user",
+            content:
+              "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
+              "local analytics workload. Evaluate storage model, ACID guarantees, query " +
+              "capabilities, write throughput, and Python API simplicity. Recommend one.",
+          },
+        ],
+      },
+      { timeoutMs: 300_000 },
+    );
 
-    // Collect the agent's full reply and surface tool call activity
     let rawText = "";
-    for (const output of response.outputs ?? []) {
-      if (output.type === "message.output") {
-        const content = output.content;
-        if (typeof content === "string") {
-          rawText += content;
-        } else if (Array.isArray(content)) {
-          rawText += content
-            .map((chunk: any) => chunk.text ?? String(chunk))
-            .join("");
-        }
+    for await (const item of stream) {
+      const data = item.data;
+      const eventType = data.type;
+      if (eventType === "message.output.delta") {
+        const content = (data as any).content;
+        rawText += typeof content === "string" ? content : "";
       } else {
-        const name = (output as any).name ?? (output as any).toolName ?? "";
-        const args = (output as any).arguments;
-        let detail = name ? ` — ${name}` : "";
-        if (args) {
-          try {
-            const parsed = typeof args === "string" ? JSON.parse(args) : args;
-            detail += `\n    ${JSON.stringify(parsed, null, 2)}`;
-          } catch {
-            detail += `\n    ${args}`;
-          }
-        }
-        console.log(`[${output.type}]${detail}`);
+        const name = (data as any).name ?? "";
+        console.log(`[${eventType}]${name ? ` ${name}` : ""}`);
       }
     }
 
@@ -446,6 +449,15 @@ async function main(): Promise<void> {
       });
       connectorIds[c.name] = connector.id;
       console.log(`Created: ${connector.name}  (id=${connector.id})`);
+      await client.beta.connectors.createOrUpdateUserCredentials({
+        connectorIdOrName: connector.name,
+        credentialsCreateOrUpdate: {
+          name: `${connector.name}-default`,
+          credentials: { headers: {} },
+          isDefault: true,
+        },
+      });
+      console.log(`  Credentials registered for ${connector.name}`);
     }
 
     // Step 3 — List to verify
@@ -456,6 +468,12 @@ async function main(): Promise<void> {
     console.log(`${showdown.length} showdown connectors registered:`);
     for (const c of showdown) {
       console.log(`  ${(c.name ?? "").padEnd(22)}  ${c.description}`);
+      const tools = await client.beta.connectors.listTools({
+        connectorIdOrName: c.name ?? "",
+      });
+      for (const tool of tools) {
+        console.log(`    - ${tool.name}: ${tool.description}`);
+      }
     }
 
     // Step 4 — Build the comparison agent
@@ -486,43 +504,32 @@ async function main(): Promise<void> {
     console.log(`Agent ready: ${agent.name}  (id=${agent.id})`);
 
     // Step 5 — Run the comparison
-    const response = await client.beta.conversations.start({
-      agentId: agent.id,
-      inputs: [
-        {
-          role: "user",
-          content:
-            "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
-            "local analytics workload. Evaluate storage model, ACID guarantees, query " +
-            "capabilities, write throughput, and Python API simplicity. Recommend one.",
-        },
-      ],
-    });
+    const stream = await client.beta.conversations.startStream(
+      {
+        agentId: agent.id,
+        inputs: [
+          {
+            role: "user",
+            content:
+              "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
+              "local analytics workload. Evaluate storage model, ACID guarantees, query " +
+              "capabilities, write throughput, and Python API simplicity. Recommend one.",
+          },
+        ],
+      },
+      { timeoutMs: 300_000 },
+    );
 
     let rawText = "";
-    for (const output of response.outputs ?? []) {
-      if (output.type === "message.output") {
-        const content = output.content;
-        if (typeof content === "string") {
-          rawText += content;
-        } else if (Array.isArray(content)) {
-          rawText += content
-            .map((chunk: any) => chunk.text ?? String(chunk))
-            .join("");
-        }
+    for await (const item of stream) {
+      const data = item.data;
+      const eventType = data.type;
+      if (eventType === "message.output.delta") {
+        const content = (data as any).content;
+        rawText += typeof content === "string" ? content : "";
       } else {
-        const name = (output as any).name ?? (output as any).toolName ?? "";
-        const args = (output as any).arguments;
-        let detail = name ? ` — ${name}` : "";
-        if (args) {
-          try {
-            const parsed = typeof args === "string" ? JSON.parse(args) : args;
-            detail += `\n    ${JSON.stringify(parsed, null, 2)}`;
-          } catch {
-            detail += `\n    ${args}`;
-          }
-        }
-        console.log(`[${output.type}]${detail}`);
+        const name = (data as any).name ?? "";
+        console.log(`[${eventType}]${name ? ` ${name}` : ""}`);
       }
     }
 

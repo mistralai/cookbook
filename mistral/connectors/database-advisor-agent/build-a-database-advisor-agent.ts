@@ -67,6 +67,15 @@ async function main(): Promise<void> {
       });
       connectorIds[c.name] = connector.id;
       console.log(`Created: ${connector.name}  (id=${connector.id})`);
+      await client.beta.connectors.createOrUpdateUserCredentials({
+        connectorIdOrName: connector.name,
+        credentialsCreateOrUpdate: {
+          name: `${connector.name}-default`,
+          credentials: { headers: {} },
+          isDefault: true,
+        },
+      });
+      console.log(`  Credentials registered for ${connector.name}`);
     }
 
     // Step 3 — List to verify
@@ -77,6 +86,12 @@ async function main(): Promise<void> {
     console.log(`${showdown.length} showdown connectors registered:`);
     for (const c of showdown) {
       console.log(`  ${(c.name ?? "").padEnd(22)}  ${c.description}`);
+      const tools = await client.beta.connectors.listTools({
+        connectorIdOrName: c.name ?? "",
+      });
+      for (const tool of tools) {
+        console.log(`    - ${tool.name}: ${tool.description}`);
+      }
     }
 
     // Step 4 — Build the comparison agent
@@ -107,43 +122,32 @@ async function main(): Promise<void> {
     console.log(`Agent ready: ${agent.name}  (id=${agent.id})`);
 
     // Step 5 — Run the comparison
-    const response = await client.beta.conversations.start({
-      agentId: agent.id,
-      inputs: [
-        {
-          role: "user",
-          content:
-            "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
-            "local analytics workload. Evaluate storage model, ACID guarantees, query " +
-            "capabilities, write throughput, and Python API simplicity. Recommend one.",
-        },
-      ],
-    });
+    const stream = await client.beta.conversations.startStream(
+      {
+        agentId: agent.id,
+        inputs: [
+          {
+            role: "user",
+            content:
+              "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
+              "local analytics workload. Evaluate storage model, ACID guarantees, query " +
+              "capabilities, write throughput, and Python API simplicity. Recommend one.",
+          },
+        ],
+      },
+      { timeoutMs: 300_000 },
+    );
 
     let rawText = "";
-    for (const output of response.outputs ?? []) {
-      if (output.type === "message.output") {
-        const content = output.content;
-        if (typeof content === "string") {
-          rawText += content;
-        } else if (Array.isArray(content)) {
-          rawText += content
-            .map((chunk: any) => chunk.text ?? String(chunk))
-            .join("");
-        }
+    for await (const item of stream) {
+      const data = item.data;
+      const eventType = data.type;
+      if (eventType === "message.output.delta") {
+        const content = (data as any).content;
+        rawText += typeof content === "string" ? content : "";
       } else {
-        const name = (output as any).name ?? (output as any).toolName ?? "";
-        const args = (output as any).arguments;
-        let detail = name ? ` — ${name}` : "";
-        if (args) {
-          try {
-            const parsed = typeof args === "string" ? JSON.parse(args) : args;
-            detail += `\n    ${JSON.stringify(parsed, null, 2)}`;
-          } catch {
-            detail += `\n    ${args}`;
-          }
-        }
-        console.log(`[${output.type}]${detail}`);
+        const name = (data as any).name ?? "";
+        console.log(`[${eventType}]${name ? ` ${name}` : ""}`);
       }
     }
 
