@@ -43,7 +43,7 @@ yarn add @mistralai/mistralai
 
 ### Required environment variables
 
-To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys), choose **Private and shared connectors** for **Connector access scope** and create a new API key.
 
 Create a `.env` at the root of your project and add your Mistral API key:
 
@@ -63,7 +63,9 @@ npx tsx build-a-database-advisor-agent.ts
 
 ## Step 1 — Setup
 
-Create `build-a-database-advisor-agent.ts` and add the client, the DeepWiki server URL, and the list of candidates. The remaining steps fill in the `main` function's `try` and `finally` blocks.
+Create `build-a-database-advisor-agent.ts` and add the client, the DeepWiki server URL, the list of candidates, and the response schema. The remaining steps fill in the `main` function's `try` and `finally` blocks.
+
+The response schema defines the exact JSON structure the agent must return. Defining it as a typed constant means it serves as both the TypeScript type source and the schema passed to the API — no duplication.
 
 ```typescript
 import Mistral from "@mistralai/mistralai";
@@ -77,6 +79,47 @@ const candidates = [
   { name: "showdown_duckdb",  description: "DeepWiki connector — duckdb/duckdb" },
   { name: "showdown_leveldb", description: "DeepWiki connector — google/leveldb" },
 ];
+
+// The JSON schema the agent must conform to. Passed to the API via completionArgs
+// so the structure is enforced at the API level, not just by prompt instructions.
+const RESPONSE_SCHEMA = {
+  type: "object",
+  properties: {
+    queries: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          connector: { type: "string" },
+          question:  { type: "string" },
+          summary:   { type: "string" },
+        },
+        required: ["connector", "question", "summary"],
+      },
+    },
+    comparison: {
+      type: "object",
+      properties: {
+        storage_model:      { type: "string" },
+        acid_guarantees:    { type: "string" },
+        query_capabilities: { type: "string" },
+        write_throughput:   { type: "string" },
+        python_api:         { type: "string" },
+      },
+      required: ["storage_model", "acid_guarantees", "query_capabilities", "write_throughput", "python_api"],
+    },
+    reasoning:      { type: "string" },
+    recommendation: { type: "string", enum: ["showdown_sqlite", "showdown_duckdb", "showdown_leveldb"] },
+  },
+  required: ["queries", "comparison", "reasoning", "recommendation"],
+} as const;
+
+interface ComparisonResult {
+  queries: { connector: string; question: string; summary: string }[];
+  comparison: Record<string, string>;
+  reasoning: string;
+  recommendation: string;
+}
 
 async function main(): Promise<void> {
   let agentId: string | undefined;
@@ -144,7 +187,7 @@ Replace `// Step 3 — List to verify` with:
 
 ## Step 4 — Build the comparison agent
 
-Create a Mistral agent with all three connectors attached. Its instructions require a structured output — the agent must end every response with a `RECOMMENDATION:` line so we can parse the winner programmatically.
+Create a Mistral agent with all three connectors attached. The instructions tell the agent to ask each connector a natural-language question rather than reading raw source files — this keeps responses concise enough to fit in the context window. Passing `RESPONSE_SCHEMA` via `completionArgs.responseFormat` enforces the JSON structure at the API level, so the recommendation field is always a valid connector name and the output is always parseable without regex.
 
 Replace `// Step 4 — Build the comparison agent` with:
 
@@ -153,15 +196,21 @@ Replace `// Step 4 — Build the comparison agent` with:
     const agent = await client.beta.agents.create({
       name: "Database Showdown Judge",
       description: "Compares database candidates using their source code via DeepWiki.",
-      model: "mistral-large-latest",
+      model: "mistral-medium-latest",
       instructions:
         "You are a database selection expert. " +
-        "Use the DeepWiki connectors to read each repository's source code and documentation. " +
-        "Evaluate: storage model, ACID guarantees, query capabilities, write throughput, and Python API simplicity. " +
-        "Be direct and data-driven. " +
-        "Always end your response with a line in exactly this format:\n" +
-        "RECOMMENDATION: <connector_name>\n" +
-        "where <connector_name> is one of: showdown_sqlite, showdown_duckdb, showdown_leveldb.",
+        "When given a comparison task, call each DeepWiki connector once with a focused " +
+        "natural-language question about the repository — do NOT read raw source files.",
+      completionArgs: {
+        responseFormat: {
+          type: "json_schema" as const,
+          jsonSchema: {
+            name: "comparison_result",
+            schemaDefinition: RESPONSE_SCHEMA,
+            strict: true,
+          },
+        },
+      },
       tools: candidates.map((c) => ({
         type: "connector" as const,
         connectorId: connectorIds[c.name],
@@ -177,7 +226,9 @@ View your agents in [Studio](https://console.mistral.ai/build/agents).
 
 ## Step 5 — Run the comparison
 
-Ask the agent to evaluate all three databases for a write-heavy local analytics workload. The agent calls DeepWiki tools on each connector to read actual source code before answering — this may take a minute.
+Ask the agent to evaluate all three databases. Before replying, the agent will call each DeepWiki connector with a natural-language question — this may take a minute.
+
+The response loop does two things: it logs any non-message outputs (connector calls, internal steps) so you can confirm the connectors are being invoked, and it collects the final message text for JSON parsing.
 
 Replace `// Step 5 — Run the comparison` with:
 
@@ -196,29 +247,56 @@ Replace `// Step 5 — Run the comparison` with:
       ],
     });
 
-    let fullText = "";
+    // Collect the agent's full reply and surface tool call activity
+    let rawText = "";
     for (const output of response.outputs ?? []) {
       if (output.type === "message.output") {
         const content = output.content;
         if (typeof content === "string") {
-          fullText += content;
+          rawText += content;
         } else if (Array.isArray(content)) {
-          fullText += content
+          rawText += content
             .map((chunk: any) => chunk.text ?? String(chunk))
             .join("");
         }
+      } else {
+        const name = (output as any).name ?? (output as any).toolName ?? "";
+        const args = (output as any).arguments;
+        let detail = name ? ` — ${name}` : "";
+        if (args) {
+          try {
+            const parsed = typeof args === "string" ? JSON.parse(args) : args;
+            detail += `\n    ${JSON.stringify(parsed, null, 2)}`;
+          } catch {
+            detail += `\n    ${args}`;
+          }
+        }
+        console.log(`[${output.type}]${detail}`);
       }
     }
-    console.log(fullText);
 
-    const match = fullText.match(/RECOMMENDATION:\s*(\S+)/);
-    if (!match) {
-      throw new Error("Agent did not return a RECOMMENDATION line.");
+    // The agent enforces json_schema via completionArgs, so the response is
+    // guaranteed to be valid JSON matching RESPONSE_SCHEMA.
+    const result = JSON.parse(rawText) as ComparisonResult;
+
+    console.log("\n--- Connector queries ---");
+    for (const q of result.queries) {
+      console.log(`\n  [${q.connector}]`);
+      console.log(`  Q: ${q.question}`);
+      console.log(`  A: ${q.summary}`);
     }
-    const winnerName = match[1].trim();
-    const loserNames = candidates
-      .map((c) => c.name)
-      .filter((n) => n !== winnerName);
+
+    console.log("\n--- Comparison ---");
+    for (const [key, val] of Object.entries(result.comparison)) {
+      console.log(`  ${key}: ${val}`);
+    }
+
+    console.log(`\n--- Reasoning ---\n  ${result.reasoning}`);
+    console.log(`\n--- Recommendation ---\n  ${result.recommendation}`);
+
+    // Extract winner and losers directly from the parsed JSON
+    const winnerName = result.recommendation;
+    const loserNames = candidates.map((c) => c.name).filter((n) => n !== winnerName);
 
     console.log(`\nWinner: ${winnerName}`);
     console.log(`Losers: ${loserNames.join(", ")}`);
@@ -246,12 +324,13 @@ Replace `// Step 6 — Promote the winner, retire the rest` with:
     console.log(`Updated:  ${updated.name}  —  ${updated.description}`);
 
     for (const name of loserNames) {
-      const result = await client.beta.connectors.delete({
+      const deleteResult = await client.beta.connectors.delete({
         connectorId: connectorIds[name],
       });
-      console.log(`Deleted:  ${name}  —  ${result.message}`);
+      console.log(`Deleted:  ${name}  —  ${deleteResult.message}`);
     }
 
+    // Confirm the winner is still registered with its updated description
     const winner = await client.beta.connectors.get({
       connectorIdOrName: winnerName,
     });
@@ -297,6 +376,45 @@ const candidates = [
   { name: "showdown_leveldb", description: "DeepWiki connector — google/leveldb" },
 ];
 
+const RESPONSE_SCHEMA = {
+  type: "object",
+  properties: {
+    queries: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          connector: { type: "string" },
+          question:  { type: "string" },
+          summary:   { type: "string" },
+        },
+        required: ["connector", "question", "summary"],
+      },
+    },
+    comparison: {
+      type: "object",
+      properties: {
+        storage_model:      { type: "string" },
+        acid_guarantees:    { type: "string" },
+        query_capabilities: { type: "string" },
+        write_throughput:   { type: "string" },
+        python_api:         { type: "string" },
+      },
+      required: ["storage_model", "acid_guarantees", "query_capabilities", "write_throughput", "python_api"],
+    },
+    reasoning:      { type: "string" },
+    recommendation: { type: "string", enum: ["showdown_sqlite", "showdown_duckdb", "showdown_leveldb"] },
+  },
+  required: ["queries", "comparison", "reasoning", "recommendation"],
+} as const;
+
+interface ComparisonResult {
+  queries: { connector: string; question: string; summary: string }[];
+  comparison: Record<string, string>;
+  reasoning: string;
+  recommendation: string;
+}
+
 async function main(): Promise<void> {
   let agentId: string | undefined;
   const connectorIds: Record<string, string> = {};
@@ -328,15 +446,21 @@ async function main(): Promise<void> {
     const agent = await client.beta.agents.create({
       name: "Database Showdown Judge",
       description: "Compares database candidates using their source code via DeepWiki.",
-      model: "mistral-large-latest",
+      model: "mistral-medium-latest",
       instructions:
         "You are a database selection expert. " +
-        "Use the DeepWiki connectors to read each repository's source code and documentation. " +
-        "Evaluate: storage model, ACID guarantees, query capabilities, write throughput, and Python API simplicity. " +
-        "Be direct and data-driven. " +
-        "Always end your response with a line in exactly this format:\n" +
-        "RECOMMENDATION: <connector_name>\n" +
-        "where <connector_name> is one of: showdown_sqlite, showdown_duckdb, showdown_leveldb.",
+        "When given a comparison task, call each DeepWiki connector once with a focused " +
+        "natural-language question about the repository — do NOT read raw source files.",
+      completionArgs: {
+        responseFormat: {
+          type: "json_schema" as const,
+          jsonSchema: {
+            name: "comparison_result",
+            schemaDefinition: RESPONSE_SCHEMA,
+            strict: true,
+          },
+        },
+      },
       tools: candidates.map((c) => ({
         type: "connector" as const,
         connectorId: connectorIds[c.name],
@@ -359,29 +483,52 @@ async function main(): Promise<void> {
       ],
     });
 
-    let fullText = "";
+    let rawText = "";
     for (const output of response.outputs ?? []) {
       if (output.type === "message.output") {
         const content = output.content;
         if (typeof content === "string") {
-          fullText += content;
+          rawText += content;
         } else if (Array.isArray(content)) {
-          fullText += content
+          rawText += content
             .map((chunk: any) => chunk.text ?? String(chunk))
             .join("");
         }
+      } else {
+        const name = (output as any).name ?? (output as any).toolName ?? "";
+        const args = (output as any).arguments;
+        let detail = name ? ` — ${name}` : "";
+        if (args) {
+          try {
+            const parsed = typeof args === "string" ? JSON.parse(args) : args;
+            detail += `\n    ${JSON.stringify(parsed, null, 2)}`;
+          } catch {
+            detail += `\n    ${args}`;
+          }
+        }
+        console.log(`[${output.type}]${detail}`);
       }
     }
-    console.log(fullText);
 
-    const match = fullText.match(/RECOMMENDATION:\s*(\S+)/);
-    if (!match) {
-      throw new Error("Agent did not return a RECOMMENDATION line.");
+    const result = JSON.parse(rawText) as ComparisonResult;
+
+    console.log("\n--- Connector queries ---");
+    for (const q of result.queries) {
+      console.log(`\n  [${q.connector}]`);
+      console.log(`  Q: ${q.question}`);
+      console.log(`  A: ${q.summary}`);
     }
-    const winnerName = match[1].trim();
-    const loserNames = candidates
-      .map((c) => c.name)
-      .filter((n) => n !== winnerName);
+
+    console.log("\n--- Comparison ---");
+    for (const [key, val] of Object.entries(result.comparison)) {
+      console.log(`  ${key}: ${val}`);
+    }
+
+    console.log(`\n--- Reasoning ---\n  ${result.reasoning}`);
+    console.log(`\n--- Recommendation ---\n  ${result.recommendation}`);
+
+    const winnerName = result.recommendation;
+    const loserNames = candidates.map((c) => c.name).filter((n) => n !== winnerName);
 
     console.log(`\nWinner: ${winnerName}`);
     console.log(`Losers: ${loserNames.join(", ")}`);
@@ -399,10 +546,10 @@ async function main(): Promise<void> {
     console.log(`Updated:  ${updated.name}  —  ${updated.description}`);
 
     for (const name of loserNames) {
-      const result = await client.beta.connectors.delete({
+      const deleteResult = await client.beta.connectors.delete({
         connectorId: connectorIds[name],
       });
-      console.log(`Deleted:  ${name}  —  ${result.message}`);
+      console.log(`Deleted:  ${name}  —  ${deleteResult.message}`);
     }
 
     const winner = await client.beta.connectors.get({
@@ -430,12 +577,12 @@ main().catch(console.error);
 
 ## Summary
 
-This script demonstrated the full Mistral Connector lifecycle — create, list, use, update, and delete — using the DeepWiki Connector to let the model read actual GitHub repository source code and produce a data-driven database recommendation.
+This script demonstrated the full Mistral Connector lifecycle — create, list, use, update, and delete — using the DeepWiki Connector to let the model ask natural-language questions about GitHub repository source code and produce a data-driven database recommendation.
 
 **What you built:**
 - Three named Connectors pointing at the DeepWiki MCP server
-- An agent (Database Showdown Judge) with all three Connectors attached
-- A conversation that produced a structured recommendation, updated the winner's Connector, and cleaned up the rest
+- An agent (Database Showdown Judge) with all three Connectors attached and a `json_schema` response format enforced via `completionArgs`
+- A conversation that logged connector tool calls, parsed a structured JSON recommendation, updated the winner's Connector, and cleaned up the rest
 
 **Mistral features used:**
 - Connectors (beta)
