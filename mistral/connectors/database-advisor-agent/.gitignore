@@ -1,2 +1,4 @@
 node_modules/
 .env
+*.0.0
+tsx
