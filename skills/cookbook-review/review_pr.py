@@ -353,8 +353,9 @@ RULES
 
 QUOTE AND SUGGESTION RULES
 - quote: copy the exact phrase or sentence that is wrong, verbatim from the cell content. This helps the reader find it. Omit quote if the issue is structural (e.g. a missing section) — there is nothing to quote.
-- suggestion: the corrected replacement for the quoted text only — nothing surrounding it.
-- Omit suggestion if the fix requires adding new content, changing more than one sentence, or is structural.
+- suggestion: the corrected replacement for the quoted text only — a single short phrase or value, nothing surrounding it. Omit if the fix requires adding new content, rewriting a code block, changing more than one sentence, or is structural. Do not suggest a full cell rewrite.
+- Do not flag obvious placeholder strings (e.g. "API_KEY", "YOUR_KEY", "your-api-key", "your_api_key") as hard-coded credentials — they are intentional tutorial placeholders, not security risks.
+- Do not suggest replacing a variable assignment with a bare expression. For example, never suggest replacing `api_key = "your_api_key"` with `os.environ["MISTRAL_API_KEY"]` — that destroys the variable binding and breaks all downstream code that uses `api_key`. If an environment variable lookup is genuinely needed, the full assignment must appear in the suggestion: `api_key = os.environ["MISTRAL_API_KEY"]`.
 """
 
 _SYSTEM_PROMPT_MD_DIFF = """\
@@ -442,8 +443,9 @@ RULES
 
 QUOTE AND SUGGESTION RULES
 - quote: copy the exact phrase or sentence that is wrong, verbatim from the cell content. Omit if the issue is structural (e.g. a missing section) — there is nothing to quote.
-- suggestion: the corrected replacement for the quoted text only — nothing surrounding it.
-- Omit suggestion if the fix requires adding new content, changing more than one sentence, or is structural.
+- suggestion: the corrected replacement for the quoted text only — a single short phrase or value, nothing surrounding it. Omit if the fix requires adding new content, rewriting a code block, changing more than one sentence, or is structural. Do not suggest a full cell rewrite.
+- Do not flag obvious placeholder strings (e.g. "API_KEY", "YOUR_KEY", "your-api-key", "your_api_key") as hard-coded credentials — they are intentional tutorial placeholders, not security risks.
+- Do not suggest replacing a variable assignment with a bare expression. For example, never suggest replacing `api_key = "your_api_key"` with `os.environ["MISTRAL_API_KEY"]` — that destroys the variable binding and breaks all downstream code that uses `api_key`. If an environment variable lookup is genuinely needed, the full assignment must appear in the suggestion: `api_key = os.environ["MISTRAL_API_KEY"]`.
 """
 
 
