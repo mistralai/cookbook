@@ -1,6 +1,6 @@
 # Building Gradio app with Mistral OCR to extract text and images from PDFs
 
-This cookbook provides a step-by-step guide to setting up and using Mistral OCR with Gradio.  
+This cookbook provides a step-by-step guide to setting up and using Mistral OCR with Gradio.
 The application allows you to extract text and images from PDFs and images using Mistral's OCR capabilities.
 
 ## Prerequisites
@@ -21,7 +21,7 @@ pip install gradio requests mistralai
 
 ## Step 2: Set Up Environment Variables
 
-You need to set up your Mistral API key as an environment variable.  
+You need to set up your Mistral API key as an environment variable.
 You can do this in your terminal or add it to your script.
 
 You can create an API key on our [Platforme](https://console.mistral.ai/api-keys/).
@@ -41,7 +41,7 @@ import gradio as gr
 import os
 import base64
 import requests
-from mistralai import Mistral
+from mistralai.client import Mistral
 ```
 
 ## Step 4: Initialize Mistral Client
@@ -57,7 +57,7 @@ client = Mistral(api_key=api_key)
 
 ### Encode Image to Base64
 
-This function encodes an image to a base64 string.  
+This function encodes an image to a base64 string.
 It will be required to provide local images to the service.
 
 ```python
@@ -74,7 +74,7 @@ def encode_image(image_path):
 
 ### Replace Images in Markdown
 
-This function replaces image placeholders in markdown with base64-encoded images.  
+This function replaces image placeholders in markdown with base64-encoded images.
 Mistral OCR is capable of outputting interleaved text and images; this function will replace placeholders to render with Gradio.
 
 ```python
@@ -86,7 +86,7 @@ def replace_images_in_markdown(markdown_str: str, images_dict: dict) -> str:
 
 ### Get Combined Markdown
 
-This function combines the markdown from all pages of the OCR response.  
+This function combines the markdown from all pages of the OCR response.
 It will output a ready-to-be-rendered version and a raw markdown output without the images.
 
 ```python
@@ -104,7 +104,7 @@ def get_combined_markdown(ocr_response) -> tuple:
 
 ### Fetch Content Type
 
-This function fetches the content type of a URL.  
+This function fetches the content type of a URL.
 The objective is to detect if we are handling PDF files or image files.
 
 ```python
@@ -164,7 +164,7 @@ def perform_ocr_file(file, ocr_method="Mistral OCR"):
 
 ### Perform OCR on URL
 
-Next, we can define a function to perform OCR on URLs.  
+Next, we can define a function to perform OCR on URLs.
 We need different ones for images and for PDF documents.
 
 ```python

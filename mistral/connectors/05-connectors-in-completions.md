@@ -1,28 +1,8 @@
 # Using Connectors in Chat Completions Cookbook
 
-Use MCP connectors, built-in tools, and agents with the Chat Completions API (`/v1/chat/completions`) and Agent Completions API (`/v1/agents/completions`).
+Use Connectors, built-in tools, and agents with the Chat Completions API (`/v1/chat/completions`) and Agent Completions API (`/v1/agents/completions`).
 
 > **SDK support:** The `mistralai` SDK supports connector-style tools in `chat.complete()`. Note that responses use `messages` (array) instead of `message` (object) when tools are invoked.
-
----
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Conversations vs Completions — When to Use Which](#conversations-vs-completions--when-to-use-which)
-- [Reading Completion Responses](#reading-completion-responses)
-- [Recipes](#recipes)
-  - [1. Hello World — Basic Chat Completion](#1-hello-world--basic-chat-completion)
-  - [2. Completion with Image Generation](#2-completion-with-image-generation)
-  - [3. Completion with a Custom Connector](#3-completion-with-a-custom-connector)
-  - [4. Combining Multiple Tools](#4-combining-multiple-tools)
-  - [5. Creating an Agent with Connectors](#5-creating-an-agent-with-connectors)
-  - [6. Agent Completions](#6-agent-completions)
-  - [7. OAuth-Authenticated Connectors (Gmail)](#7-oauth-authenticated-connectors-gmail)
-  - [8. Full Example — Create, Complete, and Clean Up](#8-full-example--create-complete-and-clean-up)
-- [Python / TypeScript Naming Conventions](#python--typescript-naming-conventions)
-- [Troubleshooting](#troubleshooting)
-- [Error Codes Reference](#error-codes-reference)
 
 ---
 
@@ -44,17 +24,19 @@ npm install @mistralai/mistralai
 
 ### Required environment variables
 
-```bash
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
+Create a `.env` at the root of your project and add your Mistral API key:
+
+```
 MISTRAL_API_KEY=your-mistral-api-key
 ```
-
-Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 ### What you need before starting
 
 Most recipes assume:
 - A valid `MISTRAL_API_KEY`
-- An existing connector for custom-connector recipes — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one
+- An existing connector for custom-connector recipes — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai)
 
 ---
 
@@ -380,14 +362,14 @@ Here's a beautiful sunset over the ocean as requested.
 
 ### 3. Completion with a Custom Connector
 
-**Goal:** Use a custom MCP connector in a chat completion so the model can call external tools.
+**Goal:** Use a Connector in a chat completion so the model can call external tools.
 
 **When to use:**
 - You've registered a connector (e.g., DeepWiki) and want the model to use its tools
 - Connecting domain-specific capabilities to the model in a chat completion context
 
 **Prereqs:**
-- An existing connector — see the [Connectors Management Cookbook](./01-connectors-management.md) to create one
+- An existing connector — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai)
 
 **Python:**
 
@@ -444,7 +426,7 @@ async function main(): Promise<void> {
     tools: [
       {
         type: "connector",
-        connector_id: "my_deepwiki", // name or UUID
+        connectorId: "my_deepwiki", // name or UUID
       },
     ],
   });
@@ -559,7 +541,7 @@ async function main(): Promise<void> {
       { type: "image_generation" },
       {
         type: "connector",
-        connector_id: "my_deepwiki",
+        connectorId: "my_deepwiki",
       },
     ],
   });
@@ -1104,7 +1086,7 @@ async function main(): Promise<void> {
         },
       ],
       tools: [
-        { type: "connector", connector_id: "completions_deepwiki" },
+        { type: "connector", connectorId: "completions_deepwiki" },
       ],
     });
     console.log("\nChat completion response:");
@@ -1247,3 +1229,32 @@ Deleted connector: c3d4e5f6-...
 | `500` | Internal Server Error | Server-side issue, retry with backoff |
 | `502` | Bad Gateway | MCP server unreachable or returned an error |
 | `504` | Gateway Timeout | MCP server took too long to respond |
+
+---
+
+## Summary
+
+This cookbook covered eight recipes for using Connectors, built-in tools, and agents with the Chat Completions and Agent Completions APIs — from a basic completion to OAuth-authenticated Connectors and a full create-complete-cleanup lifecycle example.
+
+**What this cookbook covers:**
+- Basic chat completion
+- Completion with image generation
+- Completion with a custom Connector
+- Combining multiple tools in one completion
+- Creating an agent with Connectors for use with completions
+- Agent completions
+- OAuth-authenticated Connectors (Gmail)
+- Full lifecycle: create a Connector, complete, and clean up
+
+**Mistral features used:**
+- Chat Completions API
+- Agent Completions API
+- Agents API (beta)
+- Connectors (beta)
+- Image generation built-in tool
+
+**Other services:**
+- [DeepWiki](https://deepwiki.com) — MCP server for GitHub repository exploration
+- Gmail — OAuth2-authenticated Connector
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).
