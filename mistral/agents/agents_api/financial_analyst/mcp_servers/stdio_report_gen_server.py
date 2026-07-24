@@ -2,7 +2,7 @@ from mcp.server.fastmcp import FastMCP
 import logging
 import os
 from typing import List
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 # Configure logging to only show errors
 logging.basicConfig(level=logging.ERROR)
@@ -20,10 +20,10 @@ system_prompt = "You are a professional financial analyst. Generate a very short
 def generate_report_content(prompt: str) -> str:
     """
     Generate financial report content using MistralAI LLM based on provided data
-    
+
     Args:
         prompt (str): The prompt containing financial data and analysis requirements
-    
+
     Returns:
         str: Generated report content or error message
     """

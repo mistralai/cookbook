@@ -21,6 +21,21 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 - Clear: Is your content well-structured and clearly written?
 - Value: Is your content valuable to the community? Does the community need it?
 
+## Local preview
+
+This repository includes a lightweight [Quarto](https://quarto.org/) preview site for reviewing Markdown and notebook cookbooks locally.
+
+Install Quarto, generate the local preview files, then run the preview:
+
+```bash
+python3 scripts/generate_quarto_index.py
+quarto preview --profile preview
+```
+
+Run the generator again after editing the cookbook tables in this README or Markdown cookbook files.
+
+The preview renders committed notebook content without executing notebook code. Generated preview output is written to `site/`, and generated Markdown preview files are written as ignored sibling `.qmd` files next to their source Markdown files.
+
 ## Main Notebooks
 
 | Notebook                                                                       | Category                     | Description                                                                      |
@@ -38,7 +53,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)             | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
 | [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide        |
 | [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb) | data generation | Simple data generation to refine news articles                                |
-| [image_description_extraction_pixtral.ipynb](mistral/image_understanding/image_description_extraction_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
+| [image_description_prompting_pixtral.ipynb](mistral/image_understanding/image_description_prompting_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
 | [multimodality meets function calling.ipynb](mistral/image_understanding/multimodality_meets_function_calling.ipynb) | image processing, function calling  | Extract table from image using Mistral's Pixtral model and use for function calling |
 | [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb) | RAG, function calling, references | Reference RAG with Mistral API |
 | [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb) | moderation | Quick exploration on safeguarding and Mistral's moderation API |
@@ -71,7 +86,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                                    | multi-agent, tool, data gen     | CAMEL-AI.org|
 | [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                           | UI chat, tool calling           | Chainlit   |
 | [chroma_mistral_embed_fn.ipynb](third_party/ChromaDB/chroma_mistral_embed_fn.ipynb)                              | embeddings, vector DB | Chroma
-| [corrective_rag_mistral.ipynb](third_party/langchain/corrective_rag_mistral.ipynb)                                    | RAG                             | Langchain  |
+| [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)                  | synthetic data                  | Argilla    |
 | [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)                                          | tool, agent                     | E2B        |
 | [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                       | tool call                       | Ollama     |
@@ -80,7 +95,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)                            | entity extraction, PDF          | Indexify   |
 | [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                                    | summarization, PDF              | Indexify   |
 | [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)                | code                            | Langchain  |
-| [langgraph_crag_mistral.ipynb](third_party/langchain/langgraph_crag_mistral.ipynb)                                    | RAG                             | Langchain  |
+| [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)                | code                            | Langchain  |
 | [langtrace_mistral.ipynb](third_party/langtrace/langtrace_mistral.ipynb)                                              | OTEL Observability              | Langtrace  |
 | [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)                                   | RAG, agent                      | LLamaIndex |
 | [llamaindex_arxiv_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_arxiv_agentic_rag.ipynb)                       | RAG, agent, Arxiv summarization | LLamaIndex |
@@ -99,7 +114,7 @@ Disclaimer: Examples contributed by the community and partners do not represent 
 | [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                         | RAG                             | Pinecone   |
 | [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                         | RAG                             | LLamaIndex |
 | [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                             | agent                           | LLamaIndex |
-| [self_rag_mistral.ipynb](third_party/langchain/self_rag_mistral.ipynb)                                                | RAG                             | Langchain  |
+| [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [Solara Integration - Chat with PDFs](third_party/solara/README.md)                                                   | UI chat, demo, RAG              | Solara     |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                              | UI chat, demo, RAG              | Streamlit  |
 | [Neo4j rag](third_party/Neo4j/neo4j_rag.ipynb)                                                                        | RAG                             | Neo4j      |

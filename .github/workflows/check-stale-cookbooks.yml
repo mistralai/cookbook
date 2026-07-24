@@ -1,0 +1,194 @@
+name: Check Stale Cookbooks
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # Weekly — Monday 09:00 UTC
+  workflow_dispatch:        # Manual trigger from the Actions tab
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-stale:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r skills/check-stale-cookbooks/requirements.txt
+
+      - name: Run stale cookbook check
+        # Exit code 1 means issues were found — that's expected; don't fail the job here.
+        # Exit code 2 means a bad argument (e.g. missing directory) — treat that as an error.
+        run: |
+          python skills/check-stale-cookbooks/check_stale.py \
+            --dir mistral \
+            --use-llm \
+            --output stale_report.json \
+            --format json
+        env:
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        continue-on-error: true
+
+      - name: Manage GitHub issues
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // ── Load report ────────────────────────────────────────────────────
+            let report;
+            try {
+              report = JSON.parse(fs.readFileSync('stale_report.json', 'utf8'));
+            } catch (err) {
+              core.warning(`Could not read stale_report.json: ${err.message}`);
+              return;
+            }
+
+            const LABEL_NAME = 'stale-cookbook';
+            const LABEL_COLOR = 'e4e669';
+            const LABEL_DESC  = 'Cookbook contains outdated content that needs updating';
+            const TITLE_PREFIX = '[Stale Cookbook]';
+
+            const { owner, repo } = context.repo;
+
+            // ── Ensure label exists ────────────────────────────────────────────
+            try {
+              await github.rest.issues.createLabel({
+                owner, repo,
+                name: LABEL_NAME,
+                color: LABEL_COLOR,
+                description: LABEL_DESC,
+              });
+              core.info(`Created label '${LABEL_NAME}'.`);
+            } catch (err) {
+              // 422 = label already exists — that's fine
+              if (err.status !== 422) {
+                core.warning(`Could not create label: ${err.message}`);
+              }
+            }
+
+            // ── Fetch all open stale-cookbook issues ───────────────────────────
+            const existingIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              { owner, repo, labels: LABEL_NAME, state: 'open', per_page: 100 }
+            );
+
+            // Map: filePath → issue object
+            const issueByFile = {};
+            for (const issue of existingIssues) {
+              const match = issue.title.match(new RegExp(`^\\${TITLE_PREFIX}\\s+(.+)$`));
+              if (match) {
+                issueByFile[match[1].trim()] = issue;
+              }
+            }
+
+            // Set of file paths that currently have issues
+            const staleFilePaths = new Set(report.files.map(f => f.path));
+
+            // ── Create issues for newly stale files ────────────────────────────
+            for (const fileInfo of report.files) {
+              const filePath = fileInfo.path;
+
+              if (issueByFile[filePath]) {
+                core.info(`Issue already open for ${filePath} — skipping.`);
+                continue;
+              }
+
+              const title = `${TITLE_PREFIX} ${filePath}`;
+              const body  = buildIssueBody(fileInfo, report.scanned_at);
+
+              await github.rest.issues.create({
+                owner, repo,
+                title,
+                body,
+                labels: [LABEL_NAME],
+              });
+              core.info(`Created issue: ${title}`);
+            }
+
+            // ── Close issues for files that are now clean ──────────────────────
+            for (const [filePath, issue] of Object.entries(issueByFile)) {
+              if (staleFilePaths.has(filePath)) continue;
+
+              await github.rest.issues.createComment({
+                owner, repo,
+                issue_number: issue.number,
+                body: [
+                  `✅ This cookbook looks up to date as of **${report.scanned_at}**.`,
+                  '',
+                  'Closing automatically. Reopen if you believe the check missed something.',
+                ].join('\n'),
+              });
+
+              await github.rest.issues.update({
+                owner, repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+
+              core.info(`Closed issue #${issue.number} for ${filePath} (now clean).`);
+            }
+
+            // ── Summary ────────────────────────────────────────────────────────
+            core.info('');
+            core.info(`Stale files found:      ${report.files.length}`);
+            core.info(`Deprecated models found: ${report.deprecated_models_count}`);
+            core.info(`References checked:     ${report.references_checked.join(', ') || 'none'}`);
+
+            // ── Helper: build issue body ───────────────────────────────────────
+            function buildIssueBody(fileInfo, scannedAt) {
+              const lines = [
+                `## Stale content in \`${fileInfo.path}\``,
+                '',
+                `**Detected:** ${scannedAt}`,
+                '',
+                '### Issues',
+                '',
+              ];
+
+              for (const issue of fileInfo.issues) {
+                const typeLabel = issue.type.replace(/_/g, ' ');
+                lines.push(`- **${typeLabel}**: ${issue.detail}`);
+                if (issue.location) {
+                  lines.push(`  - Location: \`${issue.location}\``);
+                }
+                if (issue.matched_line) {
+                  lines.push(`  - Found: \`${issue.matched_line}\``);
+                }
+                if (issue.quote) {
+                  lines.push(`  - Evidence: _"${issue.quote}"_`);
+                }
+                if (issue.reference_url) {
+                  lines.push(`  - Reference: [${issue.reference_url}](${issue.reference_url})`);
+                }
+                lines.push('');
+              }
+
+              lines.push('---');
+              lines.push('');
+              lines.push('### Reference links');
+              lines.push('');
+              lines.push('- [Python SDK README](https://github.com/mistralai/client-python/blob/main/README.md)');
+              lines.push('- [TypeScript SDK README](https://github.com/mistralai/client-ts/blob/main/README.md)');
+              lines.push('- [Mistral model list](https://docs.mistral.ai/getting-started/models/models_overview/)');
+              lines.push('- [Fine-tuning docs](https://docs.mistral.ai/capabilities/fine-tuning/)');
+              lines.push('- [platform-docs-public](https://github.com/mistralai/platform-docs-public)');
+              lines.push('');
+              lines.push('---');
+              lines.push('');
+              lines.push('> This issue was opened automatically by the **check-stale-cookbooks** workflow.');
+              lines.push('> To suppress a specific false-positive line, add `# stale-check: ignore` as a comment in the source.');
+              lines.push('> The issue will close automatically once the next scan finds the file clean.');
+
+              return lines.join('\n');
+            }

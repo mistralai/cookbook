@@ -26,8 +26,8 @@ Phoenix runs practically anywhere, including your Jupyter notebook, local machin
 The latest Phoenix + Mistral AI docs can be found [here](https://docs.arize.com/phoenix/tracing/integrations-tracing/mistralai).
 
 ## Examples
-- [Tracing a Mistral AI application](./examples/arize_phoenix_tracing.ipynb)
-- [Evaluating a Mistral RAG pipeline](./examples/arize_phoenix_evaluate_rag.ipynb)
+- [Tracing a Mistral AI application](./arize_phoenix_tracing.ipynb)
+- [Evaluating a Mistral RAG pipeline](./arize_phoenix_evaluate_rag.ipynb)
 
 ## See it in action
 

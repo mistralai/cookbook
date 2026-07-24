@@ -6,17 +6,6 @@ Add approval flows to tool calls so users can review and confirm or reject actio
 
 ---
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Concepts](#concepts)
-- [Recipes](#recipes)
-  - [1. Local Functions with Confirmation](#1-local-functions-with-confirmation)
-  - [2. Connector (Gmail) with Confirmation](#2-connector-gmail-with-confirmation)
-  - [3. Stateless / API-Friendly — Serialize and Resume](#3-stateless--api-friendly--serialize-and-resume)
-
----
-
 ## Prerequisites
 
 ### Install
@@ -30,17 +19,19 @@ uv add mistralai
 
 ### Required environment variables
 
-```bash
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
+Create a `.env` at the root of your project and add your Mistral API key:
+
+```
 MISTRAL_API_KEY=your-mistral-api-key
 ```
-
-Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 ---
 
 ## Concepts
 
-There are two kinds of deferral flows with the `RunContext.run_async` loop:
+Two deferral flows are available with the `RunContext.run_async` loop:
 - Client-side: [local MCP clients & functions](https://docs.mistral.ai/agents/tools/mcp) registered through `register_mcp_client` or `register_func`
 - Server-side: remote Mistral connectors (gmail, ...)
 
@@ -354,3 +345,23 @@ asyncio.run(main())
 - `deferred.to_dict()` serializes the full deferral state (conversation ID, pending tool calls, already-executed results) to a plain dict you can store or send over the wire.
 - In a separate process, `DeferredToolCallsException.from_dict(state)` reconstructs that state. From there, confirm or reject calls and resume the conversation as usual.
 - The resuming process must re-register the same local functions with `register_func` so they can be executed after approval.
+
+---
+
+## Summary
+
+This cookbook covered how to add human-in-the-loop approval flows to tool calls in Mistral conversations — intercepting pending tool calls before they execute, prompting for confirmation, and resuming or rejecting them. It also showed how to serialize a deferred conversation and resume it in a separate process.
+
+**What this cookbook covers:**
+- Tool confirmation with local functions
+- Tool confirmation with Connectors (Gmail)
+- Stateless approval flows: serialize a deferral, transmit it, and resume in a separate process
+
+**Mistral features used:**
+- Conversations API (beta)
+- Connectors (beta)
+
+**Other services:**
+- Gmail — OAuth2-authenticated Connector
+
+[View the documentation]() <!-- TODO: add link to relevant documentation -->

@@ -1,6 +1,6 @@
 import io
 import solara as sl
-from mistralai import Mistral
+from mistralai.client import Mistral
 import numpy as np
 import PyPDF2
 import faiss
@@ -44,7 +44,7 @@ messages: sl.Reactive[List[MessageDict]] = sl.reactive([])
 
 def response_generator(messages: list, txt: List[str]):
     response = client.chat.stream(
-        model = "open-mistral-7b", 
+        model = "open-mistral-7b",
         messages = messages[:-1] + [{"role":"user","content": rag_pdf(txt, messages[-1]["content"]) + "\n\n" + messages[-1]["content"]}],
         max_tokens = 1024
     )

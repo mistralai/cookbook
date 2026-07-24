@@ -1,27 +1,8 @@
 # Using Connectors in Conversations Cookbook
 
-Use MCP connectors, built-in tools, and agents in Mistral AI conversations.
+Use Connectors, built-in tools, and agents in Mistral AI conversations.
 
 > **API status:** Conversations use `client.beta.conversations`. Agents use `client.beta.agents`. These are **beta** endpoints and may change.
-
----
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Reading Conversation Responses](#reading-conversation-responses)
-- [Recipes](#recipes)
-  - [1. Hello World — First Conversation](#1-hello-world--first-conversation)
-  - [2. Conversation with Web Search](#2-conversation-with-web-search)
-  - [3. Conversation with a Custom Connector](#3-conversation-with-a-custom-connector)
-  - [4. Combining Multiple Tools in One Conversation](#4-combining-multiple-tools-in-one-conversation)
-  - [5. Filtering Connector Tools — Include / Exclude](#5-filtering-connector-tools--include--exclude)
-  - [6. Creating an Agent with Connectors](#6-creating-an-agent-with-connectors)
-  - [7. OAuth-Authenticated Connectors (Gmail)](#7-oauth-authenticated-connectors-gmail)
-  - [8. Full Example — Create a Connector, Chat, and Clean Up](#8-full-example--create-a-connector-chat-and-clean-up)
-- [Python / TypeScript Naming Conventions](#python--typescript-naming-conventions)
-- [Troubleshooting](#troubleshooting)
-- [Error Codes Reference](#error-codes-reference)
 
 ---
 
@@ -43,17 +24,20 @@ pnpm add @mistralai/mistralai
 
 ### Required environment variables
 
-```bash
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+
+Create a `.env` at the root of your project and add your Mistral API key:
+
+```
 MISTRAL_API_KEY=your-mistral-api-key
 ```
-
-Get your API key from the [Mistral AI dashboard](https://console.mistral.ai/).
 
 ### What you need before starting
 
 Most recipes assume you already have:
 - A working `client` (see [Recipe 1](#1-hello-world--first-conversation))
-- An existing connector for the custom-connector recipes — see the [Connectors Management Cookbook](./connectors-management.md) to create one
+- An existing connector for the custom-connector recipes — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai)
+
 
 ---
 
@@ -106,7 +90,7 @@ All recipes below reference this helper. Copy it into your project, or inline th
 
 ---
 
-### 1. Hello World — First Conversation
+### 1. Hello world — first conversation
 
 **Goal:** Send your first message and read the response — no tools, no connectors.
 
@@ -188,7 +172,7 @@ The capital of France is Paris.
 
 ---
 
-### 2. Conversation with Web Search
+### 2. Conversation with web search
 
 **Goal:** Give the model access to real-time web information — no custom connector needed.
 
@@ -282,16 +266,17 @@ Based on current web search results, the weather in Paris today is 8°C with par
 
 ---
 
-### 3. Conversation with a Custom Connector
+### 3. Conversation with a custom connector
 
-**Goal:** Use a custom MCP connector in a conversation so the model can call external tools.
+**Goal:** Use a Connector in a conversation so the model can call external tools.
 
 **When to use:**
 - You've registered a connector (e.g., DeepWiki) and want the model to use its tools.
 - Connecting domain-specific capabilities to the model (code search, documentation lookup, actions, etc.).
 
 **Prereqs:**
-- An existing connector — see the [Connectors Management Cookbook](./connectors-management.md) to create one.
+- An existing connector — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai).
+
 
 **Python:**
 
@@ -391,7 +376,7 @@ The sqlite/sqlite repository is organized into several key directories:
 
 ---
 
-### 4. Combining Multiple Tools in One Conversation
+### 4. Combining multiple tools in one conversation
 
 **Goal:** Give the model access to web search **and** custom connectors simultaneously.
 
@@ -503,7 +488,7 @@ I have access to the following tools:
 
 ---
 
-### 5. Filtering Connector Tools — Include / Exclude
+### 5. Filtering connector tools — include / exclude
 
 **Goal:** Control which MCP tools from a connector are visible to the model.
 
@@ -713,7 +698,7 @@ I have access to: ask_question
 
 ---
 
-### 6. Creating an Agent with Connectors
+### 6. Creating an agent with connectors
 
 **Goal:** Create a persistent agent pre-configured with connectors and custom instructions, then chat with it.
 
@@ -877,7 +862,7 @@ Deleted agent: b2c3d4e5-6789-01ab-cdef-234567890abc
 
 ---
 
-### 7. OAuth-Authenticated Connectors (Gmail)
+### 7. OAuth-authenticated connectors (Gmail)
 
 **Goal:** Use a connector that requires OAuth2 authentication, such as Gmail.
 
@@ -1001,7 +986,7 @@ Your latest email is from John Doe with the subject "Q1 Report Review" received 
 
 ---
 
-### 8. Full Example — Create a Connector, Chat, and Clean Up
+### 8. Full example — create a connector, chat, and clean up
 
 **Goal:** End-to-end workflow: create a connector, use it in a conversation, then clean up.
 
@@ -1161,5 +1146,33 @@ Cleaned up connector: Connector deleted successfully
 
 **How it works:**
 - The `try/finally` pattern ensures the connector is always deleted, even if the conversation fails.
-- This recipe combines connector CRUD (from the [Connectors Management Cookbook](./connectors-management.md)) with conversation usage.
+- This recipe combines connector CRUD (demonstrated in full in [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb)) with conversation usage.
 - The second conversation demonstrates the model intelligently routing between web search and the custom connector within a single request.
+
+---
+
+## Summary
+
+This cookbook covered eight recipes for using Connectors, built-in tools, and agents in Mistral AI conversations — from a basic hello world to OAuth-authenticated Connectors and a full create-chat-cleanup lifecycle example.
+
+**What this cookbook covers:**
+- Starting a conversation with the Conversations API
+- Adding web search to a conversation
+- Using a custom Connector in a conversation
+- Combining multiple tools in one conversation
+- Filtering which tools a Connector exposes
+- Creating an agent with Connectors
+- OAuth-authenticated Connectors (Gmail)
+- Full lifecycle: create a Connector, use it in a conversation, and clean up
+
+**Mistral features used:**
+- Conversations API (beta)
+- Agents API (beta)
+- Connectors (beta)
+- Web search built-in tool
+
+**Other services:**
+- [DeepWiki](https://deepwiki.com) — MCP server for GitHub repository exploration
+- Gmail — OAuth2-authenticated Connector
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).

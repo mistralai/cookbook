@@ -1,0 +1,640 @@
+---
+title: "Cookbooks"
+---
+
+This page is generated from the cookbook tables in `README.md`.
+
+```{=html}
+<style>
+.missing-cookbook { color: #a94442; font-weight: 600; }
+.cookbook-path { font-size: 0.9em; color: #666; }
+</style>
+```
+
+## Main notebooks
+
+### [quickstart.ipynb](quickstart.ipynb)
+
+**Category:** chat, embeddings
+
+Basic quickstart with chat and embeddings with Mistral AI API
+
+<div class="cookbook-path">quickstart.ipynb</div>
+
+### [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb)
+
+**Category:** prompting
+
+Write prompts for classification, summarization, personalization, and evaluation
+
+<div class="cookbook-path">mistral/prompting/prompting_capabilities.ipynb</div>
+
+### [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)
+
+**Category:** RAG
+
+RAG from scratch with Mistral AI API
+
+<div class="cookbook-path">mistral/rag/basic_RAG.ipynb</div>
+
+### [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)
+
+**Category:** embeddings
+
+Use Mistral embeddings API for classification and clustering
+
+<div class="cookbook-path">mistral/embeddings/embeddings.ipynb</div>
+
+### [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)
+
+**Category:** function calling
+
+Use Mistral API for function calling
+
+<div class="cookbook-path">mistral/function_calling/function_calling.ipynb</div>
+
+### [text_to_SQL.ipynb](mistral/function_calling/text_to_SQL.ipynb)
+
+**Category:** function calling
+
+Use Mistral API for function calling on a multi tables text to SQL usecase
+
+<div class="cookbook-path">mistral/function_calling/text_to_SQL.ipynb</div>
+
+### [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)
+
+**Category:** evaluation
+
+Evaluate models with Mistral API
+
+<div class="cookbook-path">mistral/evaluation/evaluation.ipynb</div>
+
+### [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)
+
+**Category:** fine-tuning
+
+Finetune a model with Mistral fine-tuning API
+
+<div class="cookbook-path">mistral/fine_tune/mistral_finetune_api.ipynb</div>
+
+### [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)
+
+**Category:** RAG, function calling
+
+Search engine built with Mistral API, function calling and RAG
+
+<div class="cookbook-path">mistral/rag/mistral-search-engine.ipynb</div>
+
+### [rag_via_function_calling.ipynb](mistral/rag/RAG_via_function_calling.ipynb)
+
+**Category:** RAG, function calling
+
+Use function calling as a router for a RAG based on multiple data sources
+
+<div class="cookbook-path">mistral/rag/RAG_via_function_calling.ipynb</div>
+
+### [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)
+
+**Category:** prefix, prompting
+
+Cool examples with Mistral's prefix feature
+
+<div class="cookbook-path">mistral/prompting/prefix_use_cases.ipynb</div>
+
+### [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb)
+
+**Category:** data generation, fine-tuning
+
+Simple data generation and fine-tuning guide
+
+<div class="cookbook-path">mistral/data_generation/synthetic_data_gen_and_finetune.ipynb</div>
+
+### [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb)
+
+**Category:** data generation
+
+Simple data generation to refine news articles
+
+<div class="cookbook-path">mistral/data_generation/data_generation_refining_news.ipynb</div>
+
+### [image_description_prompting_pixtral.ipynb](mistral/image_understanding/image_description_prompting_pixtral.ipynb)
+
+**Category:** image processing, prompting
+
+Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting
+
+<div class="cookbook-path">mistral/image_understanding/image_description_prompting_pixtral.ipynb</div>
+
+### [multimodality meets function calling.ipynb](mistral/image_understanding/multimodality_meets_function_calling.ipynb)
+
+**Category:** image processing, function calling
+
+Extract table from image using Mistral's Pixtral model and use for function calling
+
+<div class="cookbook-path">mistral/image_understanding/multimodality_meets_function_calling.ipynb</div>
+
+### [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb)
+
+**Category:** RAG, function calling, references
+
+Reference RAG with Mistral API
+
+<div class="cookbook-path">mistral/rag/mistral-reference-rag.ipynb</div>
+
+### [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb)
+
+**Category:** moderation
+
+Quick exploration on safeguarding and Mistral's moderation API
+
+<div class="cookbook-path">mistral/moderation/moderation-explored.ipynb</div>
+
+### [system-level-guardrails.ipynb](mistral/moderation/system-level-guardrails.ipynb)
+
+**Category:** moderation
+
+How to implement System Level Guardrails with Mistral API
+
+<div class="cookbook-path">mistral/moderation/system-level-guardrails.ipynb</div>
+
+### [document_understanding.ipynb](mistral/ocr/document_understanding.ipynb)
+
+**Category:** OCR, function calling
+
+Document Understanding and Tool Usage with OCR
+
+<div class="cookbook-path">mistral/ocr/document_understanding.ipynb</div>
+
+### [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb)
+
+**Category:** OCR, batch
+
+Using OCR to extract text data from datasets.
+
+<div class="cookbook-path">mistral/ocr/batch_ocr.ipynb</div>
+
+### [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb)
+
+**Category:** OCR, structured outputs
+
+Extracting structured outputs from documents.
+
+<div class="cookbook-path">mistral/ocr/structured_ocr.ipynb</div>
+
+### [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb)
+
+**Category:** evaluation, structured outputs, LLM As a Judge
+
+Evaluate RAG with LLM as a Judge and structured outputs
+
+<div class="cookbook-path">mistral/evaluation/RAG_evaluation.ipynb</div>
+
+### [product_classification.ipynb](mistral/classifier_factory/product_classification.ipynb)
+
+**Category:** fine-tuning, classifier
+
+Fine-tuning a classifier for food classification.
+
+<div class="cookbook-path">mistral/classifier_factory/product_classification.ipynb</div>
+
+### [intent_classification.ipynb](mistral/classifier_factory/intent_classification.ipynb)
+
+**Category:** fine-tuning, classifier
+
+Fine-tuning a classifier for intent classification.
+
+<div class="cookbook-path">mistral/classifier_factory/intent_classification.ipynb</div>
+
+### [moderation_classifier.ipynb](mistral/classifier_factory/moderation_classifier.ipynb)
+
+**Category:** fine-tuning, classifier
+
+Fine-tuning a classifier for moderation.
+
+<div class="cookbook-path">mistral/classifier_factory/moderation_classifier.ipynb</div>
+
+### [pixtral_finetune_on_satellite_data.ipynb](mistral/fine_tune/pixtral_finetune_on_satellite_data.ipynb)
+
+**Category:** fine-tuning, image processing, batch
+
+Fine-tuning a Pixtral-12B for satellite images classification.
+
+<div class="cookbook-path">mistral/fine_tune/pixtral_finetune_on_satellite_data.ipynb</div>
+
+### sts_demo.py <span class="missing-cookbook">not rendered by preview</span>
+
+**Category:** chat, tts
+
+STT -> LLM -> TTS Demo.
+
+<div class="cookbook-path">mistral/tts/sts_demo.py</div>
+
+### [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb)
+
+**Category:** observability, evaluation
+
+Run campaigns with LLM judges to classify agent behaviors at scale
+
+<div class="cookbook-path">mistral/observability/llm_judge_campaign_workflow.ipynb</div>
+
+### [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb)
+
+**Category:** observability, datasets
+
+Create and manage datasets for evaluation or fine-tuning
+
+<div class="cookbook-path">mistral/observability/manage_datasets.ipynb</div>
+
+## Third-party tools
+
+### [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)
+
+**Category:** RAG
+
+Langchain
+
+<div class="cookbook-path">third_party/langchain/adaptive_rag_mistral.ipynb</div>
+
+### [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)
+
+**Category:** RAG
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/Adaptive_RAG.ipynb</div>
+
+### [arize_phoenix_tracing.ipynb](third_party/Phoenix/arize_phoenix_tracing.ipynb)
+
+**Category:** tracing data
+
+Arize Phoenix
+
+<div class="cookbook-path">third_party/Phoenix/arize_phoenix_tracing.ipynb</div>
+
+### [arize_phoenix_evaluate_rag.ipynb](third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb)
+
+**Category:** evaluation
+
+Arize Phoenix
+
+<div class="cookbook-path">third_party/Phoenix/arize_phoenix_evaluate_rag.ipynb</div>
+
+### [azure_ai_search_rag.ipynb](third_party/Azure_AI_Search/azure_ai_search_rag.ipynb)
+
+**Category:** RAG, embeddings
+
+Azure
+
+<div class="cookbook-path">third_party/Azure_AI_Search/azure_ai_search_rag.ipynb</div>
+
+### [CAMEL Graph RAG with Mistral Models](third_party/CAMEL_AI/camel_graph_rag.ipynb)
+
+**Category:** multi-agent, tool, data gen
+
+CAMEL-AI.org
+
+<div class="cookbook-path">third_party/CAMEL_AI/camel_graph_rag.ipynb</div>
+
+### [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)
+
+**Category:** multi-agent, tool, data gen
+
+CAMEL-AI.org
+
+<div class="cookbook-path">third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb</div>
+
+### [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)
+
+**Category:** UI chat, tool calling
+
+Chainlit
+
+<div class="cookbook-path">third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb</div>
+
+### [chroma_mistral_embed_fn.ipynb](third_party/ChromaDB/chroma_mistral_embed_fn.ipynb)
+
+**Category:** embeddings, vector DB
+
+Chroma
+
+<div class="cookbook-path">third_party/ChromaDB/chroma_mistral_embed_fn.ipynb</div>
+
+### [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)
+
+**Category:** RAG
+
+Langchain
+
+<div class="cookbook-path">third_party/langchain/adaptive_rag_mistral.ipynb</div>
+
+### [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)
+
+**Category:** synthetic data
+
+Argilla
+
+<div class="cookbook-path">third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb</div>
+
+### E2B Code Interpreter SDK with Codestral <span class="missing-cookbook">not rendered by preview</span>
+
+**Category:** tool, agent
+
+E2B
+
+<div class="cookbook-path">third_party/E2B_Code_Interpreting</div>
+
+### [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)
+
+**Category:** tool call
+
+Ollama
+
+<div class="cookbook-path">third_party/Ollama/function_calling_local.ipynb</div>
+
+### [Gradio Integration - Chat with PDF](third_party/gradio/README.qmd)
+
+**Category:** UI chat, demo, RAG
+
+Gradio
+
+<div class="cookbook-path">third_party/gradio/README.md</div>
+
+### [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)
+
+**Category:** RAG, embeddings
+
+Haystack
+
+<div class="cookbook-path">third_party/Haystack/haystack_chat_with_docs.ipynb</div>
+
+### [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction/README.qmd)
+
+**Category:** entity extraction, PDF
+
+Indexify
+
+<div class="cookbook-path">third_party/Indexify/pdf-entity-extraction</div>
+
+### [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization/README.qmd)
+
+**Category:** summarization, PDF
+
+Indexify
+
+<div class="cookbook-path">third_party/Indexify/pdf-summarization</div>
+
+### [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)
+
+**Category:** code
+
+Langchain
+
+<div class="cookbook-path">third_party/langchain/langgraph_code_assistant_mistral.ipynb</div>
+
+### [langgraph_code_assistant_mistral.ipynb](third_party/langchain/langgraph_code_assistant_mistral.ipynb)
+
+**Category:** code
+
+Langchain
+
+<div class="cookbook-path">third_party/langchain/langgraph_code_assistant_mistral.ipynb</div>
+
+### [langtrace_mistral.ipynb](third_party/langtrace/langtrace_mistral.ipynb)
+
+**Category:** OTEL Observability
+
+Langtrace
+
+<div class="cookbook-path">third_party/langtrace/langtrace_mistral.ipynb</div>
+
+### [llamaindex_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_agentic_rag.ipynb)
+
+**Category:** RAG, agent
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/llamaindex_agentic_rag.ipynb</div>
+
+### [llamaindex_arxiv_agentic_rag.ipynb](third_party/LlamaIndex/llamaindex_arxiv_agentic_rag.ipynb)
+
+**Category:** RAG, agent, Arxiv summarization
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/llamaindex_arxiv_agentic_rag.ipynb</div>
+
+### [llamaindex_mistralai_finetuning.ipynb](third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb)
+
+**Category:** fine-tuning
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/llamaindex_mistralai_finetuning.ipynb</div>
+
+### [llamaindex_mistral_multi_modal.ipynb](third_party/LlamaIndex/llamaindex_mistral_multi_modal.ipynb)
+
+**Category:** MultiModalLLM-Pixtral
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/llamaindex_mistral_multi_modal.ipynb</div>
+
+### [Maxim AI - Observability](third_party/Maxim/cookbook_maxim_mistral_integration.ipynb)
+
+**Category:** Observability, Evaluation
+
+Maxim AI
+
+<div class="cookbook-path">third_party/Maxim/cookbook_maxim_mistral_integration.ipynb</div>
+
+### [Microsoft Autogen - Function calling a pgsql db](third_party/MS_Autogen_pgsql/mistral_pgsql_function_calling.ipynb)
+
+**Category:** Tool call, agent, RAG
+
+Ms Autogen
+
+<div class="cookbook-path">third_party/MS_Autogen_pgsql/mistral_pgsql_function_calling.ipynb</div>
+
+### [Mesop Integration - Chat with PDF](third_party/mesop/README.qmd)
+
+**Category:** UI chat, demo, RAG
+
+Mesop
+
+<div class="cookbook-path">third_party/mesop/README.md</div>
+
+### [Monitoring Mistral AI using OpenTelemetry](third_party/openlit/cookbook_mistral_opentelemetry.ipynb)
+
+**Category:** AI Observability
+
+OpenLIT
+
+<div class="cookbook-path">third_party/openlit/cookbook_mistral_opentelemetry.ipynb</div>
+
+### [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)
+
+**Category:** code
+
+Neon
+
+<div class="cookbook-path">third_party/Neon/neon_text_to_sql.ipynb</div>
+
+### [ollama_mistral_llamaindex.ipynb](third_party/LlamaIndex/ollama_mistral_llamaindex.ipynb)
+
+**Category:** RAG
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/ollama_mistral_llamaindex.ipynb</div>
+
+### [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup/README.qmd)
+
+**Category:** demo
+
+Ollama
+
+<div class="cookbook-path">third_party/Ollama/20240321_ollama_meetup</div>
+
+### [Open-source LLM engineering](third_party/Langfuse/README.qmd)
+
+**Category:** LLM Observability
+
+Langfuse
+
+<div class="cookbook-path">third_party/Langfuse</div>
+
+### [Panel Integration - Chat with PDF](third_party/panel/README.qmd)
+
+**Category:** UI chat, demo, RAG
+
+Panel
+
+<div class="cookbook-path">third_party/panel/README.md</div>
+
+### [phospho integration](third_party/phospho/cookbook_phospho_mistral_integration.ipynb)
+
+**Category:** Evaluation, Analytics
+
+phospho
+
+<div class="cookbook-path">third_party/phospho/cookbook_phospho_mistral_integration.ipynb</div>
+
+### [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)
+
+**Category:** RAG
+
+Pinecone
+
+<div class="cookbook-path">third_party/Pinecone/pinecone_rag.ipynb</div>
+
+### [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)
+
+**Category:** RAG
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/RAG.ipynb</div>
+
+### [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)
+
+**Category:** agent
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/RouterQueryEngine.ipynb</div>
+
+### [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)
+
+**Category:** RAG
+
+Langchain
+
+<div class="cookbook-path">third_party/langchain/adaptive_rag_mistral.ipynb</div>
+
+### [Solara Integration - Chat with PDFs](third_party/solara/README.qmd)
+
+**Category:** UI chat, demo, RAG
+
+Solara
+
+<div class="cookbook-path">third_party/solara/README.md</div>
+
+### [Streamlit Integration - Chat with PDF](third_party/streamlit/README.qmd)
+
+**Category:** UI chat, demo, RAG
+
+Streamlit
+
+<div class="cookbook-path">third_party/streamlit/README.md</div>
+
+### [Neo4j rag](third_party/Neo4j/neo4j_rag.ipynb)
+
+**Category:** RAG
+
+Neo4j
+
+<div class="cookbook-path">third_party/Neo4j/neo4j_rag.ipynb</div>
+
+### [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)
+
+**Category:** agent
+
+LLamaIndex
+
+<div class="cookbook-path">third_party/LlamaIndex/RouterQueryEngine.ipynb</div>
+
+### [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.qmd)
+
+**Category:** fine-tuning, evaluation
+
+Weights & Biases
+
+<div class="cookbook-path">third_party/wandb/README.md</div>
+
+### [x mistral: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.qmd)
+
+**Category:** CLI, TUI APP, Chat
+
+x-cmd
+
+<div class="cookbook-path">third_party/x-cmd/README.md</div>
+
+### [Incremental Prompt Engineering and Model Comparison](third_party/Pixeltable/README.qmd)
+
+**Category:** Prompt Engineering, Evaluation
+
+Pixeltable
+
+<div class="cookbook-path">third_party/Pixeltable/README.md</div>
+
+### [Build a bank support agent with Pydantic AI and Mistral AI](third_party/PydanticAI/pydantic_bank_support_agent.ipynb)
+
+**Category:** Agent
+
+Pydantic
+
+<div class="cookbook-path">third_party/PydanticAI/pydantic_bank_support_agent.ipynb</div>
+
+### [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)
+
+**Category:** Tracing, Observability
+
+MLflow
+
+<div class="cookbook-path">third_party/MLflow/mistral-mlflow-tracing.ipynb</div>
+
+### [Mistral OCR with Gradio](third_party/gradio/MistralOCR.qmd)
+
+**Category:** OCR
+
+Gradio
+
+<div class="cookbook-path">third_party/gradio/MistralOCR.md</div>
+
+### [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)
+
+**Category:** Prompting
+
+Optimizing prompts without any supervision
+
+<div class="cookbook-path">third_party/metagpt/prompt_optimization.ipynb</div>

@@ -1,5 +1,5 @@
 import solara as sl
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 mistral_api_key = "your_api_key"
 client = Mistral(api_key=mistral_api_key)

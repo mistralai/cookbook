@@ -10,37 +10,21 @@ This cookbook covers two authentication patterns:
 
 ---
 
-## Table of Contents
-
-- [Part 1: Multiple Bearer Token Credentials (GitHub MCP)](#part-1-multiple-bearer-token-credentials-github-mcp)
-  - [Prerequisites](#prerequisites-bearer)
-  - [When to Use Multiple Bearer Credentials](#when-to-use-multiple-bearer-credentials)
-  - [1. Initialize the Client](#1-initialize-the-client)
-  - [2. Create a GitHub MCP Connector](#2-create-a-github-mcp-connector)
-  - [3. Get Authentication Methods](#3-get-authentication-methods)
-  - [4. Store Bearer Credentials](#4-store-bearer-credentials)
-  - [5. List Credentials](#5-list-credentials)
-  - [6. Call a Tool with Specific Credentials](#6-call-a-tool-with-specific-credentials)
-  - [7. Delete Credentials](#7-delete-credentials)
-- [Part 2: Multiple OAuth2 Credentials (Outlook Calendar MCP)](#part-2-multiple-oauth2-credentials-outlook-calendar-mcp)
-  - [Prerequisites](#prerequisites-oauth2)
-  - [When to Use Multiple OAuth2 Credentials](#when-to-use-multiple-oauth2-credentials)
-  - [1. Get the Outlook Calendar Connector](#1-get-the-outlook-calendar-connector)
-  - [2. Get Authentication Methods](#2-get-authentication-methods-1)
-  - [3. Authenticate Accounts via OAuth2](#3-authenticate-accounts-via-oauth2)
-  - [4. List Credentials](#4-list-credentials-1)
-  - [5. Call a Tool with Specific Credentials](#5-call-a-tool-with-specific-credentials)
-  - [6. Promote Credentials to Default](#6-promote-credentials-to-default)
-  - [7. Delete Credentials](#7-delete-credentials-1)
-- [Naming Conventions](#naming-conventions)
-- [Troubleshooting](#troubleshooting)
-- [Error Codes Reference](#error-codes-reference)
-
----
-
 ## Part 1: Multiple Bearer Token Credentials (GitHub MCP)
 
 ### Prerequisites (Bearer)
+
+#### Install
+
+```bash
+# Python
+pip install mistralai
+# or with uv
+uv add mistralai
+```
+
+
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
 
 ```bash
 MISTRAL_API_KEY=your-mistral-api-key
@@ -435,7 +419,7 @@ Credentials 'github-pat-limited' deleted successfully
 MISTRAL_API_KEY=your-mistral-api-key
 ```
 
-- The `outlook_calendar` connector must be enabled in your workspace. Enable it in the [Mistral Console](https://console.mistral.ai/connectors).
+- The `outlook_calendar` connector must be enabled in your workspace. Enable it in [Studio](https://console.mistral.ai/connectors).
 - You need two Microsoft accounts to authenticate separately.
 
 **Script:** `python/src/scripts/08_multiple_oauth_authentication.py`
@@ -771,3 +755,25 @@ curl -X DELETE "${BASE_URL}/v1/connectors/outlook_calendar/user/credentials/pers
 | `404 Not Found` | Credentials name or connector does not exist | Verify names with `list_user_credentials` |
 | `409 Conflict` | Connector name already taken, or deleting the active default | Rename the connector or promote a different credentials to default first |
 | `422 Unprocessable Entity` | Invalid credentials name format | Use alphanumeric characters and hyphens only |
+
+---
+
+## Summary
+
+This cookbook covered how to store and manage multiple sets of credentials for a single Connector — both bearer tokens (GitHub PATs) and OAuth2 (Outlook Calendar) — and how to route specific tool calls to specific credentials at runtime.
+
+**What this cookbook covers:**
+- Storing multiple bearer token credentials for a GitHub MCP Connector
+- Storing multiple OAuth2 credentials for an Outlook Calendar MCP Connector
+- Listing, selecting, and deleting credentials
+- Promoting credentials to default
+- Calling tools with a specific named credential
+
+**Mistral features used:**
+- Connectors API — credentials management (beta)
+
+**Other services:**
+- GitHub MCP — bearer-authenticated Connector (personal access tokens)
+- Outlook Calendar MCP — OAuth2-authenticated Connector
+
+View your Connectors in [Studio](https://console.mistral.ai/build/connectors).
