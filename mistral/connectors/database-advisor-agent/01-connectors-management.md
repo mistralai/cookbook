@@ -148,6 +148,8 @@ main().catch(console.error);
 
 Each connector points at the DeepWiki MCP server, which lets Mistral read and reason about any public GitHub repository. Three named connectors — one per database — give the agent independent slots to query.
 
+After creating each connector, `createOrUpdateUserCredentials` registers credentials for it. DeepWiki is a public server that requires no authentication, so `credentials` is an empty object — but the credentials record must still exist before the connector can be queried.
+
 Replace `// Step 2 — Create one connector per candidate` with:
 
 ```typescript
@@ -161,6 +163,15 @@ Replace `// Step 2 — Create one connector per candidate` with:
       });
       connectorIds[c.name] = connector.id;
       console.log(`Created: ${connector.name}  (id=${connector.id})`);
+      await client.beta.connectors.createOrUpdateUserCredentials({
+        connectorIdOrName: connector.name,
+        credentialsCreateOrUpdate: {
+          name: `${connector.name}-default`,
+          credentials: { headers: {} },
+          isDefault: true,
+        },
+      });
+      console.log(`  Credentials registered for ${connector.name}`);
     }
 ```
 
@@ -170,7 +181,7 @@ View your registered Connectors in [Studio](https://console.mistral.ai/build/con
 
 ## Step 3 — List to verify
 
-Confirm all three connectors are registered before proceeding.
+Confirm all three connectors are registered, then call `listTools` on each one to verify the credentials are working and see what tools the connector exposes.
 
 Replace `// Step 3 — List to verify` with:
 
@@ -183,6 +194,12 @@ Replace `// Step 3 — List to verify` with:
     console.log(`${showdown.length} showdown connectors registered:`);
     for (const c of showdown) {
       console.log(`  ${(c.name ?? "").padEnd(22)}  ${c.description}`);
+      const tools = await client.beta.connectors.listTools({
+        connectorIdOrName: c.name ?? "",
+      });
+      for (const tool of tools) {
+        console.log(`    - ${tool.name}: ${tool.description}`);
+      }
     }
 ```
 
@@ -229,58 +246,58 @@ View your agents in [Studio](https://console.mistral.ai/build/agents).
 
 ## Step 5 — Run the comparison
 
-Ask the agent to evaluate all three databases. Before replying, the agent will call each DeepWiki connector with a natural-language question — this may take a minute.
+This step uses two calls intentionally. `startStream` keeps the connection open so you can watch connector calls happen in real time — `tool.execution.started` shows which database is being queried, and `tool.execution.done` confirms the result came back. But the streaming API sends all agent turn outputs (tool-call decisions, intermediate summaries, final answer) as identical `message.output.delta` events with no "is final" flag, so you can't reliably extract the `json_schema`-constrained response from the stream directly.
 
-The response loop does two things: it logs any non-message outputs (connector calls, internal steps) so you can confirm the connectors are being invoked, and it collects the final message text for JSON parsing.
+`getMessages` solves this cleanly. It returns structured `MessageOutputEntry` objects for the completed conversation, so the last assistant message is unambiguously the final JSON answer — no parsing workarounds needed.
 
 Replace `// Step 5 — Run the comparison` with:
 
 ```typescript
     // Step 5 — Run the comparison
-    const response = await client.beta.conversations.start({
-      agentId: agent.id,
-      inputs: [
-        {
-          role: "user",
-          content:
-            "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
-            "local analytics workload. Evaluate storage model, ACID guarantees, query " +
-            "capabilities, write throughput, and Python API simplicity. Recommend one.",
-        },
-      ],
-    });
+    // startStream keeps the connection alive and lets you observe connector
+    // calls in real time. We capture the conversation_id from the first event
+    // so we can retrieve the final output after the stream ends.
+    const stream = await client.beta.conversations.startStream(
+      {
+        agentId: agent.id,
+        inputs: [
+          {
+            role: "user",
+            content:
+              "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
+              "local analytics workload. Evaluate storage model, ACID guarantees, query " +
+              "capabilities, write throughput, and Python API simplicity. Recommend one.",
+          },
+        ],
+      },
+      { timeoutMs: 300_000 },
+    );
 
-    // Collect the agent's full reply and surface tool call activity
-    let rawText = "";
-    for (const output of response.outputs ?? []) {
-      if (output.type === "message.output") {
-        const content = output.content;
-        if (typeof content === "string") {
-          rawText += content;
-        } else if (Array.isArray(content)) {
-          rawText += content
-            .map((chunk: any) => chunk.text ?? String(chunk))
-            .join("");
-        }
-      } else {
-        const name = (output as any).name ?? (output as any).toolName ?? "";
-        const args = (output as any).arguments;
-        let detail = name ? ` — ${name}` : "";
-        if (args) {
-          try {
-            const parsed = typeof args === "string" ? JSON.parse(args) : args;
-            detail += `\n    ${JSON.stringify(parsed, null, 2)}`;
-          } catch {
-            detail += `\n    ${args}`;
-          }
-        }
-        console.log(`[${output.type}]${detail}`);
+    let conversationId: string | undefined;
+    for await (const item of stream) {
+      const data = item.data;
+      const eventType = data.type;
+      const name = (data as any).name ?? "";
+      if (eventType === "conversation.response.started") {
+        conversationId = (data as any).conversationId;
+      } else if (eventType !== "message.output.delta") {
+        console.log(`[${eventType}]${name ? ` ${name}` : ""}`);
       }
     }
 
-    // The agent enforces json_schema via completionArgs, so the response is
-    // guaranteed to be valid JSON matching RESPONSE_SCHEMA.
-    const result = JSON.parse(rawText) as ComparisonResult;
+    // getMessages returns the completed conversation entries. The last
+    // message.output entry is the agent's final answer, which is guaranteed
+    // to match RESPONSE_SCHEMA because json_schema was set on the agent.
+    const messages = await client.beta.conversations.getMessages({
+      conversationId: conversationId!,
+    });
+    const lastOutput = [...(messages.messages ?? [])].reverse()
+      .find((m) => (m as any).type === "message.output") as any;
+    const rawContent = lastOutput.content;
+    const rawText = typeof rawContent === "string"
+      ? rawContent
+      : (rawContent as any[]).map((c) => c.text ?? "").join("");
+    const result = lastJsonIn(rawText) as ComparisonResult;
 
     console.log("\n--- Connector queries ---");
     for (const q of result.queries) {
@@ -424,6 +441,35 @@ const RESPONSE_SCHEMA = {
   required: ["queries", "comparison", "reasoning", "recommendation"],
 } as const;
 
+// The agent can produce multiple message outputs across turns (e.g. an
+// intermediate summary before the final answer). The API stores them
+// concatenated in the content field regardless of retrieval method. This
+// helper scans for all JSON objects and returns the last one, which is always
+// the json_schema-constrained final answer.
+function lastJsonIn(s: string): unknown {
+  let remaining = s;
+  let last: unknown;
+  while (remaining) {
+    const i = remaining.indexOf("{");
+    if (i === -1) break;
+    remaining = remaining.slice(i);
+    try {
+      last = JSON.parse(remaining);
+      break;
+    } catch (e: any) {
+      const pos = e.message?.match(/position (\d+)/)?.[1];
+      if (pos !== undefined) {
+        last = JSON.parse(remaining.slice(0, Number(pos)));
+        remaining = remaining.slice(Number(pos));
+      } else {
+        remaining = remaining.slice(1);
+      }
+    }
+  }
+  if (last === undefined) throw new Error("No JSON object found in response");
+  return last;
+}
+
 interface ComparisonResult {
   queries: { connector: string; question: string; summary: string }[];
   comparison: Record<string, string>;
@@ -446,6 +492,15 @@ async function main(): Promise<void> {
       });
       connectorIds[c.name] = connector.id;
       console.log(`Created: ${connector.name}  (id=${connector.id})`);
+      await client.beta.connectors.createOrUpdateUserCredentials({
+        connectorIdOrName: connector.name,
+        credentialsCreateOrUpdate: {
+          name: `${connector.name}-default`,
+          credentials: { headers: {} },
+          isDefault: true,
+        },
+      });
+      console.log(`  Credentials registered for ${connector.name}`);
     }
 
     // Step 3 — List to verify
@@ -456,6 +511,12 @@ async function main(): Promise<void> {
     console.log(`${showdown.length} showdown connectors registered:`);
     for (const c of showdown) {
       console.log(`  ${(c.name ?? "").padEnd(22)}  ${c.description}`);
+      const tools = await client.beta.connectors.listTools({
+        connectorIdOrName: c.name ?? "",
+      });
+      for (const tool of tools) {
+        console.log(`    - ${tool.name}: ${tool.description}`);
+      }
     }
 
     // Step 4 — Build the comparison agent
@@ -486,47 +547,44 @@ async function main(): Promise<void> {
     console.log(`Agent ready: ${agent.name}  (id=${agent.id})`);
 
     // Step 5 — Run the comparison
-    const response = await client.beta.conversations.start({
-      agentId: agent.id,
-      inputs: [
-        {
-          role: "user",
-          content:
-            "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
-            "local analytics workload. Evaluate storage model, ACID guarantees, query " +
-            "capabilities, write throughput, and Python API simplicity. Recommend one.",
-        },
-      ],
-    });
+    const stream = await client.beta.conversations.startStream(
+      {
+        agentId: agent.id,
+        inputs: [
+          {
+            role: "user",
+            content:
+              "Compare sqlite/sqlite, duckdb/duckdb, and google/leveldb for a write-heavy " +
+              "local analytics workload. Evaluate storage model, ACID guarantees, query " +
+              "capabilities, write throughput, and Python API simplicity. Recommend one.",
+          },
+        ],
+      },
+      { timeoutMs: 300_000 },
+    );
 
-    let rawText = "";
-    for (const output of response.outputs ?? []) {
-      if (output.type === "message.output") {
-        const content = output.content;
-        if (typeof content === "string") {
-          rawText += content;
-        } else if (Array.isArray(content)) {
-          rawText += content
-            .map((chunk: any) => chunk.text ?? String(chunk))
-            .join("");
-        }
-      } else {
-        const name = (output as any).name ?? (output as any).toolName ?? "";
-        const args = (output as any).arguments;
-        let detail = name ? ` — ${name}` : "";
-        if (args) {
-          try {
-            const parsed = typeof args === "string" ? JSON.parse(args) : args;
-            detail += `\n    ${JSON.stringify(parsed, null, 2)}`;
-          } catch {
-            detail += `\n    ${args}`;
-          }
-        }
-        console.log(`[${output.type}]${detail}`);
+    let conversationId: string | undefined;
+    for await (const item of stream) {
+      const data = item.data;
+      const eventType = data.type;
+      const name = (data as any).name ?? "";
+      if (eventType === "conversation.response.started") {
+        conversationId = (data as any).conversationId;
+      } else if (eventType !== "message.output.delta") {
+        console.log(`[${eventType}]${name ? ` ${name}` : ""}`);
       }
     }
 
-    const result = JSON.parse(rawText) as ComparisonResult;
+    const messages = await client.beta.conversations.getMessages({
+      conversationId: conversationId!,
+    });
+    const lastOutput = [...(messages.messages ?? [])].reverse()
+      .find((m) => (m as any).type === "message.output") as any;
+    const rawContent = lastOutput.content;
+    const rawText = typeof rawContent === "string"
+      ? rawContent
+      : (rawContent as any[]).map((c) => c.text ?? "").join("");
+    const result = lastJsonIn(rawText) as ComparisonResult;
 
     console.log("\n--- Connector queries ---");
     for (const q of result.queries) {
