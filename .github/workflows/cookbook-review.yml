@@ -1,0 +1,69 @@
+name: Cookbook review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'mistral/**/*.md'
+      - 'mistral/**/*.ipynb'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+        with:
+          fetch-depth: 0   # full history required for git diff
+
+      - name: Set up Python
+        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r skills/cookbook-review/requirements.txt
+
+      - name: Detect changed cookbook files
+        id: detect
+        run: |
+          # On synchronize (new push to existing PR), review only the files changed
+          # in this push by diffing from the previous HEAD of the PR branch.
+          # On opened/reopened, review everything changed since the PR base.
+          if [ "${{ github.event.action }}" = "synchronize" ]; then
+            COMPARE_BASE="${{ github.event.before }}"
+          else
+            COMPARE_BASE="${{ github.event.pull_request.base.sha }}"
+          fi
+          echo "compare_base=${COMPARE_BASE}" >> "$GITHUB_OUTPUT"
+
+          # A = Added (new files), M = Modified (existing files changed in this push).
+          git diff --diff-filter=AM --name-only \
+            "${COMPARE_BASE}" "${{ github.sha }}" \
+            -- 'mistral/**/*.md' 'mistral/**/*.ipynb' > changed_cookbooks.txt
+
+          count=$(wc -l < changed_cookbooks.txt | tr -d ' ')
+          echo "Found ${count} changed cookbook file(s):"
+          cat changed_cookbooks.txt
+
+          if [ "$count" -gt 0 ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Review changed cookbooks
+        if: steps.detect.outputs.has_files == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.sha }}
+          BASE_SHA: ${{ steps.detect.outputs.compare_base }}
+        run: python skills/cookbook-review/review_pr.py changed_cookbooks.txt

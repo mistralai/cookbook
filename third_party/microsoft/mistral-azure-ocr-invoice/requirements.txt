@@ -1,0 +1,8 @@
+gradio>=4.0
+httpx>=0.25
+pydantic>=2.0
+mistralai>=1.0
+azure-identity>=1.15
+pymupdf>=1.24
+python-dotenv>=1.0
+openai>=1.0

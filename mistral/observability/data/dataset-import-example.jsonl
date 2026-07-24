@@ -1,0 +1,2 @@
+{"messages": [{"role": "user", "content": "How do I reset my password?"}, {"role": "assistant", "content": "You can reset your password by..."}]}
+{"messages": [{"role": "user", "content": "What's the weather like in Paris?"}], "properties": {"grading_guindance": "The agent should perform a web search to find the current weather in Paris."}}

@@ -1,0 +1,2 @@
+requests>=2.31.0
+nbformat>=5.9.0
