@@ -3,6 +3,35 @@ import { Mistral } from "@mistralai/mistralai";
 
 const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 
+// The agent can produce multiple message outputs across turns (e.g. an
+// intermediate summary before the final answer). The API stores them
+// concatenated in the content field regardless of retrieval method. This
+// helper scans for all JSON objects and returns the last one, which is always
+// the json_schema-constrained final answer.
+function lastJsonIn(s: string): unknown {
+  let remaining = s;
+  let last: unknown;
+  while (remaining) {
+    const i = remaining.indexOf("{");
+    if (i === -1) break;
+    remaining = remaining.slice(i);
+    try {
+      last = JSON.parse(remaining);
+      break;
+    } catch (e: any) {
+      const pos = e.message?.match(/position (\d+)/)?.[1];
+      if (pos !== undefined) {
+        last = JSON.parse(remaining.slice(0, Number(pos)));
+        remaining = remaining.slice(Number(pos));
+      } else {
+        remaining = remaining.slice(1);
+      }
+    }
+  }
+  if (last === undefined) throw new Error("No JSON object found in response");
+  return last;
+}
+
 const DEEPWIKI_URL = "https://mcp.deepwiki.com/mcp";
 
 const candidates = [
@@ -138,22 +167,34 @@ async function main(): Promise<void> {
       { timeoutMs: 300_000 },
     );
 
-    let rawText = "";
+    // startStream keeps the connection alive and lets you observe connector
+    // calls in real time. Capture the conversation_id from the first event so
+    // we can retrieve the final output after the stream ends.
+    let conversationId: string | undefined;
     for await (const item of stream) {
       const data = item.data;
       const eventType = data.type;
-      if (eventType === "message.output.delta") {
-        const content = (data as any).content;
-        rawText += typeof content === "string" ? content : "";
-      } else {
-        const name = (data as any).name ?? "";
+      const name = (data as any).name ?? "";
+      if (eventType === "conversation.response.started") {
+        conversationId = (data as any).conversationId;
+      } else if (eventType !== "message.output.delta") {
         console.log(`[${eventType}]${name ? ` ${name}` : ""}`);
       }
     }
 
-    // The agent enforces json_schema via completionArgs, so the response is
-    // guaranteed to be valid JSON matching RESPONSE_SCHEMA.
-    const result = JSON.parse(rawText) as ComparisonResult;
+    // getMessages returns the completed conversation entries. The last
+    // message.output entry is the agent's final answer, which is guaranteed
+    // to match RESPONSE_SCHEMA because json_schema was set on the agent.
+    const messages = await client.beta.conversations.getMessages({
+      conversationId: conversationId!,
+    });
+    const lastOutput = [...(messages.messages ?? [])].reverse()
+      .find((m) => (m as any).type === "message.output") as any;
+    const rawContent = lastOutput.content;
+    const rawText = typeof rawContent === "string"
+      ? rawContent
+      : (rawContent as any[]).map((c) => c.text ?? "").join("");
+    const result = lastJsonIn(rawText) as ComparisonResult;
 
     console.log("\n--- Connector queries ---");
     for (const q of result.queries) {
