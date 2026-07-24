@@ -265,7 +265,8 @@ Respond with a single, valid JSON object — no text before or after. Use this e
   "verdict": "approve" | "comment" | "request_changes",
   "line_comments": [
     {{
-      "line": <integer — exact line number shown in the numbered content>,
+      "line": <integer — last (or only) line of the range being changed>,
+      "start_line": <integer — first line of the range; omit for single-line changes>,
       "severity": "critical" | "moderate" | "minor",
       "issue": "<concise label, max 10 words>",
       "reasoning": "<1–2 sentences explaining exactly which style guide rule is violated and why>",
@@ -287,23 +288,30 @@ RULES
 - line_comments[].line: must be an integer matching a line number in the numbered input. Do not guess.
 - For Markdown files, use line_comments for EVERY issue where you can see the problematic text in the numbered content. If you can read the offending text on a numbered line, it must be a line_comment — never a file_comment.
 - Use file_comments ONLY for structural absences where there is no line to point to — for example, a required section (## Prerequisites, ## Summary) is entirely missing from the file with no heading or content at all.
+- Before flagging a "missing" element (sentence, section, CTA), verify it truly does not appear anywhere in the visible numbered content. A "Replace X with:" directive before a code block is a valid introduction to that block — do not flag it as a missing introductory sentence.
 - Limit the total issues across both arrays to the 8 most impactful.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 SUGGESTION RULES
-Before writing a suggestion, look up the exact text of the identified line in the numbered input.
-Your suggestion replaces that entire line — nothing more, nothing less.
+A suggestion replaces the lines from start_line through line with the suggestion text verbatim.
 
-Omit the "suggestion" key entirely if ANY of the following are true:
-- The identified line is a Markdown heading (starts with one or more `#` characters).
-- The fix requires adding content that does not exist on that line yet (e.g. a missing CTA, a missing section, a missing sentence).
-- The fix requires changing more than one existing line.
-- The replacement would not be recognizable as a modification of the original line text.
+Single-line change (start_line omitted): your suggestion replaces exactly one line.
+  - Find line N in the numbered input and copy its text. Modify only the specific word or phrase that is wrong.
+  - Omit the suggestion if any of the following are true:
+    - The line is a Markdown heading (starts with `#`).
+    - The fix adds new content that does not yet exist on that line.
+    - The suggestion does not share at least one significant word (4+ letters) with the original line.
+  - Do not include line breaks in a single-line suggestion.
 
-When you DO include a suggestion:
-- Change ONLY the specific word, phrase, or value that is wrong on that line.
-- Keep all other text on the line exactly as it appears in the numbered content.
-- Do not include surrounding lines, backticks, or fences in the suggestion value.
+Multi-line change (start_line provided): your suggestion replaces all lines from start_line to line.
+  - Use this when fixing a span of prose — a sentence that wraps, a paragraph that needs rewording, or an INSERT where you add new content without losing existing text.
+  - To INSERT a new line before line N without overwriting it: set start_line: N, line: N, and include the original line N text at the end of your suggestion after a newline.
+  - To INSERT a new line after line N without overwriting it: set start_line: N, line: N, and include the original line N text at the start of your suggestion, followed by a newline and the new content.
+  - Your suggestion must include the full replacement for every line in the range — omitted lines are deleted.
+
+In all cases:
+- Do not include backticks or fences in the suggestion value.
+- Omit the suggestion entirely if the issue is structural (missing section, missing heading) with no fixable text on the identified line(s).
 """
 
 _SYSTEM_PROMPT_IPYNB = """\
@@ -381,13 +389,15 @@ RULES
 - Only comment on added ('+') lines. Ignore removed ('-') and context lines.
 - verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the changes look good.
 - line_comments must always be an empty array.
+- Before flagging a "missing" element, verify it truly does not appear anywhere in the visible diff. A "Replace X with:" directive before a code block is a valid introduction to that block.
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 QUOTE AND SUGGESTION RULES
 - quote: copy the exact phrase or sentence that is wrong, verbatim from the '+' line. Omit if the issue is structural with nothing to quote.
-- suggestion: the corrected replacement for the quoted text only.
+- suggestion: the corrected replacement for the quoted text only — must be a single line with no newline characters.
 - Never include a suggestion if the flagged line is a heading, the fix adds new content, or the fix spans multiple lines.
+- Never include a suggestion if your text does not share at least one significant word (4+ letters) with the original quoted text.
 """
 
 _SYSTEM_PROMPT_IPYNB_DIFF = """\
@@ -510,18 +520,41 @@ def _sanitize_line_comments(line_comments: list[dict], file_lines: list[str]) ->
 
     - Removes suggestions on Markdown heading lines (structural, never valid).
     - Removes suggestions that are identical to the current line content (no-op).
+    - Removes multi-line suggestions that lack a valid start_line — without a
+      declared range, GitHub applies the multi-line content to a single line,
+      which can overwrite adjacent content. With a valid start_line the full
+      range is replaced correctly and insert operations (which include the
+      original line text in the suggestion) work as intended.
+    - Removes off-target single-line suggestions that share no significant words
+      with the flagged line — these indicate the model put the wrong line's text
+      in the suggestion field.
     """
     sanitized = []
     for lc in line_comments:
         line = lc.get("line")
         if "suggestion" in lc and isinstance(line, int) and 1 <= line <= len(file_lines):
             actual = file_lines[line - 1]
+            suggestion = lc["suggestion"]
+            start_line = lc.get("start_line")
             if actual.lstrip().startswith("#"):
                 print(f"    Stripping suggestion on heading line {line}.")
                 lc = {k: v for k, v in lc.items() if k != "suggestion"}
-            elif lc["suggestion"].strip() == actual.strip():
+            elif suggestion.strip() == actual.strip():
                 print(f"    Stripping no-op suggestion on line {line} (identical to current text).")
                 lc = {k: v for k, v in lc.items() if k != "suggestion"}
+            elif "\n" in suggestion:
+                if isinstance(start_line, int) and 1 <= start_line <= line:
+                    pass  # valid range — multi-line suggestion is intentional
+                else:
+                    print(f"    Stripping multi-line suggestion on line {line} (no valid start_line).")
+                    lc = {k: v for k, v in lc.items() if k != "suggestion"}
+            else:
+                # Word-overlap check only applies to single-line suggestions.
+                orig_words = {w.lower() for w in re.findall(r"\w{4,}", actual)}
+                sugg_words = {w.lower() for w in re.findall(r"\w{4,}", suggestion)}
+                if orig_words and sugg_words and not (orig_words & sugg_words):
+                    print(f"    Stripping off-target suggestion on line {line} (no word overlap with original).")
+                    lc = {k: v for k, v in lc.items() if k != "suggestion"}
         sanitized.append(lc)
     return sanitized
 
@@ -614,9 +647,9 @@ def post_verdict_review(
     return True
 
 
-def post_line_comment(path: str, line: int, body: str) -> bool:
+def post_line_comment(path: str, line: int, body: str, start_line: int | None = None) -> bool:
     """
-    Post a single inline comment on a specific diff line.
+    Post a single inline comment on a specific diff line (or range).
     Returns True on success, False if GitHub rejects the line (not in diff).
     """
     payload = {
@@ -626,6 +659,9 @@ def post_line_comment(path: str, line: int, body: str) -> bool:
         "line": line,
         "side": "RIGHT",
     }
+    if isinstance(start_line, int) and start_line < line:
+        payload["start_line"] = start_line
+        payload["start_side"] = "RIGHT"
     url = f"{GITHUB_API}/repos/{REPO}/pulls/{PR_NUMBER}/comments"
     resp = requests.post(url, headers=GH_HEADERS, json=payload, timeout=30)
     if resp.status_code == 422:
