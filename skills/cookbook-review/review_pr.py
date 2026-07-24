@@ -349,6 +349,7 @@ RULES
 - Focus on markdown cells for prose style and structure; focus on code cells for security (no hard-coded credentials), clarity, and completeness of example output.
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
+- Only include a cell in file_comments if it has a genuine violation to report. Do not add an entry just to say a cell looks correct — omit it entirely.
 
 QUOTE AND SUGGESTION RULES
 - quote: copy the exact phrase or sentence that is wrong, verbatim from the cell content. This helps the reader find it. Omit quote if the issue is structural (e.g. a missing section) — there is nothing to quote.
@@ -437,6 +438,7 @@ RULES
 - file_comments[].cell: the cell number from the label (e.g. 3 for "[Cell 3 — markdown — MODIFIED]"). Use null only for notebook-wide issues with no specific cell.
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
+- Only include a cell in file_comments if it has a genuine violation to report. Do not add an entry just to say a cell looks correct — omit it entirely.
 
 QUOTE AND SUGGESTION RULES
 - quote: copy the exact phrase or sentence that is wrong, verbatim from the cell content. Omit if the issue is structural (e.g. a missing section) — there is nothing to quote.
@@ -773,9 +775,20 @@ def post_review(
     for lc in fallback_lcs:
         post_pr_comment(_strip_suggestion_block(_build_line_comment_body(lc)))
 
-    # Post file-level and cell-level comments.
+    # Post file-level and cell-level comments, skipping any that describe no
+    # actual problem (model sometimes narrates "this looks fine" entries).
+    _no_issue_phrases = (
+        "no violation", "no issue", "no problem", "looks correct", "looks good",
+        "properly formatted", "clean import", "no style", "follows python",
+        "follows the style", "no hard-coded", "no credentials",
+    )
     n_file = 0
     for fc in review.get("file_comments", []):
+        body_text = (fc.get("body", "") + " " + fc.get("reasoning", "")).lower()
+        if any(phrase in body_text for phrase in _no_issue_phrases):
+            cell_label = f"cell {fc.get('cell')}" if fc.get("cell") else "file-level"
+            print(f"    Skipping vacuous file_comment on {cell_label} (no actual violation).")
+            continue
         post_pr_comment(_build_file_comment_body(filepath, fc))
         n_file += 1
 
