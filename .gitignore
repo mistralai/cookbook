@@ -135,8 +135,14 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
+# Local preview output
 /site
+/.quarto/
+_freeze/
+**/*.quarto_ipynb
+mistral/**/*.qmd
+concept-deep-dive/**/*.qmd
+third_party/**/*.qmd
 
 # mypy
 .mypy_cache/

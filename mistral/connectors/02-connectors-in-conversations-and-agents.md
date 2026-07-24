@@ -38,6 +38,7 @@ Most recipes assume you already have:
 - A working `client` (see [Recipe 1](#1-hello-world--first-conversation))
 - An existing connector for the custom-connector recipes — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai)
 
+
 ---
 
 ## Reading Conversation Responses
@@ -275,6 +276,7 @@ Based on current web search results, the weather in Paris today is 8°C with par
 
 **Prereqs:**
 - An existing connector — see [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one in [Studio](https://console.mistral.ai).
+
 
 **Python:**
 

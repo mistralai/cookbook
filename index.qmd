@@ -1,0 +1,35 @@
+---
+title: "Mistral Cookbook preview"
+---
+
+This Quarto site provides a local preview for cookbook content in this repository. It is meant for authoring and review, not as a replacement for the cookbook pages on `docs.mistral.ai`.
+
+## Preview locally
+
+Install Quarto, generate the local preview files, then run the preview:
+
+```bash
+python3 scripts/generate_quarto_index.py
+quarto preview --profile preview
+```
+
+To render a static site, run:
+
+```bash
+python3 scripts/generate_quarto_index.py
+quarto render --profile preview
+```
+
+The generated site is written to `site/`. Sanitized Markdown preview files are written as ignored sibling `.qmd` files next to their source Markdown files.
+
+## What this preview includes
+
+- Jupyter notebooks (`.ipynb`) from `mistral/`, `third_party/`, `concept-deep-dive/`, and the root quickstart.
+- Markdown guides (`.md`) from the same cookbook areas, rendered through sanitized generated preview copies.
+- A generated cookbook index grouped by section from `README.md`.
+
+Notebook code is not executed during preview. Quarto renders the committed notebook content and outputs as they exist in the repository.
+
+## Cookbook index
+
+Open [Cookbooks](/cookbooks.html) to browse the generated list.
