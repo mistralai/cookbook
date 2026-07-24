@@ -287,23 +287,26 @@ RULES
 - line_comments[].line: must be an integer matching a line number in the numbered input. Do not guess.
 - For Markdown files, use line_comments for EVERY issue where you can see the problematic text in the numbered content. If you can read the offending text on a numbered line, it must be a line_comment — never a file_comment.
 - Use file_comments ONLY for structural absences where there is no line to point to — for example, a required section (## Prerequisites, ## Summary) is entirely missing from the file with no heading or content at all.
+- Before flagging a "missing" element (sentence, section, CTA), verify it truly does not appear anywhere in the visible numbered content. A "Replace X with:" directive before a code block is a valid introduction to that block — do not flag it as a missing introductory sentence.
 - Limit the total issues across both arrays to the 8 most impactful.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 SUGGESTION RULES
-Before writing a suggestion, look up the exact text of the identified line in the numbered input.
-Your suggestion replaces that entire line — nothing more, nothing less.
+Before writing a suggestion: find line N in the numbered input and copy its exact text. Then modify only the specific word or phrase that is wrong, keeping everything else identical.
 
 Omit the "suggestion" key entirely if ANY of the following are true:
 - The identified line is a Markdown heading (starts with one or more `#` characters).
 - The fix requires adding content that does not exist on that line yet (e.g. a missing CTA, a missing section, a missing sentence).
 - The fix requires changing more than one existing line.
 - The replacement would not be recognizable as a modification of the original line text.
+- Your suggestion does not share at least one significant word (4+ letters) with the original line — this means you have the wrong line or the wrong suggestion text.
+- Your suggestion requires more than one line (no newline characters allowed).
 
 When you DO include a suggestion:
 - Change ONLY the specific word, phrase, or value that is wrong on that line.
 - Keep all other text on the line exactly as it appears in the numbered content.
-- Do not include surrounding lines, backticks, or fences in the suggestion value.
+- The suggestion must be exactly one line — no line breaks, no surrounding lines.
+- Do not include backticks or fences in the suggestion value.
 """
 
 _SYSTEM_PROMPT_IPYNB = """\
@@ -381,13 +384,15 @@ RULES
 - Only comment on added ('+') lines. Ignore removed ('-') and context lines.
 - verdict: "request_changes" if any critical issue exists; "comment" for moderate/minor only; "approve" if the changes look good.
 - line_comments must always be an empty array.
+- Before flagging a "missing" element, verify it truly does not appear anywhere in the visible diff. A "Replace X with:" directive before a code block is a valid introduction to that block.
 - Limit to the 8 most impactful issues.
 - Do not invent problems. Flag only genuine violations of the style guide.
 
 QUOTE AND SUGGESTION RULES
 - quote: copy the exact phrase or sentence that is wrong, verbatim from the '+' line. Omit if the issue is structural with nothing to quote.
-- suggestion: the corrected replacement for the quoted text only.
+- suggestion: the corrected replacement for the quoted text only — must be a single line with no newline characters.
 - Never include a suggestion if the flagged line is a heading, the fix adds new content, or the fix spans multiple lines.
+- Never include a suggestion if your text does not share at least one significant word (4+ letters) with the original quoted text.
 """
 
 _SYSTEM_PROMPT_IPYNB_DIFF = """\
@@ -510,18 +515,32 @@ def _sanitize_line_comments(line_comments: list[dict], file_lines: list[str]) ->
 
     - Removes suggestions on Markdown heading lines (structural, never valid).
     - Removes suggestions that are identical to the current line content (no-op).
+    - Removes multi-line suggestions (suggestion blocks must be single-line).
+    - Removes off-target suggestions that share no significant words with the
+      flagged line — these indicate the model put the wrong line's text in the
+      suggestion field.
     """
     sanitized = []
     for lc in line_comments:
         line = lc.get("line")
         if "suggestion" in lc and isinstance(line, int) and 1 <= line <= len(file_lines):
             actual = file_lines[line - 1]
+            suggestion = lc["suggestion"]
             if actual.lstrip().startswith("#"):
                 print(f"    Stripping suggestion on heading line {line}.")
                 lc = {k: v for k, v in lc.items() if k != "suggestion"}
-            elif lc["suggestion"].strip() == actual.strip():
+            elif suggestion.strip() == actual.strip():
                 print(f"    Stripping no-op suggestion on line {line} (identical to current text).")
                 lc = {k: v for k, v in lc.items() if k != "suggestion"}
+            elif "\n" in suggestion:
+                print(f"    Stripping multi-line suggestion on line {line}.")
+                lc = {k: v for k, v in lc.items() if k != "suggestion"}
+            else:
+                orig_words = {w.lower() for w in re.findall(r"\w{4,}", actual)}
+                sugg_words = {w.lower() for w in re.findall(r"\w{4,}", suggestion)}
+                if orig_words and sugg_words and not (orig_words & sugg_words):
+                    print(f"    Stripping off-target suggestion on line {line} (no word overlap with original).")
+                    lc = {k: v for k, v in lc.items() if k != "suggestion"}
         sanitized.append(lc)
     return sanitized
 
