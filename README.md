@@ -112,6 +112,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [Panel Integration - Chat with PDF](third_party/panel/README.md)                                                      | UI chat, demo, RAG              | Panel      |
 | [phospho integration](third_party/phospho/cookbook_phospho_mistral_integration.ipynb)                                 | Evaluation, Analytics           | phospho    |
 | [pinecone_rag.ipynb](third_party/Pinecone/pinecone_rag.ipynb)                                                         | RAG                             | Pinecone   |
+| [qdrant_ocr_search.ipynb](third_party/Qdrant/qdrant_ocr_search.ipynb)                                                 | OCR, vector search              | Qdrant     |
 | [RAG.ipynb](third_party/LlamaIndex/RAG.ipynb)                                                                         | RAG                             | LLamaIndex |
 | [RouterQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                             | agent                           | LLamaIndex |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
