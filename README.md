@@ -69,6 +69,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [sts_demo.py](mistral/tts/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
+| [voxtral_tts.ipynb](mistral/tts/voxtral_tts.ipynb) | TTS, voice cloning | Text-to-speech with Voxtral: preset voices, zero-shot voice cloning, cross-lingual transfer, streaming, and a voice-reply agent |
 
 
 
