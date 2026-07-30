@@ -89,6 +89,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)                  | synthetic data                  | Argilla    |
 | [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)                                          | tool, agent                     | E2B        |
+| [mlx_ministral_evaluation_finetuning.ipynb](third_party/MLX/mlx_ministral_evaluation_finetuning.ipynb)               | evaluation, fine-tuning         | MLX        |
 | [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                       | tool call                       | Ollama     |
 | [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                                    | UI chat, demo, RAG              | Gradio     |
 | [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)                                   | RAG, embeddings                 | Haystack   |
