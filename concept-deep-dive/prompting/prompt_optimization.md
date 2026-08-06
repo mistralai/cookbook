@@ -48,6 +48,10 @@ SPO proved highly efficient and applicable to both open- and closed-ended tasks.
 
 **Computational Cost** Manual prompt engineering is computationally cheap, but proves brittle and labor-intensive. Gradient-based tuning proves to be more compute-efficient, while RL and search-based methods are costly due to the number of required queries of the method to iterate and improve on the prompt. SPO-like approaches seem promising due to *(i)* limited number of queries and *(ii)* disuse of model internals at test-time.
 
+# External Resources
+
+[God Tier Prompts](https://www.godtierprompts.com) - A community driven leaderboard where the best prompts rise to the top.
+
 ### References
 ```bash
 @article{brown2020language,
