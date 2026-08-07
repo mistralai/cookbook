@@ -138,13 +138,25 @@ webbrowser.open(f"http://localhost:8000/{output.name}")
 server.serve_forever()  # Ctrl+C to stop
 ```
 
-Or run the included script directly:
+## Run
+
+Run the included script to generate a game and serve it locally:
 
 ```bash
 python generate_game.py
 ```
 
-The script calls GLM, extracts the HTML, saves it to `game.html`, starts a local server at `http://localhost:8000/game.html`, and opens it in your browser. Press Ctrl+C to stop the server when you're done playing.
+The script calls GLM, saves the generated HTML to `game.html`, starts a local server at `http://localhost:8000/game.html`, and opens it in your browser. Press Ctrl+C to stop the server when you're done playing.
+
+Example output:
+
+```
+Generating game: A top-down dungeon crawler. The player navigates procedurally generated rooms...
+This may take a few minutes...
+Game saved to /Users/you/glm_game_generator/game.html
+Serving game at http://localhost:8000/game.html
+Press Ctrl+C to stop the server.
+```
 
 ## 5. Try different games
 
