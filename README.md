@@ -1,6 +1,38 @@
 # Mistral Cookbook
 
-The Mistral Cookbook features examples contributed by Mistralers and our community, as well as our partners. If you have cool examples showcasing Mistral models, feel free to share them by submitting a PR to this repo.
+The Mistral Cookbook features examples contributed by Mistralers and our community, as well as our partners. If you have cool examples showcasing Mistral models, you can submit a PR to this repo for review.
+
+For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral.ai/). You can also browse the [cookbooks section](https://docs.mistral.ai/resources/cookbooks) in the docs.
+
+## Main Notebooks
+
+| Notebook                                                                       | Category                     | Description                                                                      |
+|--------------------------------------------------------------------------------|-----------------------------|----------------------------------------------------------------------------------|
+| [quickstart.ipynb](quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
+| [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb) | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
+| [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                 | RAG                          | RAG from scratch with Mistral AI API                                             |
+| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
+| [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
+| [text_to_SQL.ipynb](mistral/function_calling/text_to_SQL.ipynb)      | function calling             | Use Mistral API for function calling on a multi tables text to SQL usecase                                             |
+| [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
+| [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)         | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
+| [rag_via_function_calling.ipynb](mistral/rag/RAG_via_function_calling.ipynb)         | RAG, function calling        | Use function calling as a router for a RAG based on multiple data sources                   |
+| [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)             | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
+| [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb) | data generation | Simple data generation to refine news articles                                |
+| [image_description_prompting_pixtral.ipynb](mistral/image_understanding/image_description_prompting_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
+| [multimodality meets function calling.ipynb](mistral/image_understanding/multimodality_meets_function_calling.ipynb) | image processing, function calling  | Extract table from image using Mistral's Pixtral model and use for function calling |
+| [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb) | RAG, function calling, references | Reference RAG with Mistral API |
+| [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb) | moderation | Quick exploration on safeguarding and Mistral's moderation API |
+| [system-level-guardrails.ipynb](mistral/moderation/system-level-guardrails.ipynb) | moderation | How to implement System Level Guardrails with Mistral API |
+| [document_understanding.ipynb](mistral/ocr/document_understanding.ipynb) | OCR, function calling | Document Understanding and Tool Usage with OCR |
+| [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
+| [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
+| [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
+| [sts_demo.py](mistral/tts/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
+| [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
+| [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
+| [01-build-a-database-advisor-agent.ipynb](mistral/connectors/01-build-a-database-advisor-agent.ipynb) | connectors, agents | Build an agent that compares databases using their source code via the DeepWiki connector |
+| [02-build-a-quickstart-generator.ipynb](mistral/connectors/02-build-a-quickstart-generator.ipynb) | connectors, agents, web search | Build a quickstart generator that improves with each tool added — web search, connectors, and both combined |
 
 ## Submission Guidelines:
 
@@ -35,42 +67,6 @@ quarto preview --profile preview
 Run the generator again after editing the cookbook tables in this README or Markdown cookbook files.
 
 The preview renders committed notebook content without executing notebook code. Generated preview output is written to `site/`, and generated Markdown preview files are written as ignored sibling `.qmd` files next to their source Markdown files.
-
-## Main Notebooks
-
-| Notebook                                                                       | Category                     | Description                                                                      |
-|--------------------------------------------------------------------------------|-----------------------------|----------------------------------------------------------------------------------|
-| [quickstart.ipynb](quickstart.ipynb)                                           | chat, embeddings             | Basic quickstart with chat and embeddings with Mistral AI API                    |
-| [prompting_capabilities.ipynb](mistral/prompting/prompting_capabilities.ipynb) | prompting                    | Write prompts for classification, summarization, personalization, and evaluation |
-| [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                 | RAG                          | RAG from scratch with Mistral AI API                                             |
-| [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |                                           |
-| [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
-| [text_to_SQL.ipynb](mistral/function_calling/text_to_SQL.ipynb)      | function calling             | Use Mistral API for function calling on a multi tables text to SQL usecase                                             |
-| [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
-| [mistral_finetune_api.ipynb](mistral/fine_tune/mistral_finetune_api.ipynb)     | fine-tuning                  | Finetune a model with Mistral fine-tuning API                                    |
-| [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)         | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
-| [rag_via_function_calling.ipynb](mistral/rag/RAG_via_function_calling.ipynb)         | RAG, function calling        | Use function calling as a router for a RAG based on multiple data sources                   |
-| [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)             | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
-| [synthetic_data_gen_and_finetune.ipynb](mistral/data_generation/synthetic_data_gen_and_finetune.ipynb) | data generation, fine-tuning | Simple data generation and fine-tuning guide        |
-| [data_generation_refining_news.ipynb](mistral/data_generation/data_generation_refining_news.ipynb) | data generation | Simple data generation to refine news articles                                |
-| [image_description_prompting_pixtral.ipynb](mistral/image_understanding/image_description_prompting_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
-| [multimodality meets function calling.ipynb](mistral/image_understanding/multimodality_meets_function_calling.ipynb) | image processing, function calling  | Extract table from image using Mistral's Pixtral model and use for function calling |
-| [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb) | RAG, function calling, references | Reference RAG with Mistral API |
-| [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb) | moderation | Quick exploration on safeguarding and Mistral's moderation API |
-| [system-level-guardrails.ipynb](mistral/moderation/system-level-guardrails.ipynb) | moderation | How to implement System Level Guardrails with Mistral API |
-| [document_understanding.ipynb](mistral/ocr/document_understanding.ipynb) | OCR, function calling | Document Understanding and Tool Usage with OCR |
-| [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
-| [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
-| [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
-| [product_classification.ipynb](mistral/classifier_factory/product_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for food classification. |
-| [intent_classification.ipynb](mistral/classifier_factory/intent_classification.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for intent classification. |
-| [moderation_classifier.ipynb](mistral/classifier_factory/moderation_classifier.ipynb) | fine-tuning, classifier | Fine-tuning a classifier for moderation. |
-| [pixtral_finetune_on_satellite_data.ipynb](mistral/fine_tune/pixtral_finetune_on_satellite_data.ipynb) | fine-tuning, image processing, batch | Fine-tuning a Pixtral-12B for satellite images classification. |
-| [sts_demo.py](mistral/tts/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
-| [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
-| [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
-
-
 
 ## Third Party Tools
 
