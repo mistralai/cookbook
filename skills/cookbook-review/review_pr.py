@@ -31,6 +31,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import requests
@@ -501,12 +502,20 @@ def call_mistral(
         "temperature": 0.1,
     }
 
-    resp = requests.post(
-        MISTRAL_API_URL, headers=MISTRAL_HEADERS, json=payload, timeout=180
-    )
+    for attempt in range(4):
+        resp = requests.post(
+            MISTRAL_API_URL, headers=MISTRAL_HEADERS, json=payload, timeout=180
+        )
+        if resp.status_code == 429:
+            wait = 2 ** attempt * 5  # 5s, 10s, 20s, 40s
+            print(f"  Rate limited (429) — retrying in {wait}s ...")
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+        raw = resp.json()["choices"][0]["message"]["content"]
+        return json.loads(raw)
+    # Final attempt failed with 429
     resp.raise_for_status()
-    raw = resp.json()["choices"][0]["message"]["content"]
-    return json.loads(raw)
 
 
 # ── Comment body builders ─────────────────────────────────────────────────────
