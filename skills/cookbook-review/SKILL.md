@@ -233,9 +233,10 @@ Based on the Mistral Writing Style Guide (see reference files below).
 
 ### Headings
 
-- **Use sentence-style capitalization.** Capitalize only the first word and proper nouns.
+- **Use sentence-style capitalization.** Capitalize only the first word and proper nouns. For numbered step headings, also capitalize the first word after the step label (e.g., `## Step 2 — Set up the environment`).
   - Bad: `## Creating A Connector With OAuth Authentication`
   - Good: `## Creating a connector with OAuth authentication`
+  - Good: `## Step 3 — Craft the prompt`
 - **No period at the end of headings.**
 - **Don't use ampersands (&) or plus signs (+)** unless referring to UI that contains them.
 - **Keep headings short and specific.** A heading should tell the reader exactly what they'll find.
