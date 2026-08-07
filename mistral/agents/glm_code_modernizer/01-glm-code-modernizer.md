@@ -11,7 +11,7 @@ Use the `zai-glm-5-2` (GLM) model and the GitHub connector to read outdated Pyth
 To complete this cookbook, you will need:
 - Python 3.10+
 - A Mistral account and API key
-- The `github_app` connector authenticated in Studio
+- A GitHub account (the script handles OAuth authentication)
 
 ## Environment setup
 
@@ -27,21 +27,19 @@ pip install mistralai python-dotenv
 
 To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
 
-Create a `.env` at the root of your project and add your Mistral API key:
+Copy the example `.env` file and add your Mistral API key:
+
+```bash
+cp .env.example .env
+```
 
 ```
 MISTRAL_API_KEY=your-mistral-api-key
+GITHUB_REPO=mistralai/cookbook
+GITHUB_BRANCH=main
 ```
 
-### Authenticate the GitHub connector
-
-The `github_app` connector is a built-in connector that provides access to GitHub repositories. You authenticate it through Studio, not through the API:
-
-1. Open [Studio](https://console.mistral.ai) and go to **Connectors**
-2. Find `github_app` and authenticate with your GitHub account
-3. Grant access to the `mistralai/cookbook` repository (or your fork)
-
-Once authenticated, the connector is available by name (`"github_app"`) in any agent or conversation.
+The `GITHUB_REPO` and `GITHUB_BRANCH` variables default to the `mistralai/cookbook` repository on the `main` branch. Change these to modernize files from a different repository.
 
 ---
 
@@ -75,9 +73,10 @@ client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 async def main() -> None:
     # Step 2 — Define the modernization target
-    # Step 3 — Create the agent with the GitHub connector
-    # Step 4 — Start the conversation and extract results
-    # Step 5 — Save the modernized code
+    # Step 3 — Authenticate the GitHub connector
+    # Step 4 — Create the agent with the GitHub connector
+    # Step 5 — Start the conversation and extract results
+    # Step 6 — Save the modernized code
     pass
 
 
@@ -89,14 +88,14 @@ if __name__ == "__main__":
 
 ## Step 2 — Define the modernization target
 
-Specify the repository, branch, and file paths to modernize. This cookbook targets a pair of intentionally outdated Python files in the `legacy_app/` directory of this repository.
+Specify the repository, branch, and file paths to modernize. The repository and branch are read from environment variables, defaulting to the `mistralai/cookbook` repository on the `main` branch. This cookbook targets a pair of intentionally outdated Python files in the `legacy_app/` directory of this repository.
 
 Add the following constants below the client initialization:
 
 ```python
 # Step 2 — Define the modernization target
-REPO = "mistralai/cookbook"
-BRANCH = "main"
+REPO = os.environ.get("GITHUB_REPO", "mistralai/cookbook")
+BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 FILE_PATHS = [
     "mistral/agents/glm_code_modernizer/legacy_app/app.py",
     "mistral/agents/glm_code_modernizer/legacy_app/utils.py",
@@ -107,16 +106,35 @@ These files contain a CLI to-do list manager written with Python 2/3.5-era patte
 
 ---
 
-## Step 3 — Create the agent with the GitHub connector
+## Step 3 — Authenticate the GitHub connector
+
+The `github_app` connector requires OAuth authentication each time you run the script. The script calls `get_auth_url_async` to get an authorization URL, which you open in your browser to grant access.
+
+Add the following at the top of `main`:
+
+```python
+    # Step 3 — Authenticate the GitHub connector
+    auth_result = await client.beta.connectors.get_auth_url_async(
+        connector_id_or_name="github_app",
+    )
+    print(f"Authenticate the GitHub connector:\n{auth_result.auth_url}")
+    input("Press Enter once you've completed the OAuth flow in your browser...")
+```
+
+When you run the script, it prints a GitHub OAuth URL. Open it in your browser, authorize access, then return to the terminal and press Enter to continue.
+
+---
+
+## Step 4 — Create the agent with the GitHub connector
 
 Create an agent that pairs GLM with the GitHub connector. The agent's instructions tell it exactly which patterns to modernize and how to format the output.
 
-Add the following inside `main`, wrapped in a `try`/`finally` block to ensure cleanup:
+Add the following inside `main` after the auth step, wrapped in a `try`/`finally` block to ensure cleanup:
 
 ```python
     agent_id: str | None = None
     try:
-        # Step 3 — Create the agent with the GitHub connector
+        # Step 4 — Create the agent with the GitHub connector
         file_list = "\n".join(f"- `{path}`" for path in FILE_PATHS)
         agent = await client.beta.agents.create_async(
             name="code_modernizer",
@@ -166,7 +184,7 @@ Two things to note:
 
 ---
 
-## Step 4 — Start the conversation and extract results
+## Step 5 — Start the conversation and extract results
 
 Start a conversation with the agent. The prompt tells it which repository and files to read. The GitHub connector handles the file access — the model reads the files, analyzes the patterns, and returns modernized code in a single response.
 
@@ -199,7 +217,7 @@ def get_response_text(response) -> str:
 Then continue inside the `try` block after the agent creation:
 
 ```python
-        # Step 4 — Start the conversation
+        # Step 5 — Start the conversation
         print(f"Reading files from {REPO} and modernizing...")
         print("This may take a few minutes.\n")
 
@@ -229,12 +247,12 @@ When you pass `agent_id` instead of `model`, the conversation uses the agent's m
 
 ---
 
-## Step 5 — Save the modernized code
+## Step 6 — Save the modernized code
 
 Extract the Python code blocks from the response and save each one to a `modernized/` directory:
 
 ```python
-        # Step 5 — Save the modernized code
+        # Step 6 — Save the modernized code
         code_blocks = extract_python_blocks(text)
 
         if not code_blocks:
@@ -280,11 +298,15 @@ Once all steps are in place, run the script:
 python modernize_code.py
 ```
 
-The script creates a GLM agent with the GitHub connector, reads the legacy files from the repository, produces modernized versions, and saves them to a `modernized/` directory.
+The script prompts you to authenticate the GitHub connector via OAuth, then creates a GLM agent, reads the legacy files from the repository, produces modernized versions, and saves them to a `modernized/` directory.
 
 Example output:
 
 ```
+Authenticate the GitHub connector:
+https://github.com/login/oauth/authorize?client_id=...&scope=repo+...
+Press Enter once you've completed the OAuth flow in your browser...
+
 Created agent: code_modernizer (a1b2c3d4-5678-90ab-cdef-1234567890ab)
 Reading files from mistralai/cookbook and modernizing...
 This may take a few minutes.
@@ -300,19 +322,26 @@ Deleted agent: a1b2c3d4-5678-90ab-cdef-1234567890ab
 
 ## Try different targets
 
-Change `REPO`, `BRANCH`, and `FILE_PATHS` to modernize files from a different repository. You can also adjust the agent's instructions to focus on different modernization patterns.
+Update `GITHUB_REPO` and `GITHUB_BRANCH` in your `.env` file to modernize files from a different repository. You can also change `FILE_PATHS` in the script or adjust the agent's instructions to focus on different modernization patterns.
 
 **Modernize a Django views file:**
 
+Update your `.env`:
+
+```
+GITHUB_REPO=your-org/your-django-app
+```
+
+Then change `FILE_PATHS` in the script:
+
 ```python
-REPO = "your-org/your-django-app"
 FILE_PATHS = ["myapp/views.py"]
 ```
 
-**Target a specific branch or pull request:**
+**Target a specific branch:**
 
-```python
-BRANCH = "feature/legacy-cleanup"
+```
+GITHUB_BRANCH=feature/legacy-cleanup
 ```
 
 **Modernize JavaScript instead of Python:**
@@ -343,8 +372,8 @@ load_dotenv()
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 # Step 2 — Define the modernization target
-REPO = "mistralai/cookbook"
-BRANCH = "main"
+REPO = os.environ.get("GITHUB_REPO", "mistralai/cookbook")
+BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 FILE_PATHS = [
     "mistral/agents/glm_code_modernizer/legacy_app/app.py",
     "mistral/agents/glm_code_modernizer/legacy_app/utils.py",
@@ -375,9 +404,16 @@ def get_response_text(response) -> str:
 
 
 async def main() -> None:
+    # Step 3 — Authenticate the GitHub connector
+    auth_result = await client.beta.connectors.get_auth_url_async(
+        connector_id_or_name="github_app",
+    )
+    print(f"Authenticate the GitHub connector:\n{auth_result.auth_url}")
+    input("Press Enter once you've completed the OAuth flow in your browser...")
+
     agent_id: str | None = None
     try:
-        # Step 3 — Create the agent with the GitHub connector
+        # Step 4 — Create the agent with the GitHub connector
         file_list = "\n".join(f"- `{path}`" for path in FILE_PATHS)
         agent = await client.beta.agents.create_async(
             name="code_modernizer",
@@ -419,7 +455,7 @@ async def main() -> None:
         agent_id = agent.id
         print(f"Created agent: {agent.name} ({agent.id})")
 
-        # Step 4 — Start the conversation
+        # Step 5 — Start the conversation
         print(f"Reading files from {REPO} and modernizing...")
         print("This may take a few minutes.\n")
 
@@ -442,7 +478,7 @@ async def main() -> None:
 
         text = get_response_text(response)
 
-        # Step 5 — Save the modernized code
+        # Step 6 — Save the modernized code
         code_blocks = extract_python_blocks(text)
 
         if not code_blocks:
@@ -488,7 +524,7 @@ This cookbook demonstrated how to combine GLM's code generation with the GitHub 
 **Mistral features used:**
 - Agents API (beta) with the `zai-glm-5-2` model
 - Conversations API (beta) for server-side tool execution
-- GitHub connector (`github_app`) for repository file access
+- GitHub connector (`github_app`) with OAuth authentication
 - Extended timeout (`timeout_ms`) for long code generation
 
 Try pointing the script at your own repositories to modernize real legacy code. For more on connectors, see the [connectors documentation](https://docs.mistral.ai/capabilities/connectors/).

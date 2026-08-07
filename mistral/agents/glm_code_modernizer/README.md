@@ -16,19 +16,19 @@ pip install -r requirements.txt
 
 To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
 
-Create a `.env` at the root of your project and add your Mistral API key:
+Copy the example `.env` file and add your Mistral API key:
+
+```bash
+cp .env.example .env
+```
 
 ```
 MISTRAL_API_KEY=your-mistral-api-key
+GITHUB_REPO=mistralai/cookbook
+GITHUB_BRANCH=main
 ```
 
-### Authenticate the GitHub connector
-
-The `github_app` connector requires authentication through Studio, not the API:
-
-1. Open [Studio](https://console.mistral.ai) and go to **Connectors**
-2. Find `github_app` and authenticate with GitHub
-3. Grant access to the `mistralai/cookbook` repository (or your fork)
+To modernize files from a different repository, change `GITHUB_REPO` and `GITHUB_BRANCH`.
 
 ## 1. Understand the approach
 
@@ -36,9 +36,10 @@ GLM (`zai-glm-5-2`) is a code-generation model available through the Mistral API
 
 The workflow is:
 
-1. **Create an agent** with GLM and the GitHub connector
-2. **Start a conversation** that instructs the agent to read specific files and modernize them
-3. **Extract the code** from the response and save it locally
+1. **Authenticate** the GitHub connector via OAuth
+2. **Create an agent** with GLM and the GitHub connector
+3. **Start a conversation** that instructs the agent to read specific files and modernize them
+4. **Extract the code** from the response and save it locally
 
 The agent uses the GitHub connector to read files server-side — you don't need to clone the repository or handle any tool calls yourself.
 
@@ -70,11 +71,15 @@ Run the script to modernize the legacy app:
 python modernize_code.py
 ```
 
-The script creates a GLM agent with the GitHub connector, reads the legacy files from the repository, produces modernized versions, and saves them to a `modernized/` directory.
+The script prompts you to authenticate the GitHub connector via OAuth, then creates a GLM agent, reads the legacy files from the repository, produces modernized versions, and saves them to a `modernized/` directory.
 
 Example output:
 
 ```
+Authenticate the GitHub connector:
+https://github.com/login/oauth/authorize?client_id=...&scope=repo+...
+Press Enter once you've completed the OAuth flow in your browser...
+
 Created agent: code_modernizer (a1b2c3d4-5678-90ab-cdef-1234567890ab)
 Reading files from mistralai/cookbook and modernizing...
 This may take a few minutes.

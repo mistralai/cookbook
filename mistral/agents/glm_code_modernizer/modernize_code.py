@@ -15,8 +15,8 @@ load_dotenv()
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 # Step 2 — Define the modernization target
-REPO = "jenperson/cookbook-private"
-BRANCH = "add-connector-cookbooks"
+REPO = os.environ.get("GITHUB_REPO", "mistralai/cookbook")
+BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 FILE_PATHS = [
     "mistral/agents/glm_code_modernizer/legacy_app/app.py",
     "mistral/agents/glm_code_modernizer/legacy_app/utils.py",
