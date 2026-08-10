@@ -1,6 +1,6 @@
 # Generate a playable mini game with GLM
 
-Use the `zai-glm-5-2` (GLM) model through the Mistral API to generate a complete, playable HTML5 dungeon crawler from a single prompt.
+Use the `zai-glm-5-2` (GLM) model through the Mistral API to generate a complete, playable HTML5 dungeon crawler from a single prompt, then automatically review and fix common game mechanic issues.
 
 ---
 
@@ -40,11 +40,12 @@ Create `generate_game.py` in your project directory:
 touch generate_game.py
 ```
 
-Open the file and add the imports and client initialization. The remaining steps build out the prompt, the API call, and the local server.
+Open the file and add the imports and client initialization. The client sets `timeout_ms=600_000` (10 minutes) and a matching `httpx` timeout because GLM generates large code outputs (1000+ lines) that can take several minutes. The remaining steps build out the prompt, generation, review loop, edit mode, and local server.
 
 ```python
 """Generate a playable HTML5 mini game using the GLM model via the Mistral API."""
 
+import argparse
 import functools
 import http.server
 import os
@@ -54,19 +55,28 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+import httpx
+
 from mistralai.client import Mistral
 
 load_dotenv()
 
 # Step 1 — Initialize the client
-client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
+# GLM generates large code outputs that can take several minutes. The default
+# httpx timeout is too short, so set it to 10 minutes to match timeout_ms.
+client = Mistral(
+    api_key=os.environ["MISTRAL_API_KEY"],
+    timeout_ms=600_000,
+    client=httpx.Client(follow_redirects=True, timeout=httpx.Timeout(600.0)),
+)
 
 
 def main():
-    # Step 2 — Define the game description
-    # Step 3 — Craft the prompt
-    # Step 4 — Call the model and extract HTML
-    # Step 5 — Serve the game locally
+    # Step 2 — Craft the game prompt
+    # Step 3 — Generate the game
+    # Step 4 — Review and fix the game
+    # Step 5 — Edit the game
+    # Step 6 — Serve the game locally
     pass
 
 
@@ -76,14 +86,16 @@ if __name__ == "__main__":
 
 ---
 
-## Step 2 — Define the game description
+## Step 2 — Craft the game prompt
 
-Describe the game you want to generate. Be specific about mechanics, controls, visuals, and scope — the more detail you provide, the better the result. This description produces a top-down dungeon crawler with procedural rooms, enemies, items, and a minimap.
+The prompt has two parts. The system message constrains the output format — single HTML file, no external dependencies, Canvas rendering. The user message describes the game and lists concrete requirements so the model doesn't omit features like a start screen or game-over logic.
+
+The "game engineering requirements" block is the key addition. GLM sometimes produces games with broken mechanics — enemies that can't be killed, missing collision detection, or enemies that spawn inside walls. These requirements tell the model how to implement the most failure-prone systems.
 
 Add the following above the `main` function:
 
 ```python
-# Step 2 — Define the game description
+# Step 2 — Craft the game prompt
 # Be specific about mechanics, controls, visuals, and scope.
 # The more detail you provide, the better the generated game.
 GAME_DESCRIPTION = (
@@ -93,21 +105,14 @@ GAME_DESCRIPTION = (
     "pickups. The player has a melee attack (spacebar) and 3 lives. Generate at "
     "least 5 connected rooms. Show a minimap in the corner."
 )
-```
 
----
 
-## Step 3 — Craft the prompt
-
-The prompt has two parts. The system message constrains the output format — single HTML file, no external dependencies, Canvas rendering. The user message describes the game and lists concrete requirements so the model doesn't omit features like a start screen or game-over logic.
-
-Add the following function above `main`:
-
-```python
-# Step 3 — Craft the prompt
 # The system message constrains the output format (single HTML file, no
 # external dependencies, Canvas rendering). The user message describes the
 # game and lists concrete requirements so the model doesn't omit features.
+# The "Game engineering requirements" block addresses common failure modes
+# like broken collision detection, enemies that can't be killed, and missing
+# spawn logic.
 def build_game_prompt(game_description: str) -> tuple[str, str]:
     """Build the system and user prompts for game generation."""
     system_prompt = (
@@ -128,24 +133,50 @@ def build_game_prompt(game_description: str) -> tuple[str, str]:
         "- Include game-over and restart logic\n"
         "- Use requestAnimationFrame for the game loop\n"
         "- Add colors, simple shapes, or pixel art for visuals\n\n"
+        "Game engineering requirements (follow these exactly):\n"
+        "- Collision detection: implement rectangle or circle collision checks. "
+        "Every entity (player, enemies, projectiles, items) must have x, y, "
+        "width, and height properties used in collision tests.\n"
+        "- Enemy health: every enemy must have a numeric health property that "
+        "decreases when the player attacks. Remove the enemy when health "
+        "reaches 0.\n"
+        "- Combat feedback: when the player attacks, check collision against "
+        "every enemy in range. On hit, decrease enemy health and show visual "
+        "feedback (flash, particle, or color change).\n"
+        "- Valid spawning: enemies must spawn on valid floor positions, never "
+        "inside walls or on top of the player. Validate positions before "
+        "placing.\n"
+        "- Game loop integrity: the update function must call enemy AI, "
+        "collision detection, and rendering every frame. Never skip a step.\n"
+        "- Input handling: use keydown/keyup events with a keys-pressed "
+        "object (e.g., `keys = {}`) that tracks which keys are currently held. "
+        "Check this object each frame in the update loop.\n\n"
         "Return the complete HTML file inside a single ```html code fence."
     )
     return system_prompt, user_prompt
 ```
 
+The engineering requirements cover six failure modes:
+
+| Requirement | What it prevents |
+|---|---|
+| Collision detection | Entities passing through each other |
+| Enemy health | Enemies that can't be killed |
+| Combat feedback | Attacks that don't register hits |
+| Valid spawning | Enemies stuck in walls or overlapping the player |
+| Game loop integrity | Systems that stop updating mid-game |
+| Input handling | Dropped key presses or stuck movement |
+
 ---
 
-## Step 4 — Call the model and extract HTML
+## Step 3 — Generate the game
 
-Send the prompt to GLM and extract the HTML from the response. Two things to note:
+Send the prompt to GLM and extract the HTML from the response. The model wraps its output in a ` ```html ` code fence. The `extract_html` function parses this, falling back to DOCTYPE-based extraction if no fence is found.
 
-- **Timeout**: `timeout_ms=600_000` gives the model 10 minutes. GLM generates large code outputs (1000+ lines), so this headroom prevents the request from timing out.
-- **Extraction**: The model wraps its output in a ` ```html ` code fence. The `extract_html` function parses this, falling back to DOCTYPE-based extraction if no fence is found.
-
-Add the `extract_html` function above `main`:
+Add the `extract_html` and `generate_game` functions above `main`:
 
 ```python
-# Step 4 — Extract HTML from the response
+# Step 3 — Extract HTML from the response
 # The model wraps its output in a ```html code fence. This function extracts
 # the HTML content, falling back to DOCTYPE-based extraction if no fence is found.
 def extract_html(text: str) -> str:
@@ -161,44 +192,201 @@ def extract_html(text: str) -> str:
         return match.group(1).strip()
 
     raise ValueError("No HTML content found in the model response.")
-```
 
-Replace `# Step 3 — Craft the prompt` and `# Step 4 — Call the model and extract HTML` in `main` with:
 
-```python
-    # Step 3 — Craft the prompt
-    system_prompt, user_prompt = build_game_prompt(GAME_DESCRIPTION)
-
-    # Step 4 — Call the model and extract HTML
-    print(f"Generating game: {GAME_DESCRIPTION}")
-    print("This may take a few minutes...")
-
+# Wraps the GLM call and HTML extraction into a single function.
+def generate_game(system_prompt: str, user_prompt: str) -> str:
+    """Call GLM to generate a game and return the extracted HTML."""
     response = client.chat.complete(
         model="zai-glm-5-2",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        timeout_ms=600_000,  # 10-minute timeout for large code generation
     )
-
-    html_content = extract_html(response.choices[0].message.content)
-
-    output = Path("game.html")
-    output.write_text(html_content, encoding="utf-8")
-    print(f"Game saved to {output.resolve()}")
+    return extract_html(response.choices[0].message.content)
 ```
 
 ---
 
-## Step 5 — Serve the game locally
+## Step 4 — Review and fix the game
+
+Generated games sometimes have bugs even with good prompts. These fall into two categories:
+
+- **Runtime errors** — a spawn function accesses an undefined property, initialization code calls functions with missing arguments, or a collision check references the wrong object. The game crashes with a `TypeError`.
+- **Broken logic** — enemies take damage but are never removed from the game, attacks connect but show no visual feedback, or the game loop skips a system. The game runs but doesn't play correctly.
+
+This step sends the HTML to `mistral-medium-latest` for a two-part review that checks for both. If issues are found, it sends the HTML and issue descriptions back to GLM for a targeted fix. The loop runs up to 2 times.
+
+This uses two models for different strengths:
+
+- **`mistral-medium-latest`** reviews the code. It traces execution paths for runtime errors and follows game logic end-to-end for correctness.
+- **`zai-glm-5-2`** (GLM) fixes the code. It's the same model that generated the game, so it understands the codebase.
+
+Add the `review_game` and `fix_game` functions above `main`:
+
+```python
+# Step 4 — Review and fix the game
+# After generation, send the HTML to mistral-medium-latest for a structured
+# review. If issues are found, send the HTML and issue list back to GLM for
+# a targeted fix. This loop runs up to 2 times.
+def review_game(html_content: str) -> str | None:
+    """Review generated HTML for common game mechanic issues.
+
+    Returns a string describing the issues found, or None if no issues.
+    """
+    review_prompt = (
+        "You are a game QA engineer. Review the following HTML5 game for "
+        "both runtime errors and broken game logic.\n\n"
+        "PART 1 — RUNTIME ERRORS\n"
+        "Trace these code paths from call site to implementation. Verify "
+        "that every variable and property referenced actually exists. A "
+        "function that accesses undefined properties is a FAIL.\n\n"
+        "1. Initialization: Trace the startup path. Does every function "
+        "called during init receive the arguments it expects? Are arrays "
+        "and objects initialized before being accessed?\n"
+        "2. Spawning: Trace the enemy spawn function. Does it access "
+        "properties (like room.x, room.width) that actually exist on the "
+        "objects passed to it?\n"
+        "3. Game loop: Does the update/render loop call functions with "
+        "correct arguments? Does it access properties on objects that "
+        "might be undefined?\n"
+        "4. Room transitions: When the player moves to a new room, are "
+        "all references updated correctly?\n\n"
+        "PART 2 — GAME LOGIC\n"
+        "Trace these mechanics end-to-end. It's not enough for the code "
+        "to exist — follow the logic and confirm it produces the correct "
+        "outcome.\n\n"
+        "5. Enemy death: Trace from player attack to enemy removal. Does "
+        "the attack decrease enemy health? When health reaches 0, is the "
+        "enemy actually removed from the array/list so it stops rendering "
+        "and updating? A health property that decreases but never triggers "
+        "removal is a FAIL.\n"
+        "6. Collision detection: Are collision checks called with the "
+        "correct coordinates and dimensions? Do entities have the x, y, "
+        "width, height properties the checks reference?\n"
+        "7. Combat feedback: When the player attacks and hits an enemy, "
+        "is there any visual feedback (flash, color change, particle)? "
+        "An attack that silently reduces health with no indication is a "
+        "FAIL.\n"
+        "8. Input handling: Are keydown/keyup events tracked in a "
+        "keys-pressed object checked each frame? A system that only uses "
+        "keydown without tracking held keys will miss continuous input.\n\n"
+        "If ALL checks pass, respond with exactly: PASS\n\n"
+        "If any check fails, describe the specific bug: which function, "
+        "which property or logic path, and what goes wrong. Do not include "
+        "the game code in your response.\n\n"
+        f"```html\n{html_content}\n```"
+    )
+    response = client.chat.complete(
+        model="mistral-medium-latest",
+        messages=[{"role": "user", "content": review_prompt}],
+    )
+    result = response.choices[0].message.content.strip()
+    if result.upper().startswith("PASS"):
+        return None
+    return result
+
+
+def fix_game(html_content: str, issues: str) -> str:
+    """Send the HTML and issue list back to GLM for a targeted fix."""
+    fix_prompt = (
+        "The following HTML5 game has specific issues that need fixing. "
+        "Fix ONLY the listed issues. Keep everything else unchanged.\n\n"
+        f"Issues to fix:\n{issues}\n\n"
+        f"Game code:\n```html\n{html_content}\n```\n\n"
+        "Return the complete fixed HTML file inside a single ```html code fence."
+    )
+    response = client.chat.complete(
+        model="zai-glm-5-2",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert game developer. Fix the specific issues "
+                    "listed in the game code. Return the complete, corrected "
+                    "HTML file. Do not remove working features."
+                ),
+            },
+            {"role": "user", "content": fix_prompt},
+        ],
+    )
+    return extract_html(response.choices[0].message.content)
+```
+
+The review-fix loop in `main` ties these together:
+
+```python
+    # Step 4 — Review and fix
+    for attempt in range(2):
+        print(f"Reviewing game (attempt {attempt + 1}/2)...")
+        issues = review_game(html_content)
+        if issues is None:
+            print("Review passed.")
+            break
+        print(f"Issues found:\n{issues}")
+        print("Fixing issues...")
+        html_content = fix_game(html_content, issues)
+    else:
+        print("Applied 2 rounds of fixes. Saving result.")
+```
+
+---
+
+## Step 5 — Edit the game
+
+A generated game may be mostly right but have one specific problem — enemies don't take damage, the minimap is missing, or movement feels wrong. Instead of regenerating from scratch, the `--edit` flag lets you describe what's wrong and get a targeted fix.
+
+Add the `edit_game` function above `main`:
+
+```python
+# Step 5 — Edit the game
+# The --edit flag lets users describe what's wrong with an existing game
+# and get a targeted fix without regenerating from scratch.
+def edit_game(html_content: str, user_feedback: str) -> str:
+    """Send existing game HTML and user feedback to GLM for a targeted fix."""
+    edit_prompt = (
+        "The following HTML5 game needs changes based on user feedback. "
+        "Apply the requested changes while keeping everything else intact.\n\n"
+        f"User feedback: {user_feedback}\n\n"
+        f"Current game code:\n```html\n{html_content}\n```\n\n"
+        "Return the complete updated HTML file inside a single ```html code fence."
+    )
+    response = client.chat.complete(
+        model="zai-glm-5-2",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert game developer. Apply the user's "
+                    "requested changes to the game code. Return the complete, "
+                    "updated HTML file. Do not remove working features."
+                ),
+            },
+            {"role": "user", "content": edit_prompt},
+        ],
+    )
+    return extract_html(response.choices[0].message.content)
+```
+
+Usage:
+
+```bash
+python generate_game.py --edit "enemies don't take damage when I attack them"
+```
+
+This reads the existing `game.html`, sends it to GLM along with your feedback, and overwrites the file with the fix.
+
+---
+
+## Step 6 — Save and serve the game
 
 Opening `file://` URLs in a browser triggers security restrictions that can break JavaScript execution. A local HTTP server avoids this entirely.
 
 Add the `serve_and_open` function above `main`:
 
 ```python
-# Step 5 — Serve the game locally
+# Step 6 — Serve the game locally
 # Opening file:// URLs triggers browser security restrictions. A local HTTP
 # server avoids this and lets the game run without issues.
 def serve_and_open(directory: Path, filename: str, port: int = 8000):
@@ -215,33 +403,94 @@ def serve_and_open(directory: Path, filename: str, port: int = 8000):
     server.serve_forever()
 ```
 
-Replace `# Step 5 — Serve the game locally` in `main` with:
+Complete the `main` function with argument parsing and the full orchestration:
 
 ```python
-    # Step 5 — Serve the game locally
+def main():
+    parser = argparse.ArgumentParser(description="Generate or edit an HTML5 game.")
+    parser.add_argument(
+        "--edit",
+        type=str,
+        help="Edit an existing game.html. Describe what to fix.",
+    )
+    args = parser.parse_args()
+
+    output = Path("game.html")
+
+    if args.edit:
+        # Step 5 — Edit mode: read existing game and apply fixes
+        if not output.exists():
+            print(f"Error: {output} not found. Generate a game first.")
+            return
+        print(f"Editing game: {args.edit}")
+        html_content = output.read_text(encoding="utf-8")
+        html_content = edit_game(html_content, args.edit)
+    else:
+        # Step 2 — Craft the prompt
+        system_prompt, user_prompt = build_game_prompt(GAME_DESCRIPTION)
+
+        # Step 3 — Generate the game
+        print(f"Generating game: {GAME_DESCRIPTION}")
+        print("This may take a few minutes...")
+        html_content = generate_game(system_prompt, user_prompt)
+
+        # Step 4 — Review and fix
+        for attempt in range(2):
+            print(f"Reviewing game (attempt {attempt + 1}/2)...")
+            issues = review_game(html_content)
+            if issues is None:
+                print("Review passed.")
+                break
+            print(f"Issues found:\n{issues}")
+            print("Fixing issues...")
+            html_content = fix_game(html_content, issues)
+        else:
+            print("Applied 2 rounds of fixes. Saving result.")
+
+    output.write_text(html_content, encoding="utf-8")
+    print(f"Game saved to {output.resolve()}")
+
+    # Step 6 — Serve the game locally
     serve_and_open(output.resolve().parent, output.name)
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 ---
 
 ## Run
 
-Once all steps are in place, run the script:
+Run the script:
 
 ```bash
 python generate_game.py
 ```
 
-The script calls GLM, saves the generated HTML to `game.html`, starts a local server at `http://localhost:8000/game.html`, and opens it in your browser. Press Ctrl+C to stop the server.
+The script calls GLM, reviews the game for broken mechanics, fixes any issues it finds (up to 2 rounds), saves the HTML to `game.html`, and opens it in your browser.
 
 Example output:
 
-```
+```text
 Generating game: A top-down dungeon crawler. The player navigates procedurally generated rooms...
 This may take a few minutes...
+Reviewing game (attempt 1/2)...
+Issues found:
+3. Combat: The attack function does not check collision against enemies. Pressing spacebar sets an attack flag but no damage is applied.
+4. Spawning: Enemies are placed at random positions without checking for wall overlap.
+Fixing issues...
+Reviewing game (attempt 2/2)...
+Review passed.
 Game saved to /Users/you/glm_game_generator/game.html
 Serving game at http://localhost:8000/game.html
 Press Ctrl+C to stop the server.
+```
+
+To fix a specific issue in an existing game:
+
+```bash
+python generate_game.py --edit "the minimap doesn't update when I move to a new room"
 ```
 
 ---
@@ -295,6 +544,7 @@ For reference, here is the full script with all steps combined:
 ```python
 """Generate a playable HTML5 mini game using the GLM model via the Mistral API."""
 
+import argparse
 import functools
 import http.server
 import os
@@ -304,14 +554,22 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+import httpx
+
 from mistralai.client import Mistral
 
 load_dotenv()
 
 # Step 1 — Initialize the client
-client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
+# GLM generates large code outputs that can take several minutes. The default
+# httpx timeout is too short, so set it to 10 minutes to match timeout_ms.
+client = Mistral(
+    api_key=os.environ["MISTRAL_API_KEY"],
+    timeout_ms=600_000,
+    client=httpx.Client(follow_redirects=True, timeout=httpx.Timeout(600.0)),
+)
 
-# Step 2 — Define the game description
+# Step 2 — Craft the game prompt
 # Be specific about mechanics, controls, visuals, and scope.
 # The more detail you provide, the better the generated game.
 GAME_DESCRIPTION = (
@@ -323,10 +581,12 @@ GAME_DESCRIPTION = (
 )
 
 
-# Step 3 — Craft the prompt
 # The system message constrains the output format (single HTML file, no
 # external dependencies, Canvas rendering). The user message describes the
 # game and lists concrete requirements so the model doesn't omit features.
+# The "Game engineering requirements" block addresses common failure modes
+# like broken collision detection, enemies that can't be killed, and missing
+# spawn logic.
 def build_game_prompt(game_description: str) -> tuple[str, str]:
     """Build the system and user prompts for game generation."""
     system_prompt = (
@@ -347,12 +607,30 @@ def build_game_prompt(game_description: str) -> tuple[str, str]:
         "- Include game-over and restart logic\n"
         "- Use requestAnimationFrame for the game loop\n"
         "- Add colors, simple shapes, or pixel art for visuals\n\n"
+        "Game engineering requirements (follow these exactly):\n"
+        "- Collision detection: implement rectangle or circle collision checks. "
+        "Every entity (player, enemies, projectiles, items) must have x, y, "
+        "width, and height properties used in collision tests.\n"
+        "- Enemy health: every enemy must have a numeric health property that "
+        "decreases when the player attacks. Remove the enemy when health "
+        "reaches 0.\n"
+        "- Combat feedback: when the player attacks, check collision against "
+        "every enemy in range. On hit, decrease enemy health and show visual "
+        "feedback (flash, particle, or color change).\n"
+        "- Valid spawning: enemies must spawn on valid floor positions, never "
+        "inside walls or on top of the player. Validate positions before "
+        "placing.\n"
+        "- Game loop integrity: the update function must call enemy AI, "
+        "collision detection, and rendering every frame. Never skip a step.\n"
+        "- Input handling: use keydown/keyup events with a keys-pressed "
+        "object (e.g., `keys = {}`) that tracks which keys are currently held. "
+        "Check this object each frame in the update loop.\n\n"
         "Return the complete HTML file inside a single ```html code fence."
     )
     return system_prompt, user_prompt
 
 
-# Step 4 — Extract HTML from the response
+# Step 3 — Extract HTML from the response
 # The model wraps its output in a ```html code fence. This function extracts
 # the HTML content, falling back to DOCTYPE-based extraction if no fence is found.
 def extract_html(text: str) -> str:
@@ -370,7 +648,137 @@ def extract_html(text: str) -> str:
     raise ValueError("No HTML content found in the model response.")
 
 
-# Step 5 — Serve the game locally
+# Wraps the GLM call and HTML extraction into a single function.
+def generate_game(system_prompt: str, user_prompt: str) -> str:
+    """Call GLM to generate a game and return the extracted HTML."""
+    response = client.chat.complete(
+        model="zai-glm-5-2",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    )
+    return extract_html(response.choices[0].message.content)
+
+
+# Step 4 — Review and fix the game
+# After generation, send the HTML to mistral-medium-latest for a structured
+# review. If issues are found, send the HTML and issue list back to GLM for
+# a targeted fix. This loop runs up to 2 times.
+def review_game(html_content: str) -> str | None:
+    """Review generated HTML for common game mechanic issues.
+
+    Returns a string describing the issues found, or None if no issues.
+    """
+    review_prompt = (
+        "You are a game QA engineer. Review the following HTML5 game for "
+        "both runtime errors and broken game logic.\n\n"
+        "PART 1 — RUNTIME ERRORS\n"
+        "Trace these code paths from call site to implementation. Verify "
+        "that every variable and property referenced actually exists. A "
+        "function that accesses undefined properties is a FAIL.\n\n"
+        "1. Initialization: Trace the startup path. Does every function "
+        "called during init receive the arguments it expects? Are arrays "
+        "and objects initialized before being accessed?\n"
+        "2. Spawning: Trace the enemy spawn function. Does it access "
+        "properties (like room.x, room.width) that actually exist on the "
+        "objects passed to it?\n"
+        "3. Game loop: Does the update/render loop call functions with "
+        "correct arguments? Does it access properties on objects that "
+        "might be undefined?\n"
+        "4. Room transitions: When the player moves to a new room, are "
+        "all references updated correctly?\n\n"
+        "PART 2 — GAME LOGIC\n"
+        "Trace these mechanics end-to-end. It's not enough for the code "
+        "to exist — follow the logic and confirm it produces the correct "
+        "outcome.\n\n"
+        "5. Enemy death: Trace from player attack to enemy removal. Does "
+        "the attack decrease enemy health? When health reaches 0, is the "
+        "enemy actually removed from the array/list so it stops rendering "
+        "and updating? A health property that decreases but never triggers "
+        "removal is a FAIL.\n"
+        "6. Collision detection: Are collision checks called with the "
+        "correct coordinates and dimensions? Do entities have the x, y, "
+        "width, height properties the checks reference?\n"
+        "7. Combat feedback: When the player attacks and hits an enemy, "
+        "is there any visual feedback (flash, color change, particle)? "
+        "An attack that silently reduces health with no indication is a "
+        "FAIL.\n"
+        "8. Input handling: Are keydown/keyup events tracked in a "
+        "keys-pressed object checked each frame? A system that only uses "
+        "keydown without tracking held keys will miss continuous input.\n\n"
+        "If ALL checks pass, respond with exactly: PASS\n\n"
+        "If any check fails, describe the specific bug: which function, "
+        "which property or logic path, and what goes wrong. Do not include "
+        "the game code in your response.\n\n"
+        f"```html\n{html_content}\n```"
+    )
+    response = client.chat.complete(
+        model="mistral-medium-latest",
+        messages=[{"role": "user", "content": review_prompt}],
+    )
+    result = response.choices[0].message.content.strip()
+    if result.upper().startswith("PASS"):
+        return None
+    return result
+
+
+def fix_game(html_content: str, issues: str) -> str:
+    """Send the HTML and issue list back to GLM for a targeted fix."""
+    fix_prompt = (
+        "The following HTML5 game has specific issues that need fixing. "
+        "Fix ONLY the listed issues. Keep everything else unchanged.\n\n"
+        f"Issues to fix:\n{issues}\n\n"
+        f"Game code:\n```html\n{html_content}\n```\n\n"
+        "Return the complete fixed HTML file inside a single ```html code fence."
+    )
+    response = client.chat.complete(
+        model="zai-glm-5-2",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert game developer. Fix the specific issues "
+                    "listed in the game code. Return the complete, corrected "
+                    "HTML file. Do not remove working features."
+                ),
+            },
+            {"role": "user", "content": fix_prompt},
+        ],
+    )
+    return extract_html(response.choices[0].message.content)
+
+
+# Step 5 — Edit the game
+# The --edit flag lets users describe what's wrong with an existing game
+# and get a targeted fix without regenerating from scratch.
+def edit_game(html_content: str, user_feedback: str) -> str:
+    """Send existing game HTML and user feedback to GLM for a targeted fix."""
+    edit_prompt = (
+        "The following HTML5 game needs changes based on user feedback. "
+        "Apply the requested changes while keeping everything else intact.\n\n"
+        f"User feedback: {user_feedback}\n\n"
+        f"Current game code:\n```html\n{html_content}\n```\n\n"
+        "Return the complete updated HTML file inside a single ```html code fence."
+    )
+    response = client.chat.complete(
+        model="zai-glm-5-2",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert game developer. Apply the user's "
+                    "requested changes to the game code. Return the complete, "
+                    "updated HTML file. Do not remove working features."
+                ),
+            },
+            {"role": "user", "content": edit_prompt},
+        ],
+    )
+    return extract_html(response.choices[0].message.content)
+
+
+# Step 6 — Serve the game locally
 # Opening file:// URLs triggers browser security restrictions. A local HTTP
 # server avoids this and lets the game run without issues.
 def serve_and_open(directory: Path, filename: str, port: int = 8000):
@@ -388,29 +796,50 @@ def serve_and_open(directory: Path, filename: str, port: int = 8000):
 
 
 def main():
-    # Step 3 — Craft the prompt
-    system_prompt, user_prompt = build_game_prompt(GAME_DESCRIPTION)
-
-    # Step 4 — Call the model and extract HTML
-    print(f"Generating game: {GAME_DESCRIPTION}")
-    print("This may take a few minutes...")
-
-    response = client.chat.complete(
-        model="zai-glm-5-2",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        timeout_ms=600_000,  # 10-minute timeout for large code generation
+    parser = argparse.ArgumentParser(description="Generate or edit an HTML5 game.")
+    parser.add_argument(
+        "--edit",
+        type=str,
+        help="Edit an existing game.html. Describe what to fix.",
     )
-
-    html_content = extract_html(response.choices[0].message.content)
+    args = parser.parse_args()
 
     output = Path("game.html")
+
+    if args.edit:
+        # Step 5 — Edit mode: read existing game and apply fixes
+        if not output.exists():
+            print(f"Error: {output} not found. Generate a game first.")
+            return
+        print(f"Editing game: {args.edit}")
+        html_content = output.read_text(encoding="utf-8")
+        html_content = edit_game(html_content, args.edit)
+    else:
+        # Step 2 — Craft the prompt
+        system_prompt, user_prompt = build_game_prompt(GAME_DESCRIPTION)
+
+        # Step 3 — Generate the game
+        print(f"Generating game: {GAME_DESCRIPTION}")
+        print("This may take a few minutes...")
+        html_content = generate_game(system_prompt, user_prompt)
+
+        # Step 4 — Review and fix
+        for attempt in range(2):
+            print(f"Reviewing game (attempt {attempt + 1}/2)...")
+            issues = review_game(html_content)
+            if issues is None:
+                print("Review passed.")
+                break
+            print(f"Issues found:\n{issues}")
+            print("Fixing issues...")
+            html_content = fix_game(html_content, issues)
+        else:
+            print("Applied 2 rounds of fixes. Saving result.")
+
     output.write_text(html_content, encoding="utf-8")
     print(f"Game saved to {output.resolve()}")
 
-    # Step 5 — Serve the game locally
+    # Step 6 — Serve the game locally
     serve_and_open(output.resolve().parent, output.name)
 
 
@@ -422,16 +851,19 @@ if __name__ == "__main__":
 
 ## Summary
 
-This cookbook demonstrated how to use GLM as a code-generation engine — send a detailed game description, extract the HTML output, and serve it locally for instant play.
+This cookbook demonstrated how to use GLM as a code-generation engine with automated quality checks — send a detailed game description, review the output for broken mechanics, fix issues automatically, and iterate on existing games with targeted edits.
 
 **What you built:**
 - A game generation script that turns a text description into a playable HTML5 Canvas game
-- A prompt structure that constrains output format (single file, no dependencies) while describing game mechanics in detail
+- A prompt structure with engineering requirements that prevent common failure modes (broken collision, unkillable enemies, invalid spawning)
+- An automated review-fix loop that uses `mistral-medium-latest` to QA the game and GLM to patch issues
+- An edit mode (`--edit`) for fixing specific problems without regenerating from scratch
 - A local HTTP server that serves the generated game without browser security restrictions
 
 **Mistral features used:**
-- Chat completions API with the `zai-glm-5-2` model
+- Chat completions API with the `zai-glm-5-2` model for code generation
+- Chat completions API with `mistral-medium-latest` for code review
 - System and user message roles for structured prompting
-- Extended timeout (`timeout_ms`) for long code generation
+- Extended timeout (`timeout_ms` and `httpx.Timeout`) for long code generation
 
 Try describing your own game idea and see what GLM produces. For more on available models, see the [models documentation](https://docs.mistral.ai/getting-started/models/models_overview/).
