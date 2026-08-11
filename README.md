@@ -33,6 +33,8 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
 | [01-build-a-database-advisor-agent.ipynb](mistral/connectors/01-build-a-database-advisor-agent.ipynb) | connectors, agents | Build an agent that compares databases using their source code via the DeepWiki connector |
 | [02-build-a-quickstart-generator.ipynb](mistral/connectors/02-build-a-quickstart-generator.ipynb) | connectors, agents, web search | Build a quickstart generator that improves with each tool added — web search, connectors, and both combined |
+| [01-glm-game-generator.md](mistral/agents/glm_game_generator/01-glm-game-generator.md) | agents, code generation | Generate a playable HTML5 game from a text description using GLM, with automated review and fix loop |
+| [01-glm-code-modernizer.md](mistral/agents/glm_code_modernizer/01-glm-code-modernizer.md) | agents, code generation | Modernize legacy Python codebases using GLM for automated refactoring |
 
 ## Submission Guidelines:
 
