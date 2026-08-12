@@ -1,0 +1,2 @@
+mistralai
+python-dotenv
