@@ -44,7 +44,7 @@ jobs:
 
           # A = Added (new files), M = Modified (existing files changed in this push).
           git diff --diff-filter=AM --name-only \
-            "${COMPARE_BASE}" "${{ github.sha }}" \
+            "${COMPARE_BASE}" "${{ github.event.pull_request.head.sha }}" \
             -- 'mistral/**/*.md' 'mistral/**/*.ipynb' > changed_cookbooks.txt
 
           count=$(wc -l < changed_cookbooks.txt | tr -d ' ')
@@ -64,6 +64,6 @@ jobs:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           BASE_SHA: ${{ steps.detect.outputs.compare_base }}
         run: python skills/cookbook-review/review_pr.py changed_cookbooks.txt
