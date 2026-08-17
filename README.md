@@ -105,6 +105,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [sts_demo.py](mistral/tts/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
+| [avian_magnetoreception.ipynb](mistral/quantum/avian_magnetoreception.ipynb) | reasoning, science | Mistral designs a Trotterized radical-pair circuit for the avian "quantum compass", runs it on a simulator against pre-recorded IBM quantum hardware data, and judges whether a quantum computer is actually needed |
 
 
 
