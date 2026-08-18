@@ -379,6 +379,6 @@ if __name__ == "__main__":
     print("- list_rooms()")
     print("- get_help()")
     print()
-    print("This MCP server is ready for LeChat integration!")
+    print("This MCP server is ready for Vibe integration!")
     print("Running Tic-Tac-Toe MCP server with SSE transport")
     mcp.run(transport="sse")
