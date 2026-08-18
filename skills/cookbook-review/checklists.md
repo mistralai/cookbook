@@ -25,7 +25,7 @@ Use these checklists to review high-level guidance at a glance.
 - Always capitalize proper nouns (Mistral, Python, TypeScript, GitHub, etc.).
 - Lowercase everything else in sentences, headings, titles, and UI labels.
 - Don't capitalize the spelled-out form of an acronym unless it's a proper noun.
-- Use title-style capitalization for product and service names (Mistral Large, Codestral, Le Chat).
+- Use title-style capitalization for product and service names (Mistral Large, Codestral, Vibe).
 - In code, follow the capitalization of the programming language or environment.
 - Don't use all uppercase for emphasis.
 - Don't use all lowercase as a stylistic choice.
