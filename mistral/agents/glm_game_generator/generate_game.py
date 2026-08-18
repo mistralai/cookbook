@@ -174,7 +174,9 @@ def review_game(html_content: str) -> str | None:
         messages=[{"role": "user", "content": review_prompt}],
     )
     result = response.choices[0].message.content.strip()
-    if result.upper().startswith("PASS"):
+    # The model may add preamble before "PASS" or say "PASS - all checks passed",
+    # so check whether the entire response is short and contains PASS.
+    if len(result) < 100 and "PASS" in result.upper():
         return None
     return result
 
@@ -251,6 +253,7 @@ def serve_and_open(directory: Path, filename: str, port: int = 8000):
     server.serve_forever()
 
 
+# Step 7 — Tie it all together in main
 def main():
     parser = argparse.ArgumentParser(description="Generate or edit an HTML5 game.")
     parser.add_argument(
@@ -280,8 +283,9 @@ def main():
         html_content = generate_game(system_prompt, user_prompt)
 
         # Step 4 — Review and fix
-        for attempt in range(2):
-            print(f"Reviewing game (attempt {attempt + 1}/2)...")
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            print(f"Reviewing game (attempt {attempt + 1}/{max_attempts})...")
             issues = review_game(html_content)
             if issues is None:
                 print("Review passed.")
@@ -290,7 +294,7 @@ def main():
             print("Fixing issues...")
             html_content = fix_game(html_content, issues)
         else:
-            print("Applied 2 rounds of fixes. Saving result.")
+            print(f"Applied {max_attempts} rounds of fixes. Saving best result.")
 
     output.write_text(html_content, encoding="utf-8")
     print(f"Game saved to {output.resolve()}")

@@ -70,13 +70,18 @@ client = Mistral(
     client=httpx.Client(follow_redirects=True, timeout=httpx.Timeout(600.0)),
 )
 
+# Step 2 — Craft the game prompt
+
+# Step 3 — Generate the game
+
+# Step 4 — Review and fix the game
+
+# Step 5 — Edit the game
+
+# Step 6 — Serve the game locally
 
 def main():
-    # Step 2 — Craft the game prompt
-    # Step 3 — Generate the game
-    # Step 4 — Review and fix the game
-    # Step 5 — Edit the game
-    # Step 6 — Serve the game locally
+    # Step 7 — Tie it all together in main
     pass
 
 
@@ -216,7 +221,7 @@ Generated games sometimes have bugs even with good prompts. These fall into two 
 - **Runtime errors** — a spawn function accesses an undefined property, initialization code calls functions with missing arguments, or a collision check references the wrong object. The game crashes with a `TypeError`.
 - **Broken logic** — enemies take damage but are never removed from the game, attacks connect but show no visual feedback, or the game loop skips a system. The game runs but doesn't play correctly.
 
-This step sends the HTML to `mistral-medium-latest` for a two-part review that checks for both. If issues are found, it sends the HTML and issue descriptions back to GLM for a targeted fix. The loop runs up to 2 times.
+This step sends the HTML to `mistral-medium-latest` for a two-part review that checks for both. If issues are found, it sends the HTML and issue descriptions back to GLM for a targeted fix. The loop runs until the review passes, up to a maximum of 5 attempts.
 
 This uses two models for different strengths:
 
@@ -283,7 +288,9 @@ def review_game(html_content: str) -> str | None:
         messages=[{"role": "user", "content": review_prompt}],
     )
     result = response.choices[0].message.content.strip()
-    if result.upper().startswith("PASS"):
+    # The model may add preamble before "PASS" or say "PASS - all checks passed",
+    # so check whether the entire response is short and contains PASS.
+    if len(result) < 100 and "PASS" in result.upper():
         return None
     return result
 
@@ -314,22 +321,7 @@ def fix_game(html_content: str, issues: str) -> str:
     return extract_html(response.choices[0].message.content)
 ```
 
-The review-fix loop in `main` ties these together:
-
-```python
-    # Step 4 — Review and fix
-    for attempt in range(2):
-        print(f"Reviewing game (attempt {attempt + 1}/2)...")
-        issues = review_game(html_content)
-        if issues is None:
-            print("Review passed.")
-            break
-        print(f"Issues found:\n{issues}")
-        print("Fixing issues...")
-        html_content = fix_game(html_content, issues)
-    else:
-        print("Applied 2 rounds of fixes. Saving result.")
-```
+You'll see how the review-fix loop integrates into `main` in Step 7, where `main` calls `review_game` and `fix_game` in a loop until the review passes (up to 5 attempts).
 
 ---
 
@@ -403,10 +395,15 @@ def serve_and_open(directory: Path, filename: str, port: int = 8000):
     server.serve_forever()
 ```
 
-Complete the `main` function with argument parsing and the full orchestration:
+---
+
+## Step 7 — Tie it all together in main
+
+Replace the placeholder in `main` from Step 1 with the full orchestration. This function ties all the previous steps together — it parses arguments, calls the generation and review functions, handles edit mode, and serves the result:
 
 ```python
 def main():
+    # Step 7 — Tie it all together in main
     parser = argparse.ArgumentParser(description="Generate or edit an HTML5 game.")
     parser.add_argument(
         "--edit",
@@ -435,8 +432,9 @@ def main():
         html_content = generate_game(system_prompt, user_prompt)
 
         # Step 4 — Review and fix
-        for attempt in range(2):
-            print(f"Reviewing game (attempt {attempt + 1}/2)...")
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            print(f"Reviewing game (attempt {attempt + 1}/{max_attempts})...")
             issues = review_game(html_content)
             if issues is None:
                 print("Review passed.")
@@ -445,17 +443,13 @@ def main():
             print("Fixing issues...")
             html_content = fix_game(html_content, issues)
         else:
-            print("Applied 2 rounds of fixes. Saving result.")
+            print(f"Applied {max_attempts} rounds of fixes. Saving best result.")
 
     output.write_text(html_content, encoding="utf-8")
     print(f"Game saved to {output.resolve()}")
 
     # Step 6 — Serve the game locally
     serve_and_open(output.resolve().parent, output.name)
-
-
-if __name__ == "__main__":
-    main()
 ```
 
 ---
@@ -468,19 +462,19 @@ Run the script:
 python generate_game.py
 ```
 
-The script calls GLM, reviews the game for broken mechanics, fixes any issues it finds (up to 2 rounds), saves the HTML to `game.html`, and opens it in your browser.
+The script calls GLM, reviews the game for broken mechanics, fixes any issues it finds (up to 5 rounds), saves the HTML to `game.html`, and opens it in your browser.
 
 Example output:
 
 ```text
 Generating game: A top-down dungeon crawler. The player navigates procedurally generated rooms...
 This may take a few minutes...
-Reviewing game (attempt 1/2)...
+Reviewing game (attempt 1/5)...
 Issues found:
 3. Combat: The attack function does not check collision against enemies. Pressing spacebar sets an attack flag but no damage is applied.
 4. Spawning: Enemies are placed at random positions without checking for wall overlap.
 Fixing issues...
-Reviewing game (attempt 2/2)...
+Reviewing game (attempt 2/5)...
 Review passed.
 Game saved to /Users/you/glm_game_generator/game.html
 Serving game at http://localhost:8000/game.html
@@ -630,7 +624,7 @@ def build_game_prompt(game_description: str) -> tuple[str, str]:
     return system_prompt, user_prompt
 
 
-# Step 3 — Extract HTML from the response
+# Step 3 — Generate the game
 # The model wraps its output in a ```html code fence. This function extracts
 # the HTML content, falling back to DOCTYPE-based extraction if no fence is found.
 def extract_html(text: str) -> str:
@@ -718,7 +712,9 @@ def review_game(html_content: str) -> str | None:
         messages=[{"role": "user", "content": review_prompt}],
     )
     result = response.choices[0].message.content.strip()
-    if result.upper().startswith("PASS"):
+    # The model may add preamble before "PASS" or say "PASS - all checks passed",
+    # so check whether the entire response is short and contains PASS.
+    if len(result) < 100 and "PASS" in result.upper():
         return None
     return result
 
@@ -795,6 +791,7 @@ def serve_and_open(directory: Path, filename: str, port: int = 8000):
     server.serve_forever()
 
 
+# Step 7 — Tie it all together in main
 def main():
     parser = argparse.ArgumentParser(description="Generate or edit an HTML5 game.")
     parser.add_argument(
@@ -824,8 +821,9 @@ def main():
         html_content = generate_game(system_prompt, user_prompt)
 
         # Step 4 — Review and fix
-        for attempt in range(2):
-            print(f"Reviewing game (attempt {attempt + 1}/2)...")
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            print(f"Reviewing game (attempt {attempt + 1}/{max_attempts})...")
             issues = review_game(html_content)
             if issues is None:
                 print("Review passed.")
@@ -834,7 +832,7 @@ def main():
             print("Fixing issues...")
             html_content = fix_game(html_content, issues)
         else:
-            print("Applied 2 rounds of fixes. Saving result.")
+            print(f"Applied {max_attempts} rounds of fixes. Saving best result.")
 
     output.write_text(html_content, encoding="utf-8")
     print(f"Game saved to {output.resolve()}")
