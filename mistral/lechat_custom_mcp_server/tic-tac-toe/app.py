@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request, jsonify
 import os
 from flask_cors import CORS
 import logging
@@ -248,17 +248,6 @@ def room_chat(room_id):
         logger.error(f"AI chat failed: {e}")
         return jsonify({'error': 'AI chat failed'}), 500
 
-@app.route('/rooms/<room_id>/markdown', methods=['GET'])
-def get_room_markdown(room_id):
-    if room_id not in rooms:
-        return jsonify({'error': 'Room not found'}), 404
-
-    room = rooms[room_id]
-    return jsonify({
-        'room_id': room_id,
-        'markdown': room.to_markdown()
-    })
-
 # Helper functions for AI interactions
 def get_ai_move_for_room(room):
     board_string = ""
@@ -297,7 +286,7 @@ Board positions:
     ]
 
     response = client.chat.complete(
-        model="mistral-large-latest",
+        model="mistral-medium-latest",
         messages=messages,
         temperature=0.1,
         response_format={"type": "json_object"}
@@ -331,21 +320,11 @@ Keep responses under 50 words. Use emojis occasionally. Don't make game moves in
     ]
 
     response = client.chat.complete(
-        model="mistral-large-latest",
+        model="mistral-medium-latest",
         messages=messages
     )
 
     return response.choices[0].message.content
-
-# Serve the room-based game page
-@app.route('/')
-def index():
-    return send_from_directory('.', 'room_game.html')
-
-# Serve static files
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('.', path)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=7860, debug=True)

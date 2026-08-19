@@ -105,6 +105,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [sts_demo.py](mistral/tts/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
+| [Custom MCP Server](mistral/lechat_custom_mcp_server/custom-mcp-server.md) | MCP, connectors | Build a custom MCP server (tic-tac-toe) and connect it to Vibe |
 
 
 

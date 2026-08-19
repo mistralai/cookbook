@@ -18,7 +18,7 @@ EXPOSE 7860
 # Create startup script that runs MCP server only (simpler approach)
 RUN echo '#!/bin/bash\n\
 echo "Starting Tic-Tac-Toe MCP Server on port 7860..."\n\
-echo "This is the MCP server for LeChat integration"\n\
+echo "This is the MCP server for Vibe integration"\n\
 echo "MCP Tools: create_room, make_move, send_chat, get_room_state, list_rooms"\n\
 python mcp_server.py' > start.sh && chmod +x start.sh
 
