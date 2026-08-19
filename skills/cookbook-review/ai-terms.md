@@ -48,7 +48,7 @@ Before you invent a term, make sure a suitable term doesn't already exist.
 
 - Lowercase *model*, *agent*, *tool*, *prompt*, *token*, *embedding*, *inference*, *fine-tuning*, and *context* in general use. Capitalize *Connector* and *Connectors* when referring to the Mistral product; use lowercase *connector* only for a specific registered instance.
 - Capitalize proper model names: *Mistral Large*, *Mistral Small*, *Codestral*, *Pixtral*, *Mistral Embed*.
-- Capitalize *Le Chat* as a proper product name.
+- *Le Chat* is deprecated — use *Vibe* instead. See the product names table below.
 - Capitalize *Mistral AI* when referring to the company.
 - Use *AI* (uppercase) always—never *Ai* or *ai* in prose.
 - Use *RAG*, *MCP*, *API*, *SDK* (uppercase abbreviations).
