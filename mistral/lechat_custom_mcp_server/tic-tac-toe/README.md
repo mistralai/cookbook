@@ -42,4 +42,4 @@ The server starts on port 7860 with SSE transport.
 
 ## Deployment
 
-See the [cookbook tutorial](../custom-mcp-server.md#step-4--deploy-to-hugging-face-spaces) for deploying to Hugging Face Spaces and connecting to Vibe.
+See the [cookbook tutorial](../custom-mcp-server.md) for deploying to Hugging Face Spaces and connecting to Vibe.

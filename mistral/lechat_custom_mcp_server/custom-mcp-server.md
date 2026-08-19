@@ -36,27 +36,54 @@ To complete this cookbook, you will need:
 
 - Python 3.11+
 - A Mistral account and API key
-- A [Hugging Face](https://huggingface.co) account with a Pro subscription (to deploy a Docker container)
+- A [Hugging Face](https://huggingface.co) account with a Pro subscription (to deploy the Docker container)
 
 ## Environment setup
 
-### Install
+### Create a Hugging Face Space
 
-Install the dependencies:
+Create the Space first so you can build your project files directly inside the cloned repository.
 
-```bash
-pip install fastmcp flask flask-cors mistralai python-dotenv
-```
+1. Go to [huggingface.co/new-space](https://huggingface.co/new-space)
+2. Name your Space (for example, `tictactoe-mcp-server`)
+3. Select **Docker** as the SDK
+4. Set visibility to **Public** (required for Vibe connectors)
 
 ### Required environment variables
 
-To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+You'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys), select **Private and shared connectors** from the **Connectors access scope** dropdown menu, and create a new key.
 
-Create a `.env` at the root of your project and add your Mistral API key:
+Add your API key as a Space secret so it's available at runtime without being stored in the repository:
 
+1. Go to your Space's **Settings** tab
+2. Scroll to **Variables and secrets**
+3. Click **New secret**
+4. Set the name to `MISTRAL_API_KEY` and paste your API key as the value
+
+Space secrets are write-only — once saved, the value can't be read from the settings page. They're injected as environment variables at runtime, so `os.getenv('MISTRAL_API_KEY')` in your code works the same way it does with a local `.env` file. Don't commit a `.env` file to your repository.
+
+### Clone the Space
+
+To clone and push to Hugging Face, you need a [User Access Token](https://huggingface.co/docs/hub/security-tokens#user-access-tokens) with **write** permissions. Generate one at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens). Git will prompt for your credentials when you clone — use your Hugging Face username and the access token as your password.
+
+Clone the Space repository to your machine. Replace `<your-username>` with your Hugging Face username and `<space-name>` with the name you chose:
+
+```bash
+git clone https://huggingface.co/spaces/<your-username>/<space-name>
+cd <space-name>
 ```
-MISTRAL_API_KEY=your-mistral-api-key
+
+### Install
+
+Create a `requirements.txt` and install the dependencies in one step:
+
+```bash
+echo "fastmcp\nflask\nflask-cors\nmistralai\npython-dotenv" > requirements.txt && pip install -r requirements.txt
 ```
+
+All files in the following steps are created inside this directory.
+
+---
 
 ## Step 1 — Game logic and Flask API
 
@@ -848,26 +875,15 @@ The container runs `mcp_server.py` (which imports from `app.py`), exposing the S
 
 ## Step 4 — Deploy to Hugging Face Spaces
 
-Create a new Space on Hugging Face:
+Push your files to the Space repository you cloned in Step 1:
 
-1. Go to [huggingface.co/new-space](https://huggingface.co/new-space)
-2. Name your Space (for example, `tictactoe-mcp-server`)
-3. Select **Docker** as the SDK
-4. Set visibility to **Public** (required for Vibe connectors)
+```bash
+git add app.py mcp_server.py requirements.txt Dockerfile
+git commit -m "Add tic-tac-toe MCP server"
+git push
+```
 
-Upload your project files:
-
-- `app.py`
-- `mcp_server.py`
-- `requirements.txt`
-- `Dockerfile`
-
-Add your environment variable:
-
-1. Go to **Settings** > **Variables and secrets**
-2. Add `MISTRAL_API_KEY` as a secret with your API key
-
-Monitor the build in the **Logs** tab. Once the status shows **Running**, your SSE endpoint is live at:
+Monitor the build in the **Logs** tab of your Space. Once the status shows **Running**, your SSE endpoint is live at:
 
 ```text
 https://<your-username>-<space-name>.hf.space/sse
@@ -875,7 +891,21 @@ https://<your-username>-<space-name>.hf.space/sse
 
 ## Step 5 — Connect to Vibe
 
-Register your deployed MCP server as a Vibe connector using the Connectors API.
+You can register your MCP server in [Studio](https://console.mistral.ai/build/connectors) or programmatically.
+
+### Registering the MCP server in Studio
+
+To register the server in Studio: 
+
+1. Navigate to the [Connectors](https://console.mistral.ai/build/connectors) tab and click **Add Connector**.
+2. Click the **Custom MCP Server** tab on the modal.
+3. Give your connector a title like `Tic Tac Toe`.
+4. Add your space's URL in the proper format: `https://<your-username>-<space-name>.hf.space/sse`
+5. Optionally provide a description like "Play tic-tac-toe against Mistral".
+
+### Registering the MCP server programmatically using the Mistral API
+
+Register your deployed MCP server as a Vibe connector using the Mistral API.
 
 ```python
 from mistralai.client import Mistral
@@ -885,29 +915,27 @@ client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
 
 connector = client.beta.connectors.create(
     name="tictactoe-mcp",
-    type="mcp_server",
     url="https://<your-username>-<space-name>.hf.space/sse",
-    description="Play tic-tac-toe against Mistral AI"
+    description="Play tic-tac-toe against Mistral",
+    visibility="private",
 )
 
 print(f"Connector ID: {connector.id}")
 print(f"Connector name: {connector.name}")
+
+# This MCP server doesn't require authentication, 
+# but you must add credentials to enable the server on your project.
+await client.beta.connectors.create_or_update_user_credentials_async(
+    connector_id_or_name="connector.name",
+    name=f"new-credential",
+    credentials={'headers':{}},
+    is_default=True,
+)
 ```
 
 Replace the URL with your actual Hugging Face Spaces endpoint.
 
-### Authenticate the connector
-
-This MCP server doesn't require authentication, but you must complete the authentication step to enable the connector. Call `get_auth_url` and open the returned URL in your browser:
-
-```python
-auth = client.beta.connectors.get_auth_url(connector_id=connector.id)
-print(f"Open this URL to authenticate: {auth.url}")
-```
-
-Open the URL in your browser and complete the flow. This activates the connector for your account.
-
-### Verify the connector
+#### Verify the Connector
 
 Once authenticated, verify that Vibe can reach your server:
 
@@ -919,11 +947,28 @@ print(f"Tools: {connector_info.tools}")
 
 You should see all six tools listed.
 
-### Play in Vibe
+## Play in Vibe
 
 1. Open [Vibe](https://chat.mistral.ai)
 2. In a new conversation, enable your `tictactoe-mcp` connector
 3. Type "Let's play tic-tac-toe" and watch Vibe call your MCP tools
+
+## Clean up
+
+To avoid unnecessary resource usage, delete the connector and the Hugging Face Space when you're done.
+
+### Delete the connector
+
+Remove the connector in [Studio](https://console.mistral.ai/build/connectors) by clicking the Connector, selecting the three dots, and selecting **Delete**, or programmatically:
+
+```python
+client.beta.connectors.delete(connector_id=connector.id)
+```
+
+### Delete the Hugging Face Space
+
+1. Go to your Space's **Settings** tab
+2. Scroll to the bottom and click **Delete this Space**
 
 ## Summary
 
