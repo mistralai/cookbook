@@ -3,9 +3,7 @@
 Pytest test cases for Mistral Document AI notebook functions
 """
 
-from asyncio import subprocess
 import base64
-from email.mime import image
 import json
 import os
 from unittest import result
