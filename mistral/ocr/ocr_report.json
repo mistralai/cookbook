@@ -1,0 +1,241 @@
+{
+  "total_pages": 9,
+  "flagged_pages": [],
+  "document_annotation": {
+    "language": "en",
+    "summary": "This document introduces Mistral 7B, a 7-billion-parameter language model designed for high performance and efficiency. The model leverages grouped-query attention (GQA) and sliding window attention (SWA) to achieve faster inference and handle longer sequences with reduced computational cost. Mistral 7B outperforms the best open 13B model (Llama 2) across all evaluated benchmarks and surpasses the best released 34B model (Llama 1) in reasoning, mathematics, and code generation. A fine-tuned instruction-following variant, Mistral 7B – Instruct, also demonstrates superior performance compared to Llama 2 13B – Chat. The model is released under the Apache 2.0 license, with accompanying code and deployment tools for accessibility and ease of integration.",
+    "authors": [
+      "Albert Q. Jiang",
+      "Alexandre Sablayrolles",
+      "Arthur Mensch",
+      "Chris Bamford",
+      "Devendra Singh Chaplot",
+      "Diego de las Casas",
+      "Florian Bressand",
+      "Gianna Lengyel",
+      "Guillaume Lample",
+      "Lucile Saulnier",
+      "Lélio Renard Lavaud",
+      "Marie-Anne Lachaux",
+      "Pierre Stock",
+      "Teven Le Scao",
+      "Thibaut Lavril",
+      "Thomas Wang",
+      "Timothée Lacroix",
+      "William El Sayed"
+    ],
+    "doc_type": "research_paper"
+  },
+  "bbox_results": [
+    {
+      "page": 0,
+      "id": "img-0.jpeg",
+      "coords": {
+        "x1": 200,
+        "y1": 280,
+        "x2": 595,
+        "y2": 416
+      },
+      "annotation": {
+        "image_type": "text",
+        "description": "The image displays the word 'Mistral' in bold, stylized orange letters with a 3D effect, set against a white background. The font appears modern and is likely designed to convey a sense of strength and clarity."
+      },
+      "context_text": "...ian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, Lélio Renard Lavaud, Marie-Anne Lachaux, Pierre Stock, Teven Le Scao, Thibaut Lavril, Thomas Wang, Timothée Lacroix, William El Sayed [IMAGE] ## Abstract  We introduce Mistral 7B, a 7-billion-parameter language model engineered for superior performance and efficiency. Mistral 7B outperforms the best open 13B model (Llama 2) across all eva..."
+    },
+    {
+      "page": 1,
+      "id": "img-1.jpeg",
+      "coords": {
+        "x1": 137,
+        "y1": 299,
+        "x2": 318,
+        "y2": 469
+      },
+      "annotation": {
+        "image_type": "table",
+        "description": "The table shows a 5x5 matrix with row and column headers labeled 'The', 'cat', 'sat', 'on', and 'the'. Each cell contains a binary value (0 or 1), with the diagonal cells (from top-left to bottom-right) all marked as 1, indicating a self-referential or identity relationship. The cells below the diagonal are also 1, suggesting a transitive or cumulative relationship, while the cells above the diagonal are 0, indicating no relationship in that direction."
+      },
+      "context_text": "...work, our aim is to help the community create more affordable, efficient, and high-performing language models that can be used in a wide range of real-world applications.  ## 2 Architectural details [IMAGE] Vanilla Attention  ![img-2.jpeg](img-2.jpeg)  Sliding Window Attention  ![img-3.jpeg](img-3.jpeg)  Effective Context Length  Figure 1: Sliding Window Attention. The number of operations in vanilla a..."
+    },
+    {
+      "page": 1,
+      "id": "img-2.jpeg",
+      "coords": {
+        "x1": 337,
+        "y1": 299,
+        "x2": 483,
+        "y2": 469
+      },
+      "annotation": {
+        "image_type": "table",
+        "description": "The table is a 6x6 matrix with binary values (0 or 1) arranged in a lower triangular pattern. The diagonal and lower triangular entries are 1, while the upper triangular entries are 0. This structure visually represents a lower triangular matrix, often used in mathematical contexts such as Cholesky decomposition or in representing triangular relationships."
+      },
+      "context_text": "...more affordable, efficient, and high-performing language models that can be used in a wide range of real-world applications.  ## 2 Architectural details  ![img-1.jpeg](img-1.jpeg)  Vanilla Attention [IMAGE] Sliding Window Attention  ![img-3.jpeg](img-3.jpeg)  Effective Context Length  Figure 1: Sliding Window Attention. The number of operations in vanilla attention is quadratic in the sequence length,..."
+    },
+    {
+      "page": 1,
+      "id": "img-3.jpeg",
+      "coords": {
+        "x1": 493,
+        "y1": 299,
+        "x2": 641,
+        "y2": 469
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "The graph is a bar chart illustrating the relationship between 'Layers' (y-axis) and 'Tokens' (x-axis) with a fixed 'window size'. Each layer is represented by a horizontal bar composed of colored segments, where the number of segments corresponds to the number of tokens. The chart shows a consistent pattern across layers, with each layer containing the same number of tokens, indicating a uniform distribution of tokens per layer."
+      },
+      "context_text": "...age models that can be used in a wide range of real-world applications.  ## 2 Architectural details  ![img-1.jpeg](img-1.jpeg)  Vanilla Attention  ![img-2.jpeg](img-2.jpeg)  Sliding Window Attention [IMAGE] Effective Context Length  Figure 1: Sliding Window Attention. The number of operations in vanilla attention is quadratic in the sequence length, and the memory increases linearly with the number of..."
+    },
+    {
+      "page": 2,
+      "id": "img-4.jpeg",
+      "coords": {
+        "x1": 137,
+        "y1": 94,
+        "x2": 652,
+        "y2": 175
+      },
+      "annotation": {
+        "image_type": "table",
+        "description": "The table displays three columns labeled 'Timestamp t', 'Timestamp t+1', and 'Timestamp t+2', each containing a sentence split into individual words. The first row shows the sentence 'Mistral is a good example' decomposed into 'Mistral', 'is', 'a', 'good', 'example'. The second row shows 'The cat sat on the mat' split into 'The', 'cat', 'sat', 'on', 'the', 'mat'. The key relationship is the sequential transformation of words across timestamps, illustrating a step-by-step word-level decomposition of sentences."
+      },
+      "context_text": "... [IMAGE] Figure 2: Rolling buffer cache. The cache has a fixed size of W = 4. Keys and values for position i are stored in position i mod W of the cache. When the position i is larger than W, past values in..."
+    },
+    {
+      "page": 2,
+      "id": "img-5.jpeg",
+      "coords": {
+        "x1": 217,
+        "y1": 348,
+        "x2": 576,
+        "y2": 493
+      },
+      "annotation": {
+        "image_type": "table",
+        "description": "The table shows a sequence of words ('The', 'cat', 'sat', 'on', 'the', 'mat', 'and', 'saw', 'the', 'dog', 'go', 'to', 'the') with a sliding window approach highlighting past, cache, and current contexts. The 'Past' column (left) contains zeros for all words except the most recent non-zero entry, the 'Cache' column (middle) shows a diagonal pattern of ones indicating a sliding window of recent words, and the 'Current' column (right) marks the current word with a one while the rest are zeros."
+      },
+      "context_text": "...window size as our chunk size. For each chunk, we thus need to compute the attention over the cache and over the chunk. Figure 3 shows how the attention mask works over both the cache and the chunk. [IMAGE] Figure 3: Pre-fill and chunking. During pre-fill of the cache, long sequences are chunked to limit memory usage. We process a sequence in three chunks, \"The cat sat on\", \"the mat and saw\", \"the dog..."
+    },
+    {
+      "page": 3,
+      "id": "img-6.jpeg",
+      "coords": {
+        "x1": 139,
+        "y1": 100,
+        "x2": 388,
+        "y2": 256
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "The bar graph compares the accuracy percentages of three models—Mistral 7B, LLAMA 2 7B, and LLAMA 2 13B—across four categories: MMLU, Knowledge, Reasoning, and Comprehension. Mistral 7B shows the highest accuracy in the MMLU category, while LLAMA 2 13B performs best in Knowledge, Reasoning, and Comprehension, outperforming the other models in these areas."
+      },
+      "context_text": "... [IMAGE] ![img-7.jpeg](img-7.jpeg)  Figure 4: Performance of Mistral 7B and different Llama models on a wide range of benchmarks. All models were re-evaluated on all metrics with our evaluation pipeline for..."
+    },
+    {
+      "page": 3,
+      "id": "img-7.jpeg",
+      "coords": {
+        "x1": 400,
+        "y1": 99,
+        "x2": 647,
+        "y2": 256
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "The bar chart compares the accuracy percentages of three models—Mistral 7B, Llama 2 7B, and Llama 3 8B—across four evaluation categories: AGI Eval, Math, BBH, and Code. Mistral 7B shows the highest accuracy in AGI Eval (45.1%) and Math (42.3%), while Llama 3 8B leads in BBH (41.8%) and Code (43.4%). Llama 2 7B consistently performs the lowest across all categories."
+      },
+      "context_text": "...![img-6.jpeg](img-6.jpeg) [IMAGE] Figure 4: Performance of Mistral 7B and different Llama models on a wide range of benchmarks. All models were re-evaluated on all metrics with our evaluation pipeline for accurate comparison. Mistra..."
+    },
+    {
+      "page": 4,
+      "id": "img-8.jpeg",
+      "coords": {
+        "x1": 216,
+        "y1": 94,
+        "x2": 391,
+        "y2": 218
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "The line graph compares the performance of two models, LLaMA 2 and Mistral, across different model sizes measured in billion parameters (7B, 13B, 34B, 70B). The y-axis represents the performance metric (likely accuracy or a similar score) ranging from 45 to 70, while the x-axis lists the model sizes. Both models show a positive correlation between model size and performance, with LLaMA 2 consistently outperforming Mistral at each size increment. The performance gap widens as model size increases, indicating that LLaMA 2 scales more effectively with larger parameter counts."
+      },
+      "context_text": "... [IMAGE] ![img-9.jpeg](img-9.jpeg)  ![img-10.jpeg](img-10.jpeg)  ![img-11.jpeg](img-11.jpeg)  Figure 5: Results on MMLU, commonsense reasoning, world knowledge and reading comprehension for Mistral 7B and Ll..."
+    },
+    {
+      "page": 4,
+      "id": "img-9.jpeg",
+      "coords": {
+        "x1": 397,
+        "y1": 94,
+        "x2": 570,
+        "y2": 218
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "The graph compares the reasoning performance of two models, LLaMA 2 and Mistral, across different model sizes measured in billions of parameters (13B and 70B). The y-axis represents reasoning performance, while the x-axis shows the model sizes. LLaMA 2 (red line) and Mistral (orange line) both show an increase in reasoning performance as model size grows, with Mistral consistently outperforming LLaMA 2 at both 13B and 70B parameter sizes. The key finding is that Mistral demonstrates superior reasoning capabilities compared to LLaMA 2, particularly at the 70B parameter scale, where it achieves the highest performance marked by an asterisk."
+      },
+      "context_text": "...![img-8.jpeg](img-8.jpeg) [IMAGE] ![img-10.jpeg](img-10.jpeg)  ![img-11.jpeg](img-11.jpeg)  Figure 5: Results on MMLU, commonsense reasoning, world knowledge and reading comprehension for Mistral 7B and Llama 2 (7B/13B/70B). Mistral..."
+    },
+    {
+      "page": 4,
+      "id": "img-10.jpeg",
+      "coords": {
+        "x1": 216,
+        "y1": 218,
+        "x2": 391,
+        "y2": 339
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "The graph compares the knowledge capabilities of two models, Llama 2 and Mistral, across different model sizes measured in billion parameters (7B, 13B, 34B, 70B). The x-axis represents the model size, while the y-axis shows the knowledge percentage. Both models exhibit an upward trend in knowledge as model size increases, with Mistral consistently outperforming Llama 2 at each size category. The most notable finding is that Mistral achieves higher knowledge percentages across all model sizes, with a significant lead at the 70B parameter size."
+      },
+      "context_text": "...![img-8.jpeg](img-8.jpeg)  ![img-9.jpeg](img-9.jpeg) [IMAGE] ![img-11.jpeg](img-11.jpeg)  Figure 5: Results on MMLU, commonsense reasoning, world knowledge and reading comprehension for Mistral 7B and Llama 2 (7B/13B/70B). Mistral 7B largely outperforms Llama..."
+    },
+    {
+      "page": 4,
+      "id": "img-11.jpeg",
+      "coords": {
+        "x1": 397,
+        "y1": 218,
+        "x2": 570,
+        "y2": 339
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "The graph plots model size (in billion parameters) on the x-axis against comprehension (in percentage) on the y-axis, comparing two models: LLaMA 2 (blue line) and Mistral (orange line). Both models show an upward trend in comprehension as model size increases, with Mistral consistently outperforming LLaMA 2 across all model sizes. The key comparative finding is that Mistral achieves higher comprehension scores than LLaMA 2 for equivalent model sizes, with the gap widening as model size grows."
+      },
+      "context_text": "...![img-8.jpeg](img-8.jpeg)  ![img-9.jpeg](img-9.jpeg)  ![img-10.jpeg](img-10.jpeg) [IMAGE] Figure 5: Results on MMLU, commonsense reasoning, world knowledge and reading comprehension for Mistral 7B and Llama 2 (7B/13B/70B). Mistral 7B largely outperforms Llama 2 13B on all evaluations, ex..."
+    },
+    {
+      "page": 6,
+      "id": "img-12.jpeg",
+      "coords": {
+        "x1": 160,
+        "y1": 106,
+        "x2": 637,
+        "y2": 177
+      },
+      "annotation": {
+        "image_type": "graph",
+        "description": "Horizontal bar chart comparing the health remaining for two entities: 'Llamo 2 11b' with 1 health remaining and 'Mistral 7b' with 5 health remaining, indicating that Mistral 7b has significantly more health remaining than Llamo 2 11b."
+      },
+      "context_text": "... [IMAGE] Can you recommend a foundational and accessible book about quantum physics?  Copy Link to Question  Next Round [Enter] →  Round Winner: mistral-7b-instruct-v0.1  ![img-13.jpeg](img-13.jpeg)  ### mis..."
+    },
+    {
+      "page": 6,
+      "id": "img-13.jpeg",
+      "coords": {
+        "x1": 343,
+        "y1": 374,
+        "x2": 454,
+        "y2": 484
+      },
+      "annotation": {
+        "image_type": "image",
+        "description": "A photograph of a plush toy shaped like a brown dog with a red tongue sticking out, sitting on a surface with a blurred background. The toy appears to be made of soft fabric and has a friendly, cartoonish design."
+      },
+      "context_text": "...![img-12.jpeg](img-12.jpeg)  Can you recommend a foundational and accessible book about quantum physics?  Copy Link to Question  Next Round [Enter] →  Round Winner: mistral-7b-instruct-v0.1 [IMAGE] ### mistral-7b-instruct-v0.1 ✉ Round Winner ✉  A great book for a foundational understanding of quantum physics is \"The Quantum Universe: Everything that Can Happen Does Happen\" by Brian Cox and Jef..."
+    }
+  ]
+}
