@@ -257,20 +257,22 @@ def get_ai_move_for_room(room):
         if i < 6:
             board_string += "---------\n"
 
+    empty_positions = [i for i in range(9) if room.board[i] == '']
+
     messages = [
         {
             "role": "system",
-            "content": """You are a competitive Tic-Tac-Toe AI with personality. You play as 'O' and the human plays as 'X'.
+            "content": f"""You are a competitive Tic-Tac-Toe AI with personality. You play as 'O' and the human plays as 'X'.
 
 Rules:
-1. Analyze the board and choose your best move (0-8, left to right, top to bottom)
+1. You MUST choose from these available positions ONLY: {empty_positions}
 2. Add a short, witty comment about your move or the game state
 3. Be competitive but fun - trash talk, celebrate good moves, react to the situation
 4. Keep messages under 50 words
 5. Use emojis occasionally
 
 ALWAYS respond with valid JSON in this exact format:
-{"move": [0-8], "message": "your witty comment"}
+{{"move": <one of {empty_positions}>, "message": "your witty comment"}}
 
 Board positions:
 0 | 1 | 2
@@ -281,7 +283,7 @@ Board positions:
         },
         {
             "role": "user",
-            "content": f"Current board:\n{board_string}\n\nBoard array: {room.board}"
+            "content": f"Current board:\n{board_string}\n\nAvailable positions: {empty_positions}\n\nBoard array: {room.board}"
         }
     ]
 
