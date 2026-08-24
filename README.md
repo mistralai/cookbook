@@ -91,6 +91,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [image_description_prompting_pixtral.ipynb](mistral/image_understanding/image_description_prompting_pixtral.ipynb) | image processing, prompting  | Extract structured image descriptions using Mistral's Pixtral model and JSON response formatting |
 | [multimodality meets function calling.ipynb](mistral/image_understanding/multimodality_meets_function_calling.ipynb) | image processing, function calling  | Extract table from image using Mistral's Pixtral model and use for function calling |
 | [mistral-reference-rag.ipynb](mistral/rag/mistral-reference-rag.ipynb) | RAG, function calling, references | Reference RAG with Mistral API |
+| [citation_faithfulness_check.ipynb](mistral/rag/citation_faithfulness_check.ipynb) | RAG, references, structured outputs, evaluation | Deterministically verify RAG citations are faithful to their sources (zero-token gate + optional judge) |
 | [moderation-explored.ipynb](mistral/moderation/moderation-explored.ipynb) | moderation | Quick exploration on safeguarding and Mistral's moderation API |
 | [system-level-guardrails.ipynb](mistral/moderation/system-level-guardrails.ipynb) | moderation | How to implement System Level Guardrails with Mistral API |
 | [shieldstral_policy_moderation.ipynb](mistral/moderation/shieldstral_policy_moderation.ipynb) | moderation | Policy-based content moderation with Shieldstral, Mistral's open-weights safety classifier |
