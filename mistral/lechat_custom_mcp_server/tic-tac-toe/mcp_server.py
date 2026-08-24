@@ -181,7 +181,15 @@ async def make_move(position: int, room_id: str = None) -> dict:
                     room.make_move(ai_move, 'O')
                     if 'message' in ai_response:
                         room.add_chat_message(ai_response['message'], 'ai')
-                
+                else:
+                    # Fallback to first available position
+                    empty_positions = [i for i in range(9) if room.board[i] == '']
+                    if empty_positions:
+                        ai_move = empty_positions[0]
+                        ai_response['move'] = ai_move
+                        room.make_move(ai_move, 'O')
+                        room.add_chat_message("Oops, had a brain freeze! But I'm still playing!", 'ai')
+
                 result_message += f"🤖 Mistral AI played O at position {ai_response['move']}\n"
                 if 'message' in ai_response:
                     result_message += f"💬 Mistral says: \"{ai_response['message']}\"\n\n"
