@@ -409,7 +409,7 @@ def register_extract_pipelines(register_fn) -> None:  # type: ignore[no-untyped-
             provider_name="mistral_ocr4_extract",
             config={
                 "extract_model": "mistral-large-latest",
-                "max_tokens": 32768,
+                "max_tokens": 8192,
                 "additional_properties_false": True,
             },
         )
@@ -421,7 +421,7 @@ def register_extract_pipelines(register_fn) -> None:  # type: ignore[no-untyped-
             provider_name="mistral_ocr4_extract",
             config={
                 "extract_model": "mistral-medium-3-5",
-                "max_tokens": 32768,
+                "max_tokens": 8192,
                 "additional_properties_false": True,
             },
         )

@@ -100,7 +100,7 @@ class MistralOCR4ExtractProvider(Provider):
             )
 
         self._extract_model: str = self.base_config.get("extract_model", self.DEFAULT_EXTRACT_MODEL)
-        self._max_tokens: int = int(self.base_config.get("max_tokens", 32768))
+        self._max_tokens: int = int(self.base_config.get("max_tokens", 8192))
         self._system_prompt: str = self.base_config.get("system_prompt", DEFAULT_SYSTEM_PROMPT)
         self._user_instruction: str = self.base_config.get("user_instruction", DEFAULT_USER_INSTRUCTION)
         self._additional_properties_false: bool = bool(self.base_config.get("additional_properties_false", True))
@@ -238,7 +238,7 @@ class MistralOCR4ExtractProvider(Provider):
         }
 
         try:
-            resp = httpx.post(_MISTRAL_EXTRACT_API_URL, json=payload, headers=headers, timeout=300.0)
+            resp = httpx.post(_MISTRAL_EXTRACT_API_URL, json=payload, headers=headers, timeout=600.0)
             resp.raise_for_status()
         except httpx.TimeoutException as e:
             raise ProviderTransientError(f"Mistral extract request timed out: {e}") from e
