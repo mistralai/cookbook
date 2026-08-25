@@ -115,19 +115,12 @@ class MistralOCR4ExtractProvider(Provider):
             schema = add_additional_properties_false(schema)
         return schema
 
-    def _ocr_document(self, file_path: Path) -> ParsedDocumentText:
-        """Run Mistral OCR-4 on a PDF or image; return per-page markdown text."""
-        ext = file_path.suffix.lower()
-        if ext == ".pdf":
-            mime = "application/pdf"
-        elif ext in IMAGE_EXTENSIONS:
-            mime = IMAGE_EXTENSIONS[ext]
-        else:
-            raise ProviderPermanentError(
-                f"MistralOCR4: supports PDF and {set(IMAGE_EXTENSIONS)}, got {ext!r}"
-            )
+    # Azure AI Foundry OCR-4 accepts at most 30 pages per request.
+    _OCR_PAGE_LIMIT = 30
 
-        encoded = base64.standard_b64encode(file_path.read_bytes()).decode("utf-8")
+    def _ocr_chunk(self, data: bytes, mime: str, page_offset: int) -> list[tuple[int, str]]:
+        """Send one chunk (≤30 pages) to OCR-4 and return (1-based-page, markdown) tuples."""
+        encoded = base64.standard_b64encode(data).decode("utf-8")
         payload = {
             "model": "mistral-ocr-4-0",
             "document": {
@@ -139,7 +132,6 @@ class MistralOCR4ExtractProvider(Provider):
             "Authorization": f"Bearer {self._ocr_api_key}",
             "Content-Type": "application/json",
         }
-
         try:
             resp = httpx.post(self._ocr_endpoint, json=payload, headers=headers, timeout=300.0)
             resp.raise_for_status()
@@ -148,12 +140,11 @@ class MistralOCR4ExtractProvider(Provider):
         except httpx.HTTPStatusError as e:
             if e.response.status_code in (429, 503, 502, 504):
                 raise ProviderTransientError(f"OCR-4 transient HTTP error {e.response.status_code}: {e}") from e
-            raise ProviderPermanentError(f"OCR-4 HTTP error {e.response.status_code}: {e}") from e
+            body = getattr(e.response, "text", "")[:200]
+            raise ProviderPermanentError(f"OCR-4 HTTP error {e.response.status_code}: {body}") from e
 
-        result = resp.json()
-        pages = result.get("pages", [])
-
-        page_tuples: list[tuple[int, str]] = []
+        pages = resp.json().get("pages", [])
+        result: list[tuple[int, str]] = []
         for i, p in enumerate(pages):
             text = p.get("markdown", "")
             for tbl in (p.get("tables") or []):
@@ -161,14 +152,51 @@ class MistralOCR4ExtractProvider(Provider):
                 tcnt = (tbl.get("content") or "").strip()
                 if tid and tcnt:
                     text = text.replace(f"[{tid}]({tid})", tcnt)
-            page_tuples.append((p.get("index", i) + 1, text))
+            result.append((page_offset + p.get("index", i) + 1, text))
+        return result
+
+    def _ocr_document(self, file_path: Path) -> ParsedDocumentText:
+        """Run Mistral OCR-4 on a PDF or image; return per-page markdown text.
+
+        PDFs longer than 30 pages are split into chunks before sending because
+        the Azure AI Foundry OCR-4 endpoint enforces a 30-page limit per request.
+        """
+        ext = file_path.suffix.lower()
+        if ext == ".pdf":
+            mime = "application/pdf"
+        elif ext in IMAGE_EXTENSIONS:
+            mime = IMAGE_EXTENSIONS[ext]
+        else:
+            raise ProviderPermanentError(
+                f"MistralOCR4: supports PDF and {set(IMAGE_EXTENSIONS)}, got {ext!r}"
+            )
+
+        page_tuples: list[tuple[int, str]] = []
+
+        if ext == ".pdf":
+            from io import BytesIO
+            from pypdf import PdfReader, PdfWriter
+
+            reader = PdfReader(str(file_path))
+            total_pages = len(reader.pages)
+
+            for start in range(0, total_pages, self._OCR_PAGE_LIMIT):
+                end = min(start + self._OCR_PAGE_LIMIT, total_pages)
+                writer = PdfWriter()
+                for page_idx in range(start, end):
+                    writer.add_page(reader.pages[page_idx])
+                buf = BytesIO()
+                writer.write(buf)
+                chunk_bytes = buf.getvalue()
+                page_tuples.extend(self._ocr_chunk(chunk_bytes, mime, start))
+        else:
+            page_tuples.extend(self._ocr_chunk(file_path.read_bytes(), mime, 0))
 
         full_text = render_paged_markdown(page_tuples) if page_tuples else ""
         if not full_text.strip():
             raise ProviderPermanentError(f"OCR-4 produced no text for {file_path.name}")
 
-        usage = result.get("usage", {})
-        num_pages = len(pages) or 1
+        num_pages = len(page_tuples) or 1
 
         return ParsedDocumentText(
             text=full_text,
@@ -178,7 +206,6 @@ class MistralOCR4ExtractProvider(Provider):
                 "type": "mistral_ocr4",
                 "model": "mistral-ocr-4-0",
                 "num_pages": num_pages,
-                "usage": usage,
             },
         )
 
