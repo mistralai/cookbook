@@ -1,0 +1,77 @@
+/* ───── Metric Tooltips ───── */
+.metric-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 5px;
+  flex-shrink: 0;
+  cursor: help;
+}
+
+.metric-hint::before {
+  content: '?';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted-light);
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--muted-light);
+  line-height: 1;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.metric-hint:hover::before {
+  border-color: var(--muted);
+  color: var(--card);
+  background: var(--muted);
+}
+
+/* Tooltip popup — rendered as a singleton fixed-position element via JS */
+#metric-tooltip {
+  position: fixed;
+  z-index: 10000;
+  width: 280px;
+  padding: 10px 13px;
+  background: var(--fg, #1c1917);
+  color: #f5f5f4;
+  font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.6;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(28, 25, 23, 0.18), 0 2px 6px rgba(28, 25, 23, 0.08);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+#metric-tooltip.visible {
+  opacity: 1;
+}
+
+#metric-tooltip::after {
+  content: '';
+  position: absolute;
+  border: 5px solid transparent;
+}
+
+#metric-tooltip.arrow-bottom::after {
+  top: 100%;
+  left: var(--arrow-left, 50%);
+  transform: translateX(-50%);
+  border-top-color: var(--fg, #1c1917);
+}
+
+#metric-tooltip.arrow-top::after {
+  bottom: 100%;
+  left: var(--arrow-left, 50%);
+  transform: translateX(-50%);
+  border-bottom-color: var(--fg, #1c1917);
+}

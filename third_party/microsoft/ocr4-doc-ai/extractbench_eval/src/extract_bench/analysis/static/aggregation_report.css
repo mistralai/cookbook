@@ -1,0 +1,369 @@
+/* ───── Reset & variables (shared with detailed_report.py) ───── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #f8f7f4;
+  --fg: #1c1917;
+  --card: #ffffff;
+  --border: #e7e5e4;
+  --muted: #78716c;
+  --muted-light: #a8a29e;
+  --cream: #faf9f6;
+  --emerald: #059669;
+  --emerald-bg: #ecfdf5;
+  --amber: #d97706;
+  --amber-bg: #fffbeb;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --blue: #2563eb;
+  --blue-bg: #eff6ff;
+  --font-heading: 'Newsreader', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(28, 25, 23, 0.07), 0 2px 4px -2px rgba(28, 25, 23, 0.05);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+html {
+  font-size: 15px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ───── Scrollbar ───── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ───── Layout ───── */
+.report-container {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+/* ───── Header ───── */
+.report-header {
+  margin-bottom: 36px;
+}
+
+.report-header h1 {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  line-height: 1.2;
+}
+
+.report-header .subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* ───── Summary cards ───── */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.summary-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s;
+}
+
+.summary-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.summary-card .label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.summary-card .big-number {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+/* ───── Section titles ───── */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* The metric selector governs every card below, so it sits with the heading
+   that names them rather than repeating once per card. */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+}
+
+.section-header .metric-selector {
+  width: auto;
+  min-width: 240px;
+  margin-bottom: 0;
+  /* Primary control for every card below, not a per-card afterthought. */
+  padding: 7px 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ───── Categories grid ───── */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.category-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s;
+  cursor: pointer;
+  display: block;
+  color: inherit;
+}
+
+.category-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.category-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--fg);
+}
+
+.category-card h3 .file-count {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.category-card .main-score {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.color-emerald {
+  color: var(--emerald);
+}
+
+.color-amber {
+  color: var(--amber);
+}
+
+.color-red {
+  color: var(--red);
+}
+
+/* A split that does not report the selected metric: absent, not zero. */
+.color-muted {
+  color: var(--muted);
+}
+
+/* ───── Progress bar ───── */
+.progress-bar-track {
+  height: 6px;
+  background: var(--cream);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.bar-emerald {
+  background: var(--emerald);
+}
+
+.bar-amber {
+  background: var(--amber);
+}
+
+.bar-red {
+  background: var(--red);
+}
+
+.bar-muted {
+  background: var(--border);
+}
+
+/* ───── Metric selector dropdown ───── */
+.metric-selector {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  color: var(--fg);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.metric-selector:focus {
+  border-color: var(--blue);
+}
+
+/* ───── Metric rows ───── */
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid var(--cream);
+}
+
+.metric-row:last-child {
+  border-bottom: none;
+}
+
+.metric-row .metric-name {
+  color: var(--muted);
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.metric-row .metric-value {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.metric-row.selected .metric-name {
+  font-weight: 700;
+  color: var(--fg);
+}
+
+/* Divider between the paper's three headline metrics and the secondary ones. */
+.metric-divider {
+  border-top: 1px solid var(--border);
+  margin: 6px 0;
+}
+
+.sub-note {
+  font-size: 0.7rem;
+  color: var(--fg-muted, #888);
+  margin-top: 2px;
+}
+
+/* Cost on a category card: per-page leads, run total sits under it. */
+.cost-block {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  line-height: 1.3;
+  margin-top: 8px;
+  padding-top: 6px;
+}
+
+.cost-page {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #6b6759;
+}
+
+.cost-unit {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #8a8577;
+}
+
+.cost-total {
+  font-size: 0.66rem;
+  color: #a5a094;
+}
+
+/* ───── Responsive ───── */
+@media (max-width: 900px) {
+  .summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .report-container {
+    padding: 16px 12px 48px;
+  }
+
+  .summary-row {
+    grid-template-columns: 1fr;
+  }
+}

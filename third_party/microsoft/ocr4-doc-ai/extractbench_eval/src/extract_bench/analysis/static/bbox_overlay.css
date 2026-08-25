@@ -1,0 +1,91 @@
+/* Shared bbox overlay visualization (layout-det + extract reports) */
+.bbox-overlay-stack {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.bbox-overlay-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.bbox-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.bbox-btn {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.bbox-btn.active {
+  background: var(--fg);
+  color: var(--card);
+  border-color: var(--fg);
+}
+
+.bbox-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.bbox-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bbox-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 2px solid transparent;
+}
+
+.bbox-swatch.gt {
+  border-color: #059669;
+  background: rgba(5, 150, 105, 0.12);
+}
+
+.bbox-swatch.pred {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.bbox-swatch.pred-a {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.bbox-swatch.pred-b {
+  border-color: #9C27B0;
+  background: rgba(156, 39, 176, 0.12);
+}
+
+.bbox-swatch.selected-gt {
+  border-color: #ea580c;
+  background: rgba(234, 88, 12, 0.18);
+}
+
+.bbox-swatch.selected-pred {
+  border-color: #eab308;
+  background: rgba(234, 179, 8, 0.22);
+}

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      # Lint and validate runner-free pass/skip behavior before installing heavy deps.
+      - name: Sync dependencies (dev only)
+        run: uv sync --locked --extra dev
+
+      - name: Ruff format
+        run: uv run ruff format --check
+
+      - name: Ruff lint
+        run: uv run ruff check
+
+      - name: Pytest without runners
+        run: uv run pytest tests/ -q
+
+      - name: Sync dependencies (with runners)
+        run: uv sync --locked --extra runners --extra dev
+
+      - name: Pytest with runners
+        run: uv run pytest tests/ -q
