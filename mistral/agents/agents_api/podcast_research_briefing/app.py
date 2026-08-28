@@ -1,6 +1,8 @@
 import os
 import chainlit as cl
-from mistralai import Mistral, MessageOutputEvent, FunctionCallEvent, ResponseErrorEvent
+from mistralai.client import Mistral
+from mistralai.client.models.conversationevents import MessageOutputEvent, ResponseErrorEvent
+from mistralai.client.models.functioncallevent import FunctionCallEvent
 from mistralai.extra.run.context import RunContext
 from mcp import StdioServerParameters
 from mistralai.extra.mcp.stdio import MCPClientSTDIO
@@ -35,11 +37,16 @@ Follow this workflow for each research request:
 3. **Enrich with web research**: Use web_search to find additional context about
    the top episodes — look for transcripts, guest bios, episode summaries, or reviews.
 
-4. **Generate the briefing**: Pass all collected data to generate_research_briefing
-   to produce the final structured output.
+4. **Generate the briefing**: Pass all collected data to generate_research_briefing.
+   For the podcast_data argument, pass the raw JSON output from the Spotify tools
+   (do NOT summarize or rewrite it). The JSON contains the real Spotify URLs that
+   must appear in the final briefing.
 
 5. **Present results**: Share the briefing with the user. If results are sparse,
    note the gaps and suggest alternative search angles.
+
+IMPORTANT: Never fabricate Spotify URLs. All episode and show links must come directly
+from the Spotify tool results. If you don't have a URL for an episode, omit the link.
 
 Always aim for at least 5-10 relevant episodes before generating the briefing.
 If a niche topic yields few results, acknowledge this in your response."""

@@ -11,4 +11,5 @@ dependencies = [
     "spotipy",
     "python-dotenv",
     "loguru",
+    "griffe",
 ]

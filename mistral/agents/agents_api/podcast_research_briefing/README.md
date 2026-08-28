@@ -27,7 +27,22 @@ A research agent that searches Spotify's podcast catalog for episodes on a topic
 ## Prerequisites
 
 1. **Mistral API key**: Get one at [console.mistral.ai](https://console.mistral.ai)
-2. **Spotify Developer credentials**: Create an app at [developer.spotify.com](https://developer.spotify.com/dashboard) to get a Client ID and Client Secret. No user login is required — this uses Client Credentials (read-only public catalog access).
+2. **Spotify Developer credentials**: Follow the steps below to get a Client ID and Client Secret.
+
+### Setting up Spotify credentials
+
+1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and log in with your Spotify account. **A Spotify Premium subscription is required** to use the Web API (as of February 2026).
+2. Click **Create app**.
+3. Fill in the form:
+   - **App name**: Any name (e.g. "Podcast Research Agent")
+   - **App description**: Any description
+   - **Redirect URI**: Enter `https://localhost:8080/callback` (this won't be used, but the field is required)
+   - **Which API/SDKs are you planning to use?**: Select **Web API**
+4. Check the terms of service box and click **Save**.
+5. On your app's dashboard, click **Settings**.
+6. Copy the **Client ID** and **Client Secret** (click "View client secret" to reveal it).
+
+This cookbook uses the **Client Credentials** auth flow, which provides read-only access to Spotify's public catalog (podcast search, show details, episode details). No user login or OAuth redirect is needed at runtime.
 
 ## Installation
 

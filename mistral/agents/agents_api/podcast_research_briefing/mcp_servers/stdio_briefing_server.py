@@ -24,11 +24,16 @@ A concise overview of the podcast landscape for this topic (2-3 sentences).
 A numbered list of the most relevant episodes, each with:
 - **Relevance Score** (1-10)
 - **Episode Name** and **Show Name**
-- **Spotify Link**
+- **Spotify Link** — use ONLY the exact URL from the "url" field in the input data. NEVER fabricate or guess Spotify URLs. If no URL is provided for an episode, write "Link not available" instead.
 - **Duration** and **Release Date**
 - A 2-3 sentence summary of why this episode is relevant
 
 Rank by relevance to the research topic, recency, and quality of the source.
+
+CRITICAL: Every Spotify link you include MUST be copied verbatim from the input data.
+Do not construct URLs yourself. Spotify URLs follow the pattern
+https://open.spotify.com/episode/... — if a URL in your output does not appear
+in the input data, remove it.
 
 ## Key Themes Across Episodes
 Identify 3-5 recurring themes or perspectives found across the recommended episodes.
@@ -69,7 +74,8 @@ Supplementary Web Research:
 {web_research}
 
 Generate a comprehensive research briefing based on the above information.
-Include Spotify links for all recommended episodes."""
+For every episode you recommend, copy the exact Spotify URL from the input data above.
+Never generate or guess a URL — only use URLs that appear verbatim in the podcast data."""
 
         response = client.chat.complete(
             model="mistral-medium-latest",
