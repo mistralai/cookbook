@@ -1,0 +1,14 @@
+[project]
+name = "podcast-research-briefing"
+version = "0.1.0"
+description = "Podcast research briefing agent using Mistral Agents API with Spotify and MCP servers"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "chainlit",
+    "mistralai",
+    "mcp",
+    "spotipy",
+    "python-dotenv",
+    "loguru",
+]
