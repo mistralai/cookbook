@@ -123,6 +123,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [CAMEL Role-Playing Scraper](third_party/CAMEL_AI/camel_roleplaying_scraper.ipynb)                                    | multi-agent, tool, data gen     | CAMEL-AI.org|
 | [Chainlit - Mistral reasoning.ipynb](third_party/Chainlit/Chainlit_Mistral_reasoning.ipynb)                           | UI chat, tool calling           | Chainlit   |
 | [chroma_mistral_embed_fn.ipynb](third_party/ChromaDB/chroma_mistral_embed_fn.ipynb)                              | embeddings, vector DB | Chroma
+| [Music chart semantic search with Deezer](third_party/deezer/deezer_music_chart_search.ipynb)                         | RAG, structured outputs, chat   | Deezer     |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [distilabel_synthetic_dpo_dataset.ipynb](third_party/argilla/distilabel_synthetic_dpo_dataset.ipynb)                  | synthetic data                  | Argilla    |
 | [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)                                          | tool, agent                     | E2B        |
