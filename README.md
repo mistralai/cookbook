@@ -162,4 +162,6 @@ The preview renders committed notebook content without executing notebook code. 
 | [Build a bank support agent with Pydantic AI and Mistral AI](third_party/PydanticAI/pydantic_bank_support_agent.ipynb)| Agent                           | Pydantic   |
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
+| [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
+| [Semantic search in Rust using SurrealDB](third_party/surrealdb/rust-semantic-search-with-surrealdb.md)               | RAG                             | SurrealDB  |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
