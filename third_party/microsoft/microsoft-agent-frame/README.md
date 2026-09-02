@@ -1,4 +1,4 @@
-# Microsoft Agent Framework — Cook Book
+# Microsoft Agent Framework — CookBook
 
 Hands-on notebooks and scripts for building agents and agentic workflows with the
 **Microsoft Agent Framework** on **Azure AI Foundry**, using **Mistral** models.
