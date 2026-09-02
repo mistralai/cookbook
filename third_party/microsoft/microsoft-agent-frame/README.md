@@ -1,373 +1,276 @@
-# Microsoft Agent Framework → Foundry MCP → GitHub Repository Q&A
+# Microsoft Agent Framework — Cook Book
 
-This project demonstrates an architecture where an application uses the **Microsoft Agent Framework** to interact with an **MCP server hosted in Microsoft Foundry**, which in turn exposes GitHub repository tools. The agent can answer questions such as:
+Hands-on notebooks and scripts for building agents and agentic workflows with the
+**Microsoft Agent Framework** on **Azure AI Foundry**, using **Mistral** models.
 
-- `Who is the owner of the mistral-small-2603 repository?`
-- `Can you summarize the mistral-small-2603 repository?`
-- `What are the main components in this repository?`
-- `Show me the README and explain how to run the project.`
+---
 
-## Architecture
+## Contents
+
+| File | Description |
+|------|-------------|
+| [`BasicAgent.py`](BasicAgent.py) | Minimal runnable script — one agent, one question |
+| [`Agent_Framework_Demo.ipynb`](Agent_Framework_Demo.ipynb) | Six progressive patterns: basic → tools → MCP → sessions → memory → workflows |
+| [`Foundry_Agent_Tool_Calling.ipynb`](Foundry_Agent_Tool_Calling.ipynb) | Foundry agent with a remote MCP tool server (GitHub API) |
+| [`OCR-RAG-Agentic-Workflow.ipynb`](OCR-RAG-Agentic-Workflow.ipynb) | Three-stage pipeline: PDF OCR → vector index → RAG answer |
+
+---
+
+## Setup
+
+1. Copy `env.example` to `.env` and fill in your values.
+2. Log in with the Azure CLI: `az login`
+3. Install dependencies (each notebook has a `%pip install` cell at the top).
+
+### Required environment variables
+
+| Variable | Used by | Purpose |
+|----------|---------|---------|
+| `AZURE_AI_PROJECT_ENDPOINT` | all | Azure AI Foundry project URL |
+| `AZURE_AI_DEPLOYMENT_NAME` | Demo, Foundry | Deployed Mistral model name |
+| `AZURE_AI_QNA_MODEL` | OCR-RAG | Model for the answering stage |
+| `AZURE_AI_OCR_NAME` | OCR-RAG | Mistral OCR deployment name |
+| `MISTRAL_OCR_ENDPOINT` | OCR-RAG | Mistral OCR REST endpoint |
+| `MISTRAL_API_KEY` | OCR-RAG | API key for OCR + embeddings |
+| `AZURE_MISTRAL_EMBEDDING_MODEL` | OCR-RAG | Embedding model (`mistral-embed`) |
+| `AZURE_SEARCH_ENDPOINT` | OCR-RAG | Azure AI Search service URL |
+| `AZURE_SEARCH_INDEX_NAME` | OCR-RAG | Index to create or reuse |
+| `AZURE_SEARCH_API_KEY` | OCR-RAG | Optional — falls back to CLI auth |
+| `AZURE_SEARCH_SEMANTIC_CONFIG` | OCR-RAG | Optional semantic ranker config |
+| `MCP_SERVER_URL` | Foundry | Hosted MCP server HTTPS URL |
+| `MCP_CONNECTION_NAME` | Foundry | Foundry connection ID for MCP credentials |
+| `PROJECT_API_NAME` | Foundry | API path suffix for `AIProjectClient` |
+
+---
+
+## Architecture Diagrams
+
+### 1 — BasicAgent.py
+
+The simplest possible pattern: one agent, one synchronous call.
 
 ```mermaid
 flowchart LR
-    U["User"] --> A["Application / Chat UI"]
-
-    A --> MAF["Microsoft Agent Framework"]
-    MAF --> LLM["LLM / Agent Model"]
-
-    MAF --> MCP["MCP Client"]
-    MCP --> F["Microsoft Foundry<br/>Hosted MCP Server"]
-
-    F --> GT["GitHub MCP Tools"]
-    GT --> GH["GitHub API"]
-
-    GH --> R["GitHub Repository<br/>mistral-small-2603"]
-
-    R --> GH
-    GH --> GT
-    GT --> F
-    F --> MCP
-    MCP --> MAF
-
-    MAF --> LLM
-    LLM --> MAF
-    MAF --> A
-    A --> U
-
-    classDef app fill:#e8f0fe,stroke:#4285f4,color:#111;
-    classDef agent fill:#e8f5e9,stroke:#34a853,color:#111;
-    classDef foundry fill:#fff3e0,stroke:#f57c00,color:#111;
-    classDef github fill:#f3e5f5,stroke:#7b1fa2,color:#111;
-
-    class U,A app;
-    class MAF,LLM,MCP agent;
-    class F foundry;
-    class GT,GH,R github;
+    User["User prompt"] --> Agent
+    subgraph Agent Framework
+        Agent["Agent\n(HaikuBot)"] --> Client["OpenAIChatCompletionClient"]
+    end
+    Client -->|"Chat Completions API"| Foundry["Azure AI Foundry\n(Mistral Large 3)"]
+    Foundry --> Agent
+    Agent --> Response["Printed response"]
 ```
 
-### Request flow
+---
 
-For a question such as:
+### 2 — Agent_Framework_Demo.ipynb
 
-> **Can you summarize the `mistral-small-2603` repository?**
+Six patterns in one notebook, building up from a basic agent to a full workflow.
 
-the high-level flow is:
+#### 2a — Basic agent (non-streaming & streaming)
 
-1. The user sends the question to the application.
-2. The application invokes the Microsoft Agent Framework.
-3. The agent determines that repository information is required.
-4. The MCP client connects to the MCP server hosted in Microsoft Foundry.
-5. The MCP server exposes GitHub-related tools.
-6. The agent selects the appropriate MCP tool(s), for example:
-   - search/find the repository
-   - retrieve repository metadata
-   - retrieve files
-   - retrieve the repository README
-7. The MCP server calls GitHub through the configured GitHub integration/credentials.
-8. GitHub returns the repository data.
-9. The MCP server returns MCP tool results to the agent.
-10. The model reasons over the returned repository content and produces a natural-language answer.
+```mermaid
+flowchart LR
+    Prompt["User prompt"] --> Agent["Agent"]
+    Agent -->|"Chat Completions"| Foundry["Azure AI Foundry\n(Mistral Large 3)"]
+    Foundry --> Agent
+    Agent -->|"result.text"| Out["Response"]
 
-## Important architectural distinction
-
-The **LLM does not directly call GitHub**.
-
-Instead:
-
-```text
-User
-  ↓
-Microsoft Agent Framework
-  ↓
-LLM decides which tool is needed
-  ↓
-MCP client
-  ↓
-Foundry-hosted MCP server
-  ↓
-GitHub MCP tool
-  ↓
-GitHub API
+    Prompt2["User prompt"] --> Agent2["Agent\nstream=True"]
+    Agent2 -->|"Chat Completions\n(streaming)"| Foundry
+    Foundry -->|"token chunks"| Agent2
+    Agent2 -->|"AgentResponseUpdate chunks"| Stream["Streamed output"]
 ```
 
-The MCP server provides the tool abstraction and handles the interaction with GitHub. The model receives the tool definitions and tool results through the agent framework.
+#### 2b — Tool calling
 
-## Example questions
-
-### Repository owner
-
-```text
-Who is the owner of the mistral-small-2603 repository?
+```mermaid
+flowchart TD
+    Q["What's the weather in Seattle?"] --> Agent["Agent\n(WeatherAgent)"]
+    Agent -->|"1 decide to call tool"| Schema["@tool get_weather\n(JSON schema)"]
+    Schema -->|"2 execute locally"| Fn["get_weather(location)"]
+    Fn -->|"3 tool result"| Agent
+    Agent -->|"4 compose reply\nwith Chat Completions"| Foundry["Azure AI Foundry\n(Mistral Large 3)"]
+    Foundry --> Agent
+    Agent --> Answer["Natural-language answer"]
 ```
 
-A typical tool flow would be:
+#### 2c — Multi-turn sessions
 
-```text
-Agent
-  → GitHub repository metadata tool
-  → GitHub API
-  → repository metadata
-  → Agent
-  → "The repository is owned by ..."
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as Agent
+    participant S as Session (history)
+    participant F as Foundry LLM
+
+    U->>A: "My name is Alice and I love hiking."
+    A->>S: append user message
+    A->>F: messages = [system + history + user]
+    F-->>A: reply
+    A->>S: append assistant message
+
+    U->>A: "What did I just tell you?"
+    A->>S: append user message
+    A->>F: messages = [system + full history]
+    F-->>A: "You said your name is Alice..."
+    A->>S: append assistant message
+    A-->>U: reply
 ```
 
-### Repository summary
+#### 2d — Memory via ContextProvider
 
-```text
-Can you summarize the mistral-small-2603 repository?
+```mermaid
+flowchart TD
+    subgraph "Each agent.run() call"
+        direction TB
+        BR["before_run()\nread state → extend_instructions()"]
+        LLM["LLM call\n(Mistral Large 3)"]
+        AR["after_run()\nparse 'my name is' → write state"]
+    end
+
+    State[("Session state\n{user_name: ...}")] -->|"inject name"| BR
+    BR --> LLM
+    LLM --> AR
+    AR -->|"persist name"| State
 ```
 
-The agent may need multiple tool calls:
+#### 2e — Workflow (UpperCase → reverse_text)
 
-```text
-Agent
-  ├─→ Find repository
-  ├─→ Get repository metadata
-  ├─→ Get README
-  ├─→ Inspect relevant source/configuration files
-  └─→ Synthesize answer
+```mermaid
+flowchart LR
+    Input["'hello world'"] --> UC
+
+    subgraph Workflow
+        UC["UpperCase\n(class-based Executor)\ntext.upper()"]
+        -->|"ctx.send_message"| RT["reverse_text\n(@executor function)\ntext reversed"]
+    end
+
+    RT -->|"ctx.yield_output"| Output["'DLROW OLLEH'"]
 ```
 
-This is one of the main benefits of MCP: the agent can dynamically decide which capabilities it needs rather than the application having to implement every GitHub operation itself.
+---
 
-## Components
+### 3 — Foundry_Agent_Tool_Calling.ipynb
 
-| Component | Responsibility |
-|---|---|
-| User / Chat UI | Sends natural-language questions |
-| Application | Hosts the agent and manages the conversation |
-| Microsoft Agent Framework | Orchestrates the agent, model, and tools |
-| LLM | Understands the question, selects tools, and synthesizes the answer |
-| MCP Client | Connects the agent to MCP tools |
-| Microsoft Foundry | Hosts/provides the MCP server integration |
-| GitHub MCP Server/Tools | Exposes GitHub operations through MCP |
-| GitHub API | Provides repository metadata and file contents |
-| GitHub Repository | Source of the information being queried |
+A Foundry-managed agent uses a remote **Model Context Protocol (MCP)** server to call GitHub APIs across a multi-turn conversation.
 
-## MCP tool interaction
+```mermaid
+flowchart TD
+    Dev["Developer\n(notebook)"]
 
-Conceptually, the agent sees MCP tools similar to:
+    subgraph Azure AI Foundry
+        AC["AIProjectClient"]
+        FAgent["PromptAgentDefinition\n(Mistral Medium 3.5)\n+ MCPTool"]
+        Conv["Conversation\n(server-side history)"]
+    end
 
-```text
-get_repository(...)
-get_file_contents(...)
-search_code(...)
-list_directory(...)
+    subgraph MCP Server ["MCP Server (hosted in Foundry)"]
+        Tool1["get_me\n(GitHub profile)"]
+        Tool2["repo summary\n(GitHub API)"]
+    end
+
+    Dev -->|"create_version()"| AC
+    AC --> FAgent
+    Dev -->|"conversations.create()"| Conv
+    Dev -->|"responses.create(input='...')"| Conv
+    Conv --> FAgent
+    FAgent -->|"invoke MCP tool"| Tool1
+    Tool1 -->|"tool result"| FAgent
+    FAgent -->|"compose reply"| Conv
+    Conv -->|"response.output_text"| Dev
+
+    Dev -->|"second turn"| Conv
+    FAgent -->|"invoke MCP tool"| Tool2
+    Tool2 --> FAgent
+
+    Dev -->|"delete_version()"| AC
 ```
 
-The exact tool names depend on the MCP server implementation/configuration.
+---
 
-For example, the model could decide to call:
+### 4 — OCR-RAG-Agentic-Workflow.ipynb
 
-```json
-{
-  "repository": "mistral-small-2603",
-  "owner": "<repository-owner>"
-}
+A three-stage linear workflow. Each executor has one responsibility; the Agent Framework routes state between them automatically.
+
+```mermaid
+flowchart TD
+    PDF["table.png.pdf\n(local file)"]
+
+    subgraph Stage1 ["Stage 1 — OcrExecutor"]
+        B64["base64-encode PDF"]
+        OCR["POST to Mistral OCR\n(Azure Foundry endpoint)"]
+        MD["Markdown text\n(per-page joined)"]
+        B64 --> OCR --> MD
+    end
+
+    subgraph Stage2 ["Stage 2 — KnowledgeIndexExecutor"]
+        Embed["MistralEmbeddingClient\nmistral-embed → 1024-d vector"]
+        IdxCheck{"Index exists?"}
+        Create["Create HNSW index\n(Azure AI Search)"]
+        Upload["Upload document\n{id, source, content, contentVector}"]
+        Embed --> IdxCheck
+        IdxCheck -->|"no"| Create --> Upload
+        IdxCheck -->|"yes"| Upload
+    end
+
+    subgraph Stage3 ["Stage 3 — AnswerExecutor"]
+        VecSearch["AzureAISearchContextProvider\nvector similarity → top-3 passages"]
+        LLM["OpenAIChatCompletionClient\n(Mistral via Foundry)\nAnswer from retrieved context"]
+        VecSearch --> LLM
+    end
+
+    PDF --> Stage1
+    Stage1 -->|"state.ocr_text\nctx.send_message()"| Stage2
+    Stage2 -->|"state\nctx.send_message()"| Stage3
+    Stage3 -->|"ctx.yield_output()\nstate.answer"| Answer["Printed answer\n'The sum of unpaid\nbalances is ...'"]
+
+    Query["Query:\n'what's the sum of unpaid\nbalance in the invoice'"] --> Stage3
 ```
 
-The MCP layer handles the tool invocation and returns structured results to the agent.
+#### Data flow summary
 
-## Security and identity
-
-A production implementation should avoid putting GitHub credentials directly into prompts or application code.
-
-A recommended trust boundary is:
-
-```text
-Application
-    |
-    | Agent/MCP protocol
-    v
-Foundry
-    |
-    | Managed authentication / connection
-    v
-GitHub
+```
+table.png.pdf
+      │
+      ▼  base64 + HTTP POST
+ Mistral OCR  ──────────────────────────► Markdown text
+                                               │
+                                               ▼  mistral-embed (1024-d)
+                                        Azure AI Search index
+                                               │
+                                               ▼  vector similarity (top-3)
+ Query ──────────────────────────────► Grounding context
+                                               │
+                                               ▼  Chat Completions
+                                        Mistral (Foundry)
+                                               │
+                                               ▼
+                                         Final answer
 ```
 
-Use the authentication and connection mechanisms supported by the specific Foundry MCP integration and GitHub MCP server you deploy.
+---
 
-Consider:
+## Key Concepts
 
-- Least-privilege GitHub permissions
-- Read-only access when repository Q&A is the only requirement
-- Secret/credential management
-- Network restrictions where applicable
-- Audit logging
-- Tool-level authorization
-- Repository allowlists if the agent should only access approved repositories
+| Concept | Description |
+|---------|-------------|
+| `Agent` | Wraps an LLM client with instructions, tools, and context providers |
+| `OpenAIChatCompletionClient` | Connects to any OpenAI-compatible endpoint (e.g. Azure AI Foundry) |
+| `@tool` | Decorator that exposes a Python function as a callable tool for the LLM |
+| `MCPTool` | Declares a remote Model Context Protocol server as a tool source |
+| `Session` | Carries conversation history across multiple `agent.run()` calls |
+| `ContextProvider` | Injects dynamic system-prompt content and reads responses each turn |
+| `Executor` / `@executor` | A single stage in a workflow — receives state, transforms it, forwards it |
+| `WorkflowBuilder` | Wires executors into a directed graph and builds a runnable workflow |
+| `ctx.send_message()` | Forwards state to the next executor in the pipeline |
+| `ctx.yield_output()` | Marks the terminal result of a workflow |
 
-## Why use MCP?
+---
 
-Without MCP, the application could implement GitHub-specific functions directly:
+## References
 
-```text
-Agent → Application code → GitHub SDK/API
-```
-
-With MCP:
-
-```text
-Agent → MCP → GitHub tools → GitHub
-```
-
-This provides a standardized tool interface and allows the same GitHub capabilities to be consumed by different MCP-compatible agents or applications.
-
-## Example logical implementation
-
-The application can conceptually be structured as:
-
-```text
-+----------------------------------------------------+
-| Application                                        |
-|                                                    |
-|  User Question                                     |
-|       |                                            |
-|       v                                            |
-|  Microsoft Agent Framework                         |
-|       |                                            |
-|       +------------------+                         |
-|       |                  |                         |
-|       v                  v                         |
-|      LLM             MCP Client                    |
-|       |                  |                         |
-|       +------ tool ------+                         |
-+--------------------------|-------------------------+
-                           |
-                           | MCP
-                           v
-              +--------------------------+
-              | Microsoft Foundry        |
-              | MCP Server               |
-              +------------+-------------+
-                           |
-                           | GitHub tools
-                           v
-              +--------------------------+
-              | GitHub API               |
-              +------------+-------------+
-                           |
-                           v
-              +--------------------------+
-              | GitHub Repository        |
-              | mistral-small-2603       |
-              +--------------------------+
-```
-
-## Key design principle
-
-The application should generally **not hard-code the decision about which GitHub API to call for every user question**.
-
-Instead, the agent should have access to MCP tools and decide which tools are appropriate based on the user's request.
-
-For example:
-
-```text
-"Who owns this repository?"
-        ↓
-Repository metadata tool
-
-"Summarize this repository"
-        ↓
-Repository metadata
-        +
-README
-        +
-selected source/configuration files
-
-"What dependencies does it use?"
-        ↓
-Package/configuration files
-        +
-possibly repository metadata
-```
-
-The agent can therefore perform multiple tool calls before generating the final response.
-
-## Troubleshooting
-
-### `404 Not Found` when accessing a repository
-
-If an MCP GitHub tool returns a GitHub `404`, verify:
-
-1. The repository owner/organization is correct.
-2. The repository name is correct.
-3. The GitHub connection used by the MCP server has access to the repository.
-4. The repository is not private to a different account/organization.
-5. The MCP server is receiving the expected repository identifier.
-6. The GitHub token/application has sufficient repository permissions.
-
-A GitHub `404` can indicate either that the repository does not exist or that the authenticated identity cannot access it.
-
-### Tool is available but the agent does not call it
-
-Check:
-
-- MCP server connection is healthy.
-- The tool is exposed to the agent.
-- Tool descriptions clearly explain what each tool does.
-- The agent instructions allow tool use.
-- The model is receiving the MCP tool definitions.
-- The repository identifier is unambiguous.
-
-### Repository summary is incomplete
-
-A repository summary should not necessarily rely only on the README.
-
-For higher-quality answers, allow the agent to inspect:
-
-- README
-- directory structure
-- package/dependency files
-- configuration files
-- representative source files
-- documentation
-
-The agent should avoid retrieving the entire repository unless necessary.
-
-## Suggested agent instructions
-
-A useful system/developer instruction for this scenario is:
-
-```text
-You are a GitHub repository assistant.
-
-When answering questions about a repository, use the available GitHub MCP
-tools rather than guessing.
-
-For repository ownership questions, retrieve repository metadata.
-
-For repository summaries, inspect the README and repository structure and,
-when useful, inspect relevant configuration, dependency, and source files.
-
-Clearly distinguish information retrieved from GitHub from your own inference.
-
-If a repository cannot be found or accessed, explain the problem instead of
-inventing repository information.
-```
-
-## Summary
-
-The architecture separates **agent reasoning** from **external system access**:
-
-```text
-                    Reasoning
-                       |
-                       v
-User → Agent Framework → LLM
-              |
-              | MCP tool calls
-              v
-        Foundry MCP Server
-              |
-              | GitHub operations
-              v
-          GitHub API
-              |
-              v
-          Repository
-```
-
-This makes the GitHub integration a reusable MCP capability while allowing the Microsoft Agent Framework to handle agent orchestration, tool selection, and response generation.
+- [Microsoft Agent Framework](https://github.com/microsoft/agent-framework)
+- [Azure AI Foundry documentation](https://learn.microsoft.com/en-us/azure/ai-foundry/)
+- [Mistral on Azure AI Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/models/mistral)
+- [Azure AI Foundry MCP tools](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/model-context-protocol?pivots=python)
+- [Azure AI Search vector search](https://learn.microsoft.com/en-us/azure/search/vector-search-overview)
