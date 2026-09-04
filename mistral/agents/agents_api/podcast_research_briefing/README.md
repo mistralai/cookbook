@@ -4,18 +4,7 @@ A research agent that searches Spotify's podcast catalog for episodes on a topic
 
 ## Architecture
 
-```
-├── podcast_research_briefing.ipynb  # Notebook — agent orchestration + results
-├── pyproject.toml                   # uv project config
-└── .env.example                     # Required env vars template
-```
-
-### Function Tools
-- **Spotify tools** — wrap the Spotify Web API via `spotipy` with Client Credentials auth. Provide tools for searching podcasts, searching episodes, and fetching details.
-- **Briefing tool** — uses `mistral-medium-latest` to generate a structured research briefing from collected podcast data and web research.
-
-### Built-in Tools
-- **web_search** — the agent uses Mistral's built-in web search to find transcripts, guest bios, and episode summaries to enrich the briefing.
+The notebook defines six function tools (Spotify search/details + briefing generation), registers them on a Mistral agent alongside built-in web search, and streams the agent's output while executing tool calls locally.
 
 ## Prerequisites
 
@@ -37,38 +26,6 @@ A research agent that searches Spotify's podcast catalog for episodes on a topic
 
 This cookbook uses the **Client Credentials** auth flow, which provides read-only access to Spotify's public catalog (podcast search, show details, episode details). No user login or OAuth redirect is needed at runtime.
 
-## Installation
-
-```bash
-cd mistral/agents/agents_api/podcast_research_briefing
-uv sync
-```
-
-## Environment Setup
-
-Copy `.env.example` to `.env` and fill in your keys:
-
-```bash
-cp .env.example .env
-```
-
-Or export them directly:
-
-```bash
-export MISTRAL_API_KEY="your_mistral_api_key"
-export SPOTIFY_CLIENT_ID="your_spotify_client_id"
-export SPOTIFY_CLIENT_SECRET="your_spotify_client_secret"
-```
-
 ## Usage
 
-```bash
-jupyter notebook podcast_research_briefing.ipynb
-```
-
-Run the cells top-to-bottom. The notebook will:
-1. Create a Mistral agent with podcast research instructions and function tools
-2. Stream the agent's research process, executing tool calls locally
-3. Render the final briefing as formatted markdown
-
-Try different topics by editing the `QUERY` variable in the "Try another topic" cell.
+Open the notebook in Jupyter or Colab and run the cells top-to-bottom. The notebook installs its own dependencies and prompts for API keys via `getpass`.
