@@ -1,0 +1,7 @@
+This use case is about using an AI tool to analyze bank data like revenue, transactions, and market trends from spreadsheets. The AI helps senior managers make quicker and better decisions by automatically pulling data, predicting future trends, and modeling different scenarios. This way, they can plan finances and strategies more effectively.
+
+Today data analysis process involves multiple roles, data engineer, analyst, and business analysts—who manually transform unstructured data into structured insights before delivering results to senior management. This creates bottlenecks and delays.
+
+In the future, AI agents will streamline the workflow by automating data engineering, analysis, and reporting tasks. Senior managers will interact directly with intelligent agents capable of processing unstructured data, running queries, self-correcting errors, and generating visualizations and reports autonomously.
+
+Here is the demo, senior managers can ask questions through a user interface, and AI agents will handle the rest. The Data Engineer agent sets up the necessary SQL tables from spreadsheets, while the Data Analyst agent writes SQL queries based on the manager's needs. The Business Analyst agent identifies market trends and simulates scenarios to evaluate financial impacts. Meanwhile, the Report Agent creates clear charts and reports from the results. The system is self-correcting and delivers professionally formatted outputs to the manager, eliminating the need to wait for multiple teams or deal with technical details.
