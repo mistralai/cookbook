@@ -22,7 +22,7 @@ This script can work with Mistral's OCR and Document AI endpoints on La Platform
 
 ---
 
-If you want to explore how it works, and how you can implement it yourself, we also have the cookbook `document_chunking_cookbook.ipynb` for you.
+Explore how it works and implement it yourself in the `document_chunking_cookbook.ipynb` cookbook.
 
 **⚠️ Note:**
 This utility is made to be flexible for many document processing approaches and endpoints. By default it will only output the results of the API calls to the console or logs. You will need to modify the script to save the results, or process as your needs require.
