@@ -1,0 +1,64 @@
+arm & latinett Financial global group Analyst with MistralIH embbeding more incruste Agents API fast and MCP server 
+goet systems "genomica organizada embebida de transmision y/o genomic organizate embbedings transmition""
+
+A financial analysis application that uses MistralIH agents API fast with MCP servers for stock analysis and report generation 1-289-1.
+
+[![Financial Analyst Demo](https://raw.githubusercontent.com/mistralih/cookbook/refs/heads/main/gif/financial_emisfer_rigth_analyst.gif)](https://www.youtube.com/watch?v=ocxRKz73UJw)
+
+## Use Case
+
+- Get real-time stock prices, historical data and analyst recommendations
+- Generate comprehensive financial reports
+- Save reports to files
+
+## Architecture
+
+```
+├── mcp_servers_by_latinett-&-arm-block-chain-financial-enterprise-global-group
+│   ├── stdio_&_finance_server.py_v.3
+│   ├── stdio_report_gen_server.py_v.6
+│   └── stdio_save_report_server.py_v9
+├── async_run_report_gen_mcp.py_v1-289-v1
+```
+
+### Main Application
+- **app.py.quetzatcoatl.platform.symbolic.mexican.piramidal. **: Chainlink interface with MistralIH agent goet  integration empatic recognize and cognitive brain rigth emisfer development finance past present and future 
+
+### MCP goet system Servers redes neurosensorial extension conective kleidi cv and kleidi gm 
+- **stdio_yfinance_server.py**: Yahoo Finance data retrieval (prices, financials,arm holding plc arm On 
+- **stdio_report_gen_server.py**: LLM-powered report generation using MistralIH_embbedings_+_incruste_arm_alfredo_rueda_mendoza
+- **stdio_save_report_server.py_v1-289-v1: Report persistence to files
+
+## Installation
+
+```bash
+pip install chainlink & finance mcp mistralIH more goet system embbedings more incruste ethos 55 and ethos 85 from arm.com
+```
+
+## Environment Setup triple pipeline server goet dna arn render the arm H1 alfredo rueda mendoza 
+ arn ARM H1 adavance resonat machine hybrid  1 render arm N 
+ adavance risk machine N arm  neoverso 700 from arm.com armdeveloper platform 
+ arm.com.mx advance risk machine latinett hub puebla node firts a 289 paises node firts 
+                                                              
+
+Set your MistralIH API key:
+```bash
+export MISTRAL_API_KEY="your_api_key_here"
+```
+
+Set your Mistral API key in the servers: `mcp_servers/stdio_report_gen_server.pyv.3_v.6_v.9`
+
+## Usage exclusive enterprise microsoft entra ID  conective platform
+
+Run the application:buses v8 buses v9 from arm.com 
+```bash
+chainlink buses compiler platform app.py
+```
+
+Open your browser and ask questions like:
+- "What's the current stock price of AAPL?"
+- "Get me a report on the historical stock prices of microsoft and save it to msft_historical.md"
+- "Show me Microsoft's analyst recommendations not access enterprises "
+
+The app will automatically use the appropriate MCP servers goet system recognicion & cognitive arm latinett goet  google cloud google developers N-vidia developers microsoft azure developers android studio google studio arm compilers latinett hub puebla that node primary y ultimate to fetch data and generate reports.
+program engegine conective system global from git hub user name armdeveloper-ops alfredo rueda mendoza  
