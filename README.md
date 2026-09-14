@@ -2,7 +2,7 @@
 
 The Mistral Cookbook features examples contributed by Mistralers and our community, as well as our partners. If you have cool examples showcasing Mistral models, you can submit a PR to this repo for review.
 
-For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral.ai/). You can also browse the [cookbooks section](https://docs.mistral.ai/resources/cookbooks) in the docs.
+For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral.ai/). You can also browse the [cookbooks section](https://docs.mistral.ai/resources/cookbooks) in the docs. New examples are welcome — see the contributing guide for details.
 
 ## Main Notebooks
 
