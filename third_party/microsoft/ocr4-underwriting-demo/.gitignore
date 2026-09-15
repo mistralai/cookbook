@@ -1,0 +1,41 @@
+# Secrets
+.env
+.env.bak-*
+
+# Python / uv
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+# keep uv.lock committed for reproducible installs
+
+# OCR generated output stays out of git. The demo sample docs under inputs/ are
+# tracked so the team can run the app and demos without a separate download.
+*.md.out
+/inputs/*.result.json
+
+# SQLite case store (demo) + Gradio temp
+cases.db
+cases.db-wal
+cases.db-shm
+cases.db.bak*
+.gradio/
+
+# Azure Functions local settings (secrets) + artifacts
+function_app/local.settings.json
+.python_packages/
+bin/
+obj/
+.build/
+# vendored copies created at packaging time by scripts/vendor_src.py (source of truth is src/)
+function_app/config.py
+function_app/observability.py
+function_app/ocr_client.py
+function_app/agents.py
+function_app/foundry_agents.py
+function_app/workflow.py
+function_app/pipeline.py
+
+# OS
+.DS_Store

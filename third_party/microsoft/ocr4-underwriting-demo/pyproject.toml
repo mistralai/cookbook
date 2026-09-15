@@ -1,0 +1,27 @@
+[project]
+name = "mistral-ocr-foundry"
+version = "0.1.0"
+description = "Extract markdown from PDFs/images via mistral-ocr-4-0 on Azure Foundry"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.32",
+    "httpx>=0.28",
+    "python-dotenv>=1.0",
+    "azure-identity>=1.25.3",
+    "azure-storage-blob>=12.30.0",
+    "pydantic>=2.13.4",
+    "azure-monitor-opentelemetry>=1.8.9",
+    "gradio>=6.22.0",
+    "fastapi>=0.138.0",
+    "uvicorn[standard]>=0.52.1",
+    "python-multipart>=0.0.32",
+    "pypdfium2>=5.12.1",
+    "pillow>=12.3.0",
+    "agent-framework-foundry>=1.10.3",
+    "agent-framework-devui>=1.0.0b260721",
+    "opentelemetry-instrumentation-requests>=0.64b0",
+]
+
+[[tool.uv.index]]
+url = "https://socket-registry.mistralai.com/pypi/simple/"
+default = true

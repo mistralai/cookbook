@@ -1,0 +1,21 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "<storage connection string — same account as inbox/results>",
+
+    "AZURE_AI_KEY": "<foundry account key>",
+    "AZURE_OCR_ENDPOINT": "https://mistral-ocr-foundry-mistralai.services.ai.azure.com/providers/mistral/azure/ocr",
+    "AZURE_OCR_DEPLOYMENT": "mistral-ocr-4",
+    "AZURE_INFERENCE_ENDPOINT": "https://mistral-ocr-foundry-mistralai.services.ai.azure.com",
+    "AZURE_CHAT_DEPLOYMENT": "mistral-medium-3-5",
+
+    "AZURE_STORAGE_CONNECTION_STRING": "<same storage connection string>",
+    "AZURE_STORAGE_INBOX_CONTAINER": "inbox",
+    "AZURE_STORAGE_RESULTS_CONTAINER": "results",
+
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "<app insights connection string>",
+    "ENABLE_SENSITIVE_TELEMETRY": "true",
+    "OTEL_SERVICE_NAME": "doc-pipeline"
+  }
+}
