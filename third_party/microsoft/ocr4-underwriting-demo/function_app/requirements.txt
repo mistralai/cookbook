@@ -1,0 +1,19 @@
+# Azure Functions requires a requirements.txt for its remote pip build (the platform doesn't
+# use uv). Keep these in sync with the root pyproject.toml / uv.lock.
+azure-functions
+
+# Agent framework: the narrow Foundry sub-packages, not the broad `agent-framework` meta
+# (whose [all] extra pulls unused provider connectors). Mirrors the slimmed root deps.
+agent-framework-core>=1.11.0
+agent-framework-foundry>=1.10.3
+
+# Hosted-agent path (foundry_agents.py): Projects SDK + Entra auth. The deployed Function
+# authenticates with its managed identity via DefaultAzureCredential.
+azure-ai-projects>=2.3.0
+azure-identity>=1.25.3
+
+# Pipeline + storage
+azure-storage-blob>=12.30.0
+requests>=2.32
+pydantic>=2.13
+python-dotenv>=1.0

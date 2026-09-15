@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+#
+# `azd up` provisions the infra (infra/main.bicep, which folds in the Function host module)
+# and deploys the event pipeline as the single `api` service. It does NOT deploy the Gradio
+# UI. The extractor runs as a hosted Foundry agent by default; see AGENTS.md and README.
+name: mistral-doc-pipeline
+metadata:
+  template: mistral-doc-pipeline@1.0.0
+
+infra:
+  provider: bicep
+  path: infra
+  module: main
+
+services:
+  api:
+    project: function_app
+    language: python
+    host: function
+
+hooks:
+  # Register the Foundry agents once infra exists (data-plane, so Bicep can't). --all registers
+  # every agent (extractor for the Function pipeline; intake/underwriting/doc-chat for the
+  # Gradio app), so all appear in the Foundry portal after a deploy. Never fails the deploy:
+  # the script logs and exits 0 on error, and the pipeline still runs via the fallback.
+  # azd runs hook `run:` strings through a shell, so each explicitly invokes the interpreter
+  # (uv run python), never bare `script.py` which the shell would try to execute as sh.
+  postprovision:
+    posix:
+      shell: sh
+      run: uv run python scripts/provision_agents.py --all
+    windows:
+      shell: pwsh
+      run: uv run python scripts/provision_agents.py --all
+    continueOnError: true
+
+  # function_app.py imports the shared src/ modules by bare name, but azd packages only the
+  # service folder. Vendor them in before packaging, remove them after deploy so the copies
+  # never get committed or drift from src/.
+  prepackage:
+    posix:
+      shell: sh
+      run: uv run python scripts/vendor_src.py copy
+    windows:
+      shell: pwsh
+      run: uv run python scripts/vendor_src.py copy
+  postdeploy:
+    posix:
+      shell: sh
+      run: uv run python scripts/vendor_src.py clean
+    windows:
+      shell: pwsh
+      run: uv run python scripts/vendor_src.py clean

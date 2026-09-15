@@ -1,0 +1,5 @@
+local.settings.json
+.venv/
+__pycache__/
+*.pyc
+deploy.sh
