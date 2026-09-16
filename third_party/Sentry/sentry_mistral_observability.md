@@ -207,12 +207,12 @@ pnpm start
 
 Open [Explore > Agents](https://sentry.io/orgredirect/organizations/:orgslug/explore/agents/), select your project, and find the conversation ID printed in the terminal. Choose **Transcript** to read the questions, answers, and follow-up as one conversation. The conversation ID groups related model calls even when they belong to separate traces. The basic setup is complete; the remaining steps are optional.
 
-![Sentry Transcript shows order status answers and a follow-up question in the automatic-only Mistral conversation.](images/mistral-conversation.jpg)
+![Sentry Transcript with the automatic model’s lookup_order request, ORD-1001 arguments, timing, and token counts open in the sidebar.](images/mistral-conversation.jpg)
 
-*The Transcript tab shows the conversation captured by the native integration, without application agent or tool spans.*
+*The Transcript tab stays visible while the sidebar shows the model’s lookup_order request, arguments, duration, and token counts.*
 
 - **Conversation:** check that the first answer uses the shipped status and Thursday delivery, and that the follow-up identifies the item as Kettle.
-- **Model details:** switch to **Timeline** and select a model call to inspect its prompt, output, duration, and token counts. The first call’s output contains the lookup_order request; the second call’s input contains the tool result.
+- **Model details:** in **Timeline**, select the first model call and open **Output**, then return to **Transcript** to keep its details beside the conversation. The sidebar shows the tool request, duration, and token counts. The second call’s **Input** contains the tool result.
 - **Local lookup:** this setup has no tool execution span. The optional steps add its duration, result, and error details.
 
 [Explore agent conversations](https://docs.sentry.io/product/agents/conversations/).
