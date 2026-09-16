@@ -4,6 +4,12 @@ Author: Sergiy Dybskiy ([@sergical](https://github.com/sergical)), Sentry.
 
 Run a TypeScript support assistant that looks up fictional orders and answers follow-up questions. Sentry traces Mistral SDK calls automatically, including tool requests, streamed replies, and token usage. Optional application spans show the local lookup duration and connect a deliberate tool failure to its trace.
 
+Screenshots show fictional orders and the native Mistral SDK tested through OpenRouter, which explains the model identifier. The setup below uses Mistral directly.
+
+![Sentry conversation view with order status answers and a follow-up question.](images/mistral-conversation.jpg)
+
+*The conversation view groups model replies and follow-up questions.*
+
 ## Before you start
 
 You need Node.js 24.12 or later, pnpm, a [Mistral API key](https://console.mistral.ai/) with access to a model that supports tool calling, and a [Sentry project](https://sentry.io/signup/) with its DSN.
@@ -203,14 +209,11 @@ pnpm start
 
 ## 5. Inspect the automatic Mistral spans
 
-Open [Explore > Agents](https://sentry.io/orgredirect/organizations/:orgslug/explore/agents/), select your project, and find the conversation ID printed in the terminal. Use **Transcript** to read the exchange and **Timeline** to inspect the model calls. Each SDK call gets a span automatically. With no enclosing application span, the calls can belong to separate traces while sharing the conversation ID. The basic setup is complete; steps 6 and 7 are optional.
+Open [Explore > Agents](https://sentry.io/orgredirect/organizations/:orgslug/explore/agents/), select your project, and find the conversation ID printed in the terminal. Use **Transcript** to read the exchange and **Timeline** to inspect the model calls. Each SDK call gets a span automatically. With no enclosing application span, the calls can belong to separate traces while sharing the conversation ID. The basic setup is complete; the remaining steps are optional.
 
-**Expected automatic coverage per successful turn**
+![Sentry shows an automatic Mistral model span with token counts and a lookup_order request for ORD-1001.](images/mistral-automatic-tool-call.jpg)
 
-```text
-chat <model>    tool request: lookup_order({ orderId: "ORD-1001" })
-chat <model>    tool result in input; streamed answer in output
-```
+*The automatic model span records the tool request and its arguments. This run has no application agent or tool spans.*
 
 - **First model call:** inspect the prompt, available tool definition, and returned lookup_order request with its orderId arguments.
 - **Second model call:** inspect the tool result passed back to Mistral and the answer streamed to the terminal.
@@ -298,12 +301,21 @@ await traceTurn(() => answer(question, failNextTurn));
 ```
 
 - Type `/quit`, restart with the command from step 4, and ask about ORD-1001 again. Restarting creates a new conversation ID.
+
+## 7. Inspect the tool execution (optional)
+
+After you add the spans in step 6, open the new conversation’s **Timeline**. Select **lookup_order** and open **Output** to inspect the returned order. The screenshot shows the local function’s duration and result alongside the automatic model calls.
+
 - Open the new trace: invoke_agent Order Support contains two automatic model spans and one manual execute_tool lookup_order span.
 - Inspect the lookup’s arguments, returned order, and roughly 250 ms duration. The manual argument/result attributes use fictional data; omit or redact them for sensitive records.
 
+![Sentry shows the optional lookup_order span with its duration and the fictional shipped Kettle result.](images/mistral-tool-result.jpg)
+
+*Optional instrumentation records the local lookup duration and returned order. The model calls still come from the native integration.*
+
 [Add application context to AI traces](https://docs.sentry.io/platforms/javascript/guides/node/agent-tracing/manual-instrumentation/).
 
-## 7. Debug a tool failure (optional)
+## 8. Debug a tool failure (optional)
 
 Complete step 6 first, then enter these lines in the running assistant. The `/fail` command makes the next lookup throw. The first Mistral call should complete, but the tool fails before the second model call starts. The optional wrapper records the application error, and the terminal stays open for a retry.
 
@@ -318,6 +330,10 @@ Where is order ORD-1002?
 - Find the failed execute_tool lookup_order span and the stack frame in orders.ts. There should be no second model span because answer generation never started.
 - Ask **Where is order ORD-1002?** again. The failure resets after one turn. The retry should include a successful lookup and a second model call that streams the answer.
 - Compare the failed turn and retry in the same conversation. The lookup failed in application code; the first model call succeeded.
+
+![Sentry shows the optional lookup_order span with ORD-1002 input and the linked Order service unavailable demo error.](images/mistral-tool-failure.jpg)
+
+*The selected tool span contains the deliberate application error. The first model call succeeds; the retry appears in the next trace group.*
 
 [Connect captured errors to traces](https://docs.sentry.io/platforms/javascript/guides/node/usage/).
 
