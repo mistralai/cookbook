@@ -113,6 +113,7 @@ The preview renders committed notebook content without executing notebook code. 
 
 | Tools                                                                                                                 | Category                        | Party      |
 |:----------------------------------------------------------------------------------------------------------------------|:--------------------------------| :--------- |
+| [local_hybrid_rag_sqlite.ipynb](third_party/SQLite/local_hybrid_rag_sqlite.ipynb) | RAG, embeddings, hybrid search | SQLite |
 | [adaptive_rag_mistral.ipynb](third_party/langchain/adaptive_rag_mistral.ipynb)                                        | RAG                             | Langchain  |
 | [Adaptive_RAG.ipynb](third_party/LlamaIndex/Adaptive_RAG.ipynb)                                                       | RAG                             | LLamaIndex |
 | [Agents_Tools.ipynb](third_party/LlamaIndex/Agents_Tools.ipynb)                                                       | agent                           | LLamaIndex |
