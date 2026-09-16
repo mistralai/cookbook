@@ -160,6 +160,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                             | CLI, TUI APP, Chat              | x-cmd      |
 | [Incremental Prompt Engineering and Model Comparison](third_party/Pixeltable/README.md)                               | Prompt Engineering, Evaluation  | Pixeltable |
 | [Build a bank support agent with Pydantic AI and Mistral AI](third_party/PydanticAI/pydantic_bank_support_agent.ipynb)| Agent                           | Pydantic   |
+| [Monitor a Mistral support agent with Sentry](third_party/Sentry/sentry_mistral_observability.md) | Tracing, Observability | Sentry |
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
