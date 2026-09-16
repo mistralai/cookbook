@@ -6,10 +6,6 @@ Run a TypeScript support assistant that looks up fictional orders and answers fo
 
 Screenshots show fictional orders and the native Mistral SDK tested through OpenRouter, which explains the model identifier. The setup below uses Mistral directly.
 
-![Sentry conversation view with order status answers and a follow-up question.](images/mistral-conversation.jpg)
-
-*The conversation view groups model replies and follow-up questions.*
-
 ## Before you start
 
 You need Node.js 24.12 or later, pnpm, a [Mistral API key](https://console.mistral.ai/) with access to a model that supports tool calling, and a [Sentry project](https://sentry.io/signup/) with its DSN.
@@ -207,18 +203,17 @@ pnpm start
 - Ask **What item is in that order?** The assistant should use the previous turn to identify ORD-1001, look it up, and answer Kettle.
 - Leave the terminal open while you inspect the conversation. Type `/quit` when you finish.
 
-## 5. Inspect the automatic Mistral spans
+## 5. Read the support conversation
 
-Open [Explore > Agents](https://sentry.io/orgredirect/organizations/:orgslug/explore/agents/), select your project, and find the conversation ID printed in the terminal. Use **Transcript** to read the exchange and **Timeline** to inspect the model calls. Each SDK call gets a span automatically. With no enclosing application span, the calls can belong to separate traces while sharing the conversation ID. The basic setup is complete; the remaining steps are optional.
+Open [Explore > Agents](https://sentry.io/orgredirect/organizations/:orgslug/explore/agents/), select your project, and find the conversation ID printed in the terminal. Choose **Transcript** to read the questions, answers, and follow-up as one conversation. The conversation ID groups related model calls even when they belong to separate traces. The basic setup is complete; the remaining steps are optional.
 
-![Sentry shows an automatic Mistral model span with token counts and a lookup_order request for ORD-1001.](images/mistral-automatic-tool-call.jpg)
+![Sentry Transcript shows order status answers and a follow-up question in the automatic-only Mistral conversation.](images/mistral-conversation.jpg)
 
-*The automatic model span records the tool request and its arguments. This run has no application agent or tool spans.*
+*The Transcript tab shows the conversation captured by the native integration, without application agent or tool spans.*
 
-- **First model call:** inspect the prompt, available tool definition, and returned lookup_order request with its orderId arguments.
-- **Second model call:** inspect the tool result passed back to Mistral and the answer streamed to the terminal.
-- **Usage:** compare model names, duration, and input/output token counts. Cost estimates depend on Sentry recognizing the model and its usage.
-- **Local lookup:** its result appears in the next model call’s input. It has no execution span yet because your application runs it outside the Mistral SDK.
+- **Conversation:** check that the first answer uses the shipped status and Thursday delivery, and that the follow-up identifies the item as Kettle.
+- **Model details:** switch to **Timeline** and select a model call to inspect its prompt, output, duration, and token counts. The first call’s output contains the lookup_order request; the second call’s input contains the tool result.
+- **Local lookup:** this setup has no tool execution span. The optional steps add its duration, result, and error details.
 
 [Explore agent conversations](https://docs.sentry.io/product/agents/conversations/).
 
