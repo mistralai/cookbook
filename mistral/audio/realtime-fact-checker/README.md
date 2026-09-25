@@ -12,19 +12,20 @@ our little server in 200ms chunks over a `WebSocket`.
 Requires [uv](https://docs.astral.sh/uv/). Dependencies install automatically
 on first run, or install them up front with:
 
-```
+```sh
 uv sync
 ```
 
 Create a `.env` file in this folder:
 
-```
+```sh
 MISTRAL_API_KEY=your-mistral-api-key
 ```
 
 ## Run
+This command starts both your Python server and your web server:
 
-```
+```sh
 uv run server.py
 ```
 
