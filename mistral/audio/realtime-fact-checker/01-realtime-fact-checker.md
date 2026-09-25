@@ -32,7 +32,7 @@ To complete this cookbook, you will need:
 
 ### Install
 #### Python
-You can install the packages globally with `pip`. But it's recommended to 
+Install the packages globally with `pip`, or create a project with `uv` and add the packages you'll need:
 create a project with `uv` and add the packages you'll need:
 
 ```sh
