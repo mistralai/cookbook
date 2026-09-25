@@ -16,7 +16,7 @@ on first run, or install them up front with:
 uv sync
 ```
 
-To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key. Create a `.env` file in this folder:
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key. Create a `.env` at the root of your project and add your Mistral API key:
 
 ```sh
 MISTRAL_API_KEY=your-mistral-api-key
