@@ -1,6 +1,6 @@
 # Audio fact-checking agent
 
-A simple demo which checks an audio stream for factual assertions, checking
+A demo which checks an audio stream for factual assertions, checking
 each against a source of truth. Click Start, talk, and enjoy!
 
 We use Mistral's real-time transcription API, plus its chat and embeddings APIs. 
@@ -16,7 +16,7 @@ on first run, or install them up front with:
 uv sync
 ```
 
-Create a `.env` file in this folder:
+To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key. Create a `.env` file in this folder:
 
 ```
 MISTRAL_API_KEY=your-mistral-api-key
