@@ -386,7 +386,7 @@ Now make the HTML for your web app. You'll include markup for
 * an area for fact-checking verdicts
 
 Create a new file called `index.html`. Add the following.
-To make this look nice, use the `style.css` provided [in the GitHub repo]((https://github.com/mistralai/cookbook/tree/main/mistral/audio/realtime-fact-checker/web/style.css)).
+To make this look nice, use [the `style.css` provided in the GitHub repo](https://github.com/mistralai/cookbook/tree/main/mistral/audio/realtime-fact-checker/web/style.css).
 
 ```html
 <!DOCTYPE html>
