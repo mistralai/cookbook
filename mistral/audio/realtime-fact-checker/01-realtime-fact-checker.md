@@ -386,7 +386,7 @@ Now make the HTML for your web app. You'll include markup for
 * an area for fact-checking verdicts
 
 Create a new file called `index.html`. Add the following.
-To make this look nice, use the `style.css` provided [in the GitHub repo](web/style.css).
+To make this look nice, use the `style.css` provided [in the GitHub repo]((https://github.com/mistralai/cookbook/tree/main/mistral/audio/realtime-fact-checker/web/style.css)).
 
 ```html
 <!DOCTYPE html>
@@ -495,8 +495,8 @@ Wire up three event listeners for this WebSocket session:
 * `"open"`: when the user clicks "Start", the session starts. Tell the server what
   sample rate your microphone audio is using, and switch the button text to
   "Stop".
-* `"message"`: Whenever a message arrives, render it. It'll be either an
-updated transcript or a new fact-check verdict
+* `"message"`: whenever a message arrives, render it. It'll be either an
+updated transcript or a new fact-check verdict.
 * `"close"`: when the connection closes, release the microphone and reset the UI
   back to its starting state
 
