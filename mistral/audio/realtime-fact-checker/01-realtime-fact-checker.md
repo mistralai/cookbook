@@ -112,20 +112,20 @@ TRANSCRIPTION_MODEL = "voxtral-mini-transcribe-realtime-2602"
 
 Choose a threshold for [cosine similarity](https://www.ibm.com/think/topics/cosine-similarity).
 
-In this project, we compare each claim with the assertions in our source of
+In this project, you compare each claim with the assertions in our source of
 facts by generating
 [embeddings](https://www.cloudflare.com/learning/ai/what-are-embeddings/).
 Embeddings are a representation of a concept across multiple "dimensions". They
 are represented by a set of numbers - a vector.
 
-Once two human concepts are transformed into vectors, we can compare them using
+Once two human concepts are transformed into vectors, you can compare them using
 the very standard method of cosine similarity. By calculating the angle between
-these vectors, we see broadly how similar our embeddings model thinks the
+these vectors, you see broadly how similar our embeddings model thinks the
 concepts are. If they point in the exact same direction, the angle is 0°, and
 the cosine is 1.0. If they're perpendicular, the angle is 90°, and the cosine is
 0.0.
 
-Here, if the similarity score is below `MATCH_THRESHOLD`, we determine that the
+Here, if the similarity score is below `MATCH_THRESHOLD`, you determine that the
 two associated statements are unrelated, and not worth comparing.
 
 ```py
@@ -470,7 +470,7 @@ Open up the `app.js` file you made earlier and add the following code.
 Change this constant to buffer more or less audio. Lower values mean less latency,
 but can also cause some audio to get lost. 
 ```js
-const CHUNK_MS = 200; // how much audio we buffer client-side before sending
+const CHUNK_MS = 200; // how much audio buffered client-side before sending
 ```
 
 Now locate the DOM elements you need to work with, and initialize the `audioContext`
