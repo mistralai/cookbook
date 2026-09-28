@@ -31,9 +31,8 @@ To complete this cookbook, you will need:
 ## Environment setup
 
 ### Install
-#### Python
-Install the packages globally with `pip`, or create a project with `uv` and add the packages you'll need:
-create a project with `uv` and add the packages you'll need:
+
+You can install the Python packages globally with `pip`. But the best practice is to install them just for this project. To do so, create a project with `uv` and add the packages you'll need:
 
 ```sh
 uv init
@@ -48,10 +47,10 @@ automatically. Or, sync it yourself:
 uv sync
 ```
 
-#### JavaScript
-This project uses vanilla, plain JavaScript. No build process or packages needed!
+The frontend for this project uses vanilla, plain JavaScript. No build process or packages needed!
 
 ### Required environment variables
+
 To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
 
 Create a `.env` at the root of your project and add your Mistral API key:
@@ -61,6 +60,7 @@ MISTRAL_API_KEY=your-mistral-api-key
 ```
 
 ## Create the server
+
 Create `server.py` in your project directory.
 
 ```sh
@@ -110,8 +110,23 @@ CHAT_MODEL = "mistral-medium-3.5"
 TRANSCRIPTION_MODEL = "voxtral-mini-transcribe-realtime-2602"
 ```
 
-Choose a threshold for cosine similarity. Below this value, determine that a
-claim is unrelated to any fact in the source of truth.
+Choose a threshold for [cosine similarity](https://www.ibm.com/think/topics/cosine-similarity).
+
+In this project, we compare each claim with the assertions in our source of
+facts by generating
+[embeddings](https://www.cloudflare.com/learning/ai/what-are-embeddings/).
+Embeddings are a representation of a concept across multiple "dimensions". They
+are represented by a set of numbers - a vector.
+
+Once two human concepts are transformed into vectors, we can compare them using
+the very standard method of cosine similarity. By calculating the angle between
+these vectors, we see broadly how similar our embeddings model thinks the
+concepts are. If they point in the exact same direction, the angle is 0°, and
+the cosine is 1.0. If they're perpendicular, the angle is 90°, and the cosine is
+0.0.
+
+Here, if the similarity score is below `MATCH_THRESHOLD`, we determine that the
+two associated statements are unrelated, and not worth comparing.
 
 ```py
 MATCH_THRESHOLD = 0.5
@@ -142,7 +157,7 @@ FACTS = [
     "The Great Wall of China is not visible to the naked eye from the Moon",
     "An octopus has three hearts: two pump blood through the gills, and one pumps it through the rest of the body",
     "The capital of New York State is Albany",
-    "The Red Sox won the World Series in 2004 for the first time since 1918"
+    "Noodles originated in China"
 ]
 ```
 
@@ -261,6 +276,7 @@ async def check_claim(assertion: str) -> dict | None:
 ```
 
 ### Create the API
+
 Your server has one main service: `/ws`, which uses a WebSocket.
 This service bridges your browser's microphone audio into Mistral's real-time transcription,
 fact-checking each sentence as it completes and pushing verdicts back as JSON.
@@ -348,6 +364,7 @@ if __name__ == "__main__":
 ```
 
 ## Create the web app
+
 Create a directory for your web assets. Inside that, create one file for the
 `AudioWorklet`, and another for the JavaScript that will run your app.
 ```sh
@@ -358,6 +375,7 @@ touch app.js
 ```
 
 ### Your AudioWorklet module
+
 You'll make a little `AudioWorkletProcessor` which will work in the
 `AudioWorklet` thread. Its purpose is to grab audio samples as they come through
 and pass those along to the main thread.
@@ -379,6 +397,7 @@ registerProcessor("pcm-capture-processor", PCMCaptureProcessor);
 ```
 
 ### Your HTML
+
 Now make the HTML for your web app. You'll include markup for
 * a title
 * a button to start/stop recording audio
@@ -424,13 +443,16 @@ To make this look nice, use [the `style.css` provided in the GitHub repo](https:
 ```
 
 ### Your client-side logic
-Now, write the JavaScript which runs your web app.
-* Use an `AudioWorklet` to capture microphone input
-* Convert the raw audio data to a standard format - 16-bit PCM
-* Stream the processed audio to the server over a `WebSocket`
+
+Now, write the JavaScript which runs your web app. The web app will:
+* use an `AudioWorklet` to capture microphone input
+* convert the raw audio data to a standard format - 16-bit PCM
+* stream the processed audio to the server over a `WebSocket`
 
 When the server sends back a message over the `WebSocket`, it has either an
 updated transcription or a new fact-check for you to display.
+
+Open up the `app.js` file you made earlier and add the following code.
 
 Change this constant to buffer more or less audio. Lower values mean less latency,
 but can also cause some audio to get lost. 
@@ -531,6 +553,30 @@ function stopRecording() {
   ws.close(); // triggers the "close" listener above, which does the actual cleanup
 }
 ```
+Finally, attach an event listener to your `AudioWorkletNode`.
+`audio-processor.js` posts a message here every audio "quantum" (a fixed
+batch of ~128 samples, delivered many times per second) with the
+microphone's raw audio for that instant. Each piece gets appended
+to buffered below. Once there's `CHUNK_MS` worth, they're stitched into
+one array, converted to the PCM format the server expects, and sent -
+then the buffer resets to start collecting the next chunk.
+
+```js
+  captureNode.port.onmessage = (event) => {
+    buffered.push(event.data);
+    bufferedLength += event.data.length;
+    if (bufferedLength >= samplesPerChunk) {
+      const chunk = mergeFloat32(buffered, bufferedLength);
+      buffered = [];
+      bufferedLength = 0;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(floatTo16BitPCM(chunk).buffer);
+      }
+    }
+  };
+}
+```
+
 
 Every message from the server is one of two things: a live transcript
 update, or a fact-check verdict.
@@ -561,29 +607,6 @@ function renderMessage(message) {
     `;
   }
   resultsEl.prepend(card);
-}
-```
-
-`audio-processor.js` posts a message here every audio "quantum" (a fixed
-batch of ~128 samples, delivered many times per second) with the
-microphone's raw audio for that instant. Each piece gets appended
-to buffered below. Once there's `CHUNK_MS` worth, they're stitched into
-one array, converted to the PCM format the server expects, and sent -
-then the buffer resets to start collecting the next chunk.
-
-```js
-  captureNode.port.onmessage = (event) => {
-    buffered.push(event.data);
-    bufferedLength += event.data.length;
-    if (bufferedLength >= samplesPerChunk) {
-      const chunk = mergeFloat32(buffered, bufferedLength);
-      buffered = [];
-      bufferedLength = 0;
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(floatTo16BitPCM(chunk).buffer);
-      }
-    }
-  };
 }
 ```
 
@@ -632,16 +655,38 @@ function escapeHtml(text) {
 ```
 
 ## Run it
-Run `uv run server.py`, then open http://127.0.0.1:8000, click Start, and allow microphone access when your browser asks.
+
+Run `uv run server.py`. Open http://127.0.0.1:8000 in your browser. Click Start, then allow
+microphone access when your browser asks.
+
+Then try making a few statements. Try some things that match the facts in `FACTS`:
+* France is larger than Spain
+* A day on Venus is longer than a year there
+
+Try some things with contradict your facts:
+* Spain is larger than France
+* A year on Venus is longer than a day there
+
+Try a few things that don't relate to any of your facts, or statements whose
+truthiness is more ambiguous. What happens? You can play with `MATCH_THRESHOLD`
+to make matches more or less strict.
 
 ## Summary
-You've just built a real-time audio fact-checking agent. A Python server streams  microphone audio to Mistral's real-time transcription API over a WebSocket, checks any factual claims it hears against a small set of known facts, and shows the live transcript and each verdict in a little web UI.
+
+You've just built a real-time audio fact-checking agent. A Python server streams
+microphone audio to Mistral's real-time transcription API over a WebSocket,
+checks any factual claims it hears against a small set of known facts, and shows
+the live transcript and each verdict in a little web UI.
 
 **What you built**
-- An `AudioWorklet` that captures microphone audio in the browser and streams it to a Python server over a WebSocket
-- A server that forwards that audio to Mistral's real-time transcription API and splits the growing transcript into sentences
-- An assertion detector and fact-checker built on Mistral's chat and embeddings APIs
-- A small web UI that renders the live transcript and each fact-check verdict as it arrives
+- An `AudioWorklet` that captures microphone audio in the browser and streams it
+  to a Python server over a WebSocket
+- A server that forwards that audio to Mistral's real-time transcription API and
+  splits the growing transcript into sentences
+- An assertion detector and fact-checker built on Mistral's chat and embeddings
+  APIs
+- A small web UI that renders the live transcript and each fact-check verdict as
+  it arrives
 
 **Mistral features used**
 - Real-time audio transcription (`voxtral-mini-transcribe-realtime-2602`)
