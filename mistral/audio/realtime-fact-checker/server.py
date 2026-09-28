@@ -39,13 +39,13 @@ MATCH_THRESHOLD = 0.5
 
 # The source of truth. In a real-world scenario, you'd probably want to source facts in advance anyway.
 FACTS = [
-    "Venus rotates once every 243 Earth days and completes one orbit around the Sun in 225 Earth days",
-    "The mythical unicorn is Scotland's official national animal",
+    "Earth's days are getting longer, as our planet's rotation is slowly decreasing by about 1.8 seconds per century",
+    "Newborn babies can see some intense colors, especially red",
     "France is slightly larger than Spain in total area - about 551,500 km², compared to 505,400 km² for Spain",
     "The Great Wall of China is not visible to the naked eye from the Moon",
     "An octopus has three hearts: two pump blood through the gills, and one pumps it through the rest of the body",
     "The capital of New York State is Albany",
-    "The Red Sox won the World Series in 2004 for the first time since 1918"
+    "Noodles originated in China"
 ]
 
 SENTENCE_END_RE = re.compile(r"(?<=[.!?])\s+")
@@ -123,13 +123,15 @@ async def judge_assertion(assertion: str, fact: str) -> dict:
                     'Use "unknown" if the known fact doesn\'t actually relate to the claim. '
                     'If you use "unknown", don\'t mention the irrelevant known fact in your reasoning. '
                     'Never say "the known fact" or "the context" in your reasoning, since the reader '
-                    'won\'t know what that means - when the known fact confirms or denies the claim, '
-                    'just state the correct information directly, e.g. "In fact, ...".'
-                ),
+                    'won\'t know what that means - when the known fact confirms or denies the claim. '
+                    'If the known fact does relate to the claim, mention the known fact!'
+                    "You're then free to elaborate on the fact based on your own knowledge."
+                )
             },
             {"role": "user", "content": f"Claim: {assertion}\n\nKnown fact: {fact}"},
         ],
     )
+
     return json.loads(response.choices[0].message.content)
 
 
@@ -165,6 +167,18 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         except WebSocketDisconnect:
             return
 
+    async def send(payload: dict) -> None:
+        """Send JSON to the browser, ignoring the case where it's already gone.
+
+        The client can disconnect (e.g. the user clicks Stop) while a
+        transcript update or fact-check is still in flight - without this,
+        that last send raises WebSocketDisconnect and crashes the handler.
+        """
+        try:
+            await websocket.send_json(payload)
+        except WebSocketDisconnect:
+            pass
+
     transcript_so_far = ""
     processed_count = 0
     in_flight: set[asyncio.Task] = set()  # holds refs so tasks aren't GC'd mid-flight
@@ -176,9 +190,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         assertion = capitalize(assertion)
         result = await check_claim(assertion)
         if result is None:
-            await websocket.send_json({"type": "verdict", "text": assertion, "matched": False})
+            await send({"type": "verdict", "text": assertion, "matched": False})
         else:
-            await websocket.send_json(
+            await send(
                 {
                     "type": "verdict",
                     "text": assertion,
@@ -203,7 +217,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         else:
             continue
 
-        await websocket.send_json({"type": "transcript", "text": transcript_so_far})
+        await send({"type": "transcript", "text": transcript_so_far})
 
         for sentence in new_sentences:
             task = asyncio.create_task(fact_check_one(sentence))
