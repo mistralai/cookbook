@@ -112,7 +112,7 @@ TRANSCRIPTION_MODEL = "voxtral-mini-transcribe-realtime-2602"
 
 Choose a threshold for [cosine similarity](https://www.ibm.com/think/topics/cosine-similarity).
 
-In this project, you compare each claim with the assertions in our source of
+In this project, you compare each claim with the assertions in your source of
 facts by generating
 [embeddings](https://www.cloudflare.com/learning/ai/what-are-embeddings/).
 Embeddings are a representation of a concept across multiple "dimensions". They
@@ -123,7 +123,7 @@ the very standard method of cosine similarity. By calculating the angle between
 these vectors, you see broadly how similar our embeddings model thinks the
 concepts are. If they point in the exact same direction, the angle is 0°, and
 the cosine is 1.0. If they're perpendicular, the angle is 90°, and the cosine is
-0.0.
+Once two human concepts are transformed into vectors, compare them using cosine similarity. By calculating the angle between these vectors, you get a broad measure of how similar the concepts are according to the embeddings model. If they point in the exact same direction, the angle is 0°, and the cosine is 1.0. If they're perpendicular, the angle is 90°, and the cosine is 0.0.
 
 Here, if the similarity score is below `MATCH_THRESHOLD`, you determine that the
 two associated statements are unrelated, and not worth comparing.
