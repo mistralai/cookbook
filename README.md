@@ -155,3 +155,4 @@ The preview renders committed notebook content without executing notebook code. 
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
+| [reasoning_capabilities.ipynb](mistral/reasoning/reasoning_capabilities.ipynb) | reasoning, chain-of-thought | Explore reasoning capabilities with Magistral models: CoT, math, logic, and code analysis |
