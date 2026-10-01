@@ -147,6 +147,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [Solara Integration - Chat with PDFs](third_party/solara/README.md)                                                   | UI chat, demo, RAG              | Solara     |
 | [Streamlit Integration - Chat with PDF](third_party/streamlit/README.md)                                              | UI chat, demo, RAG              | Streamlit  |
 | [Neo4j rag](third_party/Neo4j/neo4j_rag.ipynb)                                                                        | RAG                             | Neo4j      |
+| [Ground Ministral on signed company records](third_party/AYA/ground_mistral_on_signed_company_records.ipynb)    | agent, function calling, MCP    | AYA        |
 | [SubQuestionQueryEngine.ipynb](third_party/LlamaIndex/RouterQueryEngine.ipynb)                                        | agent                           | LLamaIndex |
 | [LLM Judge: Detecting hallucinations in language models](third_party/wandb/README.md)                                 | fine-tuning, evaluation         | Weights & Biases |
 | [`x mistral`: CLI & TUI APP Module in X-CMD](third_party/x-cmd/README.md)                                             | CLI, TUI APP, Chat              | x-cmd      |
