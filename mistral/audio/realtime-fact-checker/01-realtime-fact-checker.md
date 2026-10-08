@@ -7,7 +7,7 @@ web UI to capture microphone input and display results. Follow the instructions
 here to create the files you need - or visit [the GitHub repo](https://github.com/mistralai/cookbook/tree/main/mistral/audio/realtime-fact-checker) if
 that's easier.
 
-Here's how it works:
+## How it works
 
 1. On startup, the server generates embeddings for each fact in a source of truth.
 1. The web app uses an AudioWorklet to read audio from the microphone and streams it to
