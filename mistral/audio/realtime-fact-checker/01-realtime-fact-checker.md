@@ -20,6 +20,11 @@ Here's how it works:
    and returns a verdict plus its reasoning, which is pushed back to the browser and
    rendered as a card.
 
+To focus on the audio techniques, this project uses a minimalist RAG process to
+compare claims to facts. For a solution designed for real-world data at scale,
+check out [Search Toolkit](https://docs.mistral.ai/studio/search/search-toolkit),
+which handles ingestion, chunking, and retrieval for document collections.
+
 ## Prerequisites
 
 To complete this cookbook, you will need:
