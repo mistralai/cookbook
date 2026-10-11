@@ -18,6 +18,21 @@ import json
 import re
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
+from pathlib import Path
+
+
+def load_contract(path: str | Path) -> "Contract":
+    """Load the machine-readable contract body (wordlist JSON).
+
+    The same artifact an auditor or a vendor session would load —
+    the regime consumes its own canonical data format.
+    """
+    body = json.loads(Path(path).read_text(encoding="utf-8"))
+    contract = Contract()
+    for word, e in body["lexicon"].items():
+        contract.add(Entry(word=word, mark=e["mark"], source=e["source"], gloss=e["gloss"]))
+    contract.known_hybrids = dict(body.get("known_hybrids", {}))
+    return contract
 
 
 # ---------------------------------------------------------------------------
@@ -178,7 +193,12 @@ def preflight(text: str) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def run_demo() -> dict:
-    contract = Contract()
+    demo_dir = Path(__file__).parent
+    wordlist = demo_dir / "wordlist-v0.6-demo.json"
+    if wordlist.exists():
+        contract = load_contract(wordlist)
+    else:
+        contract = Contract()
 
     # ⊢ sourced entries (SSKJ² / Fran, accessed September 2026)
     contract.add(Entry("lúka", "⊢", "SSKJ²", "pristan, zavetišče za ladje"))
