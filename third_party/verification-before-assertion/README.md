@@ -100,3 +100,36 @@ Sovereignty context: OpenEuroLLM is building multilingual foundation models for 
 **Integrity of the marks.** ⚠ words stay marked in every derived artifact. A derived version that silently verifies a ⚠ word falsifies the regime and does not represent it.
 
 **Contact:** Luka Pintarič — demonstration performed before it is reported (L4).
+
+## 9. The regime as runnable code
+
+The demonstration is no longer structure — it runs. `vba.py` implements
+L1–L5 as ~200 lines of dependency-free Python (standard library only):
+
+- `Contract` / `Entry` — L1: ⊢ entries require a source at construction
+  time; a ⊢ without a source raises (the law enforced by the type, not
+  by discipline)
+- `Register` — L3: append-only; corrections append, never rewrite; every
+  fall carries its scar
+- `mark_claims` — L1 in code: sourced ⊢, open ⚠, and hybrid falls caught
+  by lookup alone
+- `verify_claim` — the check that caught the recorded *lúka* fall: a
+  claimed gloss contradicted by the sourced entry is a named FALL,
+  recorded in the register
+- `report_after_the_act` — L4: the report is computed from the performed
+  act (the register), never asserted ahead of it
+- `preflight` — L5: one language per body, formatting noise
+
+`test_vba.py` — 13 tests, each named for the law it verifies, including
+the end-to-end run of the two recorded real falls. No API key required:
+the regime is model-agnostic — it verifies claims, whatever produced them.
+
+```bash
+python vba.py        # run the recorded falls end-to-end
+python test_vba.py   # 13 tests, one per law + the demo
+```
+
+L2 (two hands) is structural: the executor never seals her own
+verification — the register exports as JSON for any independent
+witness (a second reviewer, another model instance, a human auditor).
+The claim is sealed only when someone else has read it.
