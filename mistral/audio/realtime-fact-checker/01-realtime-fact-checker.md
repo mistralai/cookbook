@@ -437,7 +437,7 @@ To make this look nice, use [the `style.css` provided in the GitHub repo](https:
 <body>
   <header>
     <div class="wordmark">
-      <img class="logo-mark" src="img/cat.svg" alt="" width="36" height="36" />
+      <img class="logo-mark" src="web/cat.svg" alt="" width="36" height="36" />
       <span class="wordmark-text">Fact Checker Demo</span>
     </div>
     <button id="start-button">Start</button>
@@ -679,11 +679,11 @@ microphone access when your browser asks.
 
 Then try making a few statements. Try some things that match the facts in `FACTS`:
 * France is larger than Spain
-* A day on Venus is longer than a year there
+* Newborn babies can see some intense colors
 
 Try some things with contradict your facts:
 * Spain is larger than France
-* A year on Venus is longer than a day there
+* Newborn babies see in black and white
 
 Try a few things that don't relate to any of your facts, or statements whose
 truthiness is more ambiguous. What happens? You can play with `MATCH_THRESHOLD`
