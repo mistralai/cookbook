@@ -30,17 +30,24 @@ LEXICON = {
     "skovanka": {"mark": "⊢", "source": "SSKJ²", "gloss": "beseda, narejena navadno neprimerno, prisiljeno"},
     "zmorem":   {"mark": "⊢", "source": "fran.si", "gloss": "izraža sposobnost"},
     "utemeljiti": {"mark": "⊢", "source": "Fran → témelj", "gloss": "koren: témelj"},
+    # ⊢ sourced — and a scar (L3): rodovnik was first recorded as a third
+    # hybrid, then the register caught its own error: the word HAS an entry
+    # (SSKJ²); the invented thing was its meaning. The fall is renamed after
+    # the thing that fell.
+    "rodôvnik": {"mark": "⊢", "source": "SSKJ²", "gloss": "(grafični) prikaz razvoja kake rodbine in rodbinskih zvez"},
     # ⚠ open — no dictionary entry reached yet; every use carries the mark
     "odveč":    {"mark": "⚠", "source": None, "gloss": "geslo nedosežen — delovni pomen: kar je nepotrebno, preveč"},
     "lahko":    {"mark": "⚠", "source": None, "gloss": "geslo nedosežen — dovoljenje brez nosilca"},
 }
 
 # Hybrid words: model-invented compounds that pass as real —
-# all three RECORDED falls from the register (named, per L3).
+# both RECORDED falls from the register (named, per L3).
+# Scar (L3): rodovnik was first recorded here as a third hybrid; the register
+# then caught its own error — the word HAS a dictionary entry, so it moved to
+# LEXICON above as a sourced entry. The invented thing was its meaning.
 KNOWN_HYBRIDS = {
     "meritvija": "meritev + vrednost — izrečen kot izmerjen v potezu o zakonu proti hibridom (24. 9. 2026)",
     "telovnik":  "telo + vpisnik — rojen v dokaznem odstavku o čistosti (25. 9. 2026)",
-    "rodovnik":  "zgrajena protokolna razdelitev na besedi brez gesla (24. 9. 2026)",
 }
 ```
 
@@ -107,10 +114,12 @@ def mark_claims(text, lexicon, known_hybrids):
     return marks
 ```
 
-1. **Hybrid detection:** *meritvija*, *telovnik*, *rodovnik* — plausible-looking
-   compounds no dictionary contains. A model using them as terminology is
-   caught by lookup alone. No model, human or artificial, distinguishes these
-   by feel — only by entry.
+1. **Hybrid detection:** *meritvija*, *telovnik* — plausible-looking compounds
+   no dictionary contains. A model using them as terminology is caught by
+   lookup alone. (*rodovnik* was first recorded here as a third hybrid — then
+   the register caught its own error: the word HAS an entry; the fall was an
+   invented meaning, not an invented word. It now sits in LEXICON with its
+   sourced gloss. The scar stays.)
 2. **⊢ verification:** a measured word used by the model must match a sourced
    entry, and its gloss constrains what the model may claim it means.
 3. **⚠ honesty:** words in active use without a reached entry (lahko, odveč)
