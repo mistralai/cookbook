@@ -1,14 +1,23 @@
 # The demo notebook
 
+**Author: Luka Pintarič — GitHub: [@AtmaOVictu](https://github.com/AtmaOVictu) — independent researcher (Slovenia).** Submitted to the Mistral Cookbook, October 2026.
+
 *Structure for the cookbook PR. One demonstration: the ⊢/⚠ regime catching a real model failure in Slovene, with the correction recorded — not rewritten.*
+
+## Cell 0 — Environment (Colab)
+
+```python
+# Colab: Runtime > Run all. Package versions pinned per the submission guidelines.
+!pip install -q "mistralai==2.10.1"
+```
 
 ## Cell 1 — Setup and contract
 
 ```python
-from mistralai import Mistral
-import json, datetime
+from mistralai.client import Mistral   # mistralai==2.10.1 (SDK v2 import)
+import json, datetime, os
 
-client = Mistral(api_key=API_KEY)
+client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 # The session contract: the custom language layer (request #2, demonstrated).
 # Entries below are REAL register entries, sourced ⊢ from SSKJ² (Fran)
@@ -38,7 +47,7 @@ KNOWN_HYBRIDS = {
 ## Cell 2 — Structured outputs: the contract as a schema (L1 made structural)
 
 ```python
-from pydantic import BaseModel
+from pydantic import BaseModel   # pydantic 2.x (dependency of mistralai==2.10.1)
 from typing import Literal, Optional
 
 # The schema cannot verify that a source is TRUE. What it can do — and what no
@@ -61,6 +70,8 @@ SYSTEM = (
     "claim_type='open' with source=null. Never invent compound words as terminology."
 )
 
+prompt_in_slovene = "Poimenuj in razloži: íhta, skovanka — in povej, kaj zmorem izmeriti."
+
 response = client.chat.parse(
     model="mistral-small-latest",
     messages=[
@@ -78,16 +89,21 @@ claims = response.choices[0].message.parsed.claims
 Three detection layers, all mechanical:
 
 ```python
+import re
+
+def extract_terms(text):
+    return re.findall(r"[a-zšžčćáéíóúà-ž]+", text.lower())
+
 def mark_claims(text, lexicon, known_hybrids):
     marks = []
     for word in extract_terms(text):
         if word in known_hybrids:
-            marks.append((word, "FALL:hybrid", known_hybrids[word]))
+            marks.append({"word": word, "mark": "FALL:hybrid", "source": known_hybrids[word]})
         elif word in lexicon:
-            marks.append((word, lexicon[word]["mark"],
-                          lexicon[word]["source"] or "⚠ open"))
+            marks.append({"word": word, "mark": lexicon[word]["mark"],
+                          "source": lexicon[word]["source"] or "⚠ open"})
         else:
-            marks.append((word, "⚠", "no sourced entry — outside contract"))
+            marks.append({"word": word, "mark": "⚠", "source": "no sourced entry — outside contract"})
     return marks
 ```
 
@@ -138,12 +154,28 @@ exportable, readable by any independent witness (a second reviewer, another
 model instance, a human auditor). The deliverable is the register file — the
 claim is only sealed when someone *else* has read it.
 
+```python
+print(json.dumps(REGISTER, ensure_ascii=False, indent=2))   # the export any witness reads
+```
+
 ## Cell 7 — The report after the act
 
 Summarize the register: assertions sourced vs. unverified vs. hybrid, per
 category, timestamped. This table is what RLHF pipelines approximate at
 $12–25/hr — here produced pre-verified by design, in a language the vendor
 lists as "not strong performance."
+
+```python
+marks = mark_claims(prompt_in_slovene, LEXICON, KNOWN_HYBRIDS)  # the same mechanical count as run_izmera.py
+report = {
+    "generated": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    "falls_recorded": len(REGISTER),
+    "claims_sourced": sum(1 for m in marks if m["mark"] == "⊢"),
+    "claims_open": sum(1 for m in marks if m["mark"] == "⚠"),
+    "hybrids_caught": sum(1 for m in marks if m["mark"] == "FALL:hybrid"),
+}
+print(json.dumps(report, ensure_ascii=False, indent=2))
+```
 
 ## What the notebook proves, in one sentence
 
