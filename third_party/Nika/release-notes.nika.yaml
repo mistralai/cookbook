@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# Draft release notes from a git log, with Mistral, checked before a token
+# is spent. Run `nika check` and you see the plan, the honest cost floor and
+# which secrets flow where BEFORE anything runs. Then:
+#   nika run release-notes.nika.yaml
+nika: v1
+workflow: mistral-release-notes
+description: "git log since the last tag -> Mistral drafts release notes -> save"
+
+model: mistral/mistral-large-latest    # EU provider; MISTRAL_API_KEY read from the env
+
+vars:
+  out_path: "./RELEASE_NOTES.md"
+
+permits:
+  exec: ["git"]
+  tools: ["nika:write"]
+
+tasks:
+  - id: log
+    exec:
+      command: ["git", "log", "--pretty=format:- %s", "-n", "50"]
+      capture: structured
+
+  - id: notes
+    depends_on: [log]
+    with:
+      commits: ${{ tasks.log.output.stdout }}
+    infer:
+      system: "You write concise, developer-facing release notes."
+      prompt: |
+        Turn these commit subjects into grouped release notes under
+        Features, Fixes and Chores. Keep it terse and factual.
+        ${{ with.commits }}
+      max_tokens: 800
+
+  - id: save
+    depends_on: [notes]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "${{ vars.out_path }}"
+        content: "${{ tasks.notes.output }}"
+        overwrite: true
+
+outputs:
+  notes_path:
+    value: ${{ vars.out_path }}
+    type: string
+    description: "where the drafted notes were written"
