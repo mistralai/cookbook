@@ -14,7 +14,7 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
 MISTRAL_SERVER_URL = MISTRAL_OCR_ENDPOINT.rsplit("/ocr", 1)[0]
 
 # Model name used for the Mistral SDK call
-MISTRAL_OCR_MODEL = os.getenv("MISTRAL_OCR_MODEL", "mistral-document-ai-2505")
+MISTRAL_OCR_MODEL = os.getenv("MISTRAL_OCR_MODEL", "mistral-ocr-4-0")
 
 # ── Mistral chat model (used for verification / structured extraction) ─────────
 MISTRAL_CHAT_MODEL = os.getenv("MISTRAL_CHAT_MODEL", "mistral-large-latest")
