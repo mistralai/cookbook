@@ -1,0 +1,36 @@
+{
+  "version": "v0.6-demo",
+  "note": "Machine-readable contract body. Entries transcribed from the sealed records in README.md §4 and notebook.md Cell 1 — every ⊢ gloss below is already sourced in those records; nothing is invented here. The remaining entries of the full 20-⊢ run stay in the corpus per the deliberate boundary (README §Deliberate boundary): the PR demonstrates the method, the corpus prices it. Scar (L3): rodovnik moved from known_hybrids to the lexicon — the word HAS a dictionary entry; the invented thing was its meaning, and a fall is named after the thing that fell.",
+  "access_date": "2026-09-30",
+  "lexicon": {
+    "lúka":       { "mark": "⊢", "source": "SSKJ²", "gloss": "pristan, zavetišče za ladje" },
+    "lúknja":     { "mark": "⊢", "source": "SSKJ²", "gloss": "odprtina, luknja" },
+    "íhta":       { "mark": "⊢", "source": "SSKJ²", "gloss": "krčevita jeza; velika vnema; krčevit jok" },
+    "le":         { "mark": "⊢", "source": "SSKJ²", "gloss": "člen: omejenost na navedeno (varovalo / pomnoževal / nasprotvja)" },
+    "samo":       { "mark": "⊢", "source": "SSKJ²", "gloss": "popolna omejenost na navedeno dejanje; pogojenost (če)" },
+    "skovanka":   { "mark": "⊢", "source": "SSKJ²", "gloss": "beseda, narejena navadno neprimerno, prisiljeno" },
+    "zmorem":     { "mark": "⊢", "source": "fran.si", "gloss": "izraža sposobnost" },
+    "utemeljiti": { "mark": "⊢", "source": "Fran → témelj", "gloss": "koren: témelj" },
+    "rodôvnik":   { "mark": "⊢", "source": "SSKJ²", "gloss": "(grafični) prikaz razvoja kake rodbine in rodbinskih zvez" },
+    "odveč":      { "mark": "⚠", "source": null, "gloss": "geslo nedosežen — delovni pomen: kar je nepotrebno, preveč" },
+    "lahko":      { "mark": "⚠", "source": null, "gloss": "geslo nedosežen — dovoljenje brez nosilca" }
+  },
+  "known_hybrids": {
+    "meritvija": "meritev + vrednost — izrečen kot izmerjen v potezu o zakonu proti hibridom (24. 9. 2026)",
+    "telovnik":  "telo + vpisnik — rojen v dokaznem odstavku o čistosti (25. 9. 2026)"
+  },
+  "recorded_falls": [
+    {
+      "word": "lúka",
+      "date": "2026-09-30",
+      "fall": "seed entry sealed gloss 'opening' with ⊢; the dictionary entry means 'harbor' — 'opening' belongs to lúknja. A mark applied before an entry: the exact failure L1 exists to catch.",
+      "correction": "gloss re-sealed from SSKJ²; scar kept in the register"
+    },
+    {
+      "word": "rodovnik",
+      "date": "2026-09-24",
+      "fall": "recorded fall misnamed: the word does have a dictionary entry (genealogical tree); what was invented was a meaning, not a word.",
+      "correction": "fall renamed: a fall is named after the thing that fell"
+    }
+  ]
+}

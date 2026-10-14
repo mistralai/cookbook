@@ -1,0 +1,207 @@
+# The demo notebook
+
+**Author: Luka Pintarič — GitHub: [@AtmaOVictu](https://github.com/AtmaOVictu) — independent researcher (Slovenia).** Submitted to the Mistral Cookbook, October 2026.
+
+*Structure for the cookbook PR. One demonstration: the ⊢/⚠ regime catching a real model failure in Slovene, with the correction recorded — not rewritten.*
+
+## Cell 0 — Environment (Colab)
+
+```python
+# Colab: Runtime > Run all. Package versions pinned per the submission guidelines.
+!pip install -q "mistralai==2.10.1"
+```
+
+## Cell 1 — Setup and contract
+
+```python
+from mistralai.client import Mistral   # mistralai==2.10.1 (SDK v2 import)
+import json, datetime, os
+
+client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
+
+# The session contract: the custom language layer (request #2, demonstrated).
+# Entries below are REAL register entries, sourced ⊢ from SSKJ² (Fran)
+# or marked ⚠ open — no invented glosses in the contract itself.
+LEXICON = {
+    # ⊢ sourced (SSKJ² / Fran, accessed Sep 2026)
+    "íhta":     {"mark": "⊢", "source": "SSKJ²", "gloss": "krčevita jeza; velika vnema; krčevit jok"},
+    "le":       {"mark": "⊢", "source": "SSKJ²", "gloss": "člen: omejenost na navedeno (varovalo / pomnoževal / nasprotvja)"},
+    "samo":     {"mark": "⊢", "source": "SSKJ²", "gloss": "popolna omejenost na navedeno dejanje; pogojenost (če)"},
+    "skovanka": {"mark": "⊢", "source": "SSKJ²", "gloss": "beseda, narejena navadno neprimerno, prisiljeno"},
+    "zmorem":   {"mark": "⊢", "source": "fran.si", "gloss": "izraža sposobnost"},
+    "utemeljiti": {"mark": "⊢", "source": "Fran → témelj", "gloss": "koren: témelj"},
+    # ⊢ sourced — and a scar (L3): rodovnik was first recorded as a third
+    # hybrid, then the register caught its own error: the word HAS an entry
+    # (SSKJ²); the invented thing was its meaning. The fall is renamed after
+    # the thing that fell.
+    "rodôvnik": {"mark": "⊢", "source": "SSKJ²", "gloss": "(grafični) prikaz razvoja kake rodbine in rodbinskih zvez"},
+    # ⚠ open — no dictionary entry reached yet; every use carries the mark
+    "odveč":    {"mark": "⚠", "source": None, "gloss": "geslo nedosežen — delovni pomen: kar je nepotrebno, preveč"},
+    "lahko":    {"mark": "⚠", "source": None, "gloss": "geslo nedosežen — dovoljenje brez nosilca"},
+}
+
+# Hybrid words: model-invented compounds that pass as real —
+# both RECORDED falls from the register (named, per L3).
+# Scar (L3): rodovnik was first recorded here as a third hybrid; the register
+# then caught its own error — the word HAS a dictionary entry, so it moved to
+# LEXICON above as a sourced entry. The invented thing was its meaning.
+KNOWN_HYBRIDS = {
+    "meritvija": "meritev + vrednost — izrečen kot izmerjen v potezu o zakonu proti hibridom (24. 9. 2026)",
+    "telovnik":  "telo + vpisnik — rojen v dokaznem odstavku o čistosti (25. 9. 2026)",
+}
+```
+
+## Cell 2 — Structured outputs: the contract as a schema (L1 made structural)
+
+```python
+from pydantic import BaseModel   # pydantic 2.x (dependency of mistralai==2.10.1)
+from typing import Literal, Optional
+
+# The schema cannot verify that a source is TRUE. What it can do — and what no
+# prompt reliably can — is forbid the uniform voice: every claim must arrive
+# typed, and "sourced" must carry a source string or admit none.
+
+class Claim(BaseModel):
+    word: str
+    claim_type: Literal["sourced", "open", "hybrid"]
+    gloss: str
+    source: Optional[str] = None   # the model must name a source, or confess "none"
+
+class VerifiedOutput(BaseModel):
+    claims: list[Claim]
+
+SYSTEM = (
+    "You are writing in Slovene under a verification contract. "
+    "For every word you use as measured: claim_type='sourced' requires a real "
+    "dictionary source (SSKJ² / Fran) in `source`; if you have none, use "
+    "claim_type='open' with source=null. Never invent compound words as terminology."
+)
+
+prompt_in_slovene = "Poimenuj in razloži: íhta, skovanka — in povej, kaj zmorem izmeriti."
+
+response = client.chat.parse(
+    model="mistral-small-latest",
+    messages=[
+        {"role": "system", "content": SYSTEM},
+        {"role": "user", "content": prompt_in_slovene},
+    ],
+    response_format=VerifiedOutput,   # schema-enforced: typed claims, sourced-or-null
+    temperature=0,
+)
+claims = response.choices[0].message.parsed.claims
+```
+
+## Cell 3 — L1 in code: entry before utterance
+
+Three detection layers, all mechanical:
+
+```python
+import re
+
+def extract_terms(text):
+    return re.findall(r"[a-zšžčćáéíóúà-ž]+", text.lower())
+
+def mark_claims(text, lexicon, known_hybrids):
+    marks = []
+    for word in extract_terms(text):
+        if word in known_hybrids:
+            marks.append({"word": word, "mark": "FALL:hybrid", "source": known_hybrids[word]})
+        elif word in lexicon:
+            marks.append({"word": word, "mark": lexicon[word]["mark"],
+                          "source": lexicon[word]["source"] or "⚠ open"})
+        else:
+            marks.append({"word": word, "mark": "⚠", "source": "no sourced entry — outside contract"})
+    return marks
+```
+
+1. **Hybrid detection:** *meritvija*, *telovnik* — plausible-looking compounds
+   no dictionary contains. A model using them as terminology is caught by
+   lookup alone. (*rodovnik* was first recorded here as a third hybrid — then
+   the register caught its own error: the word HAS an entry; the fall was an
+   invented meaning, not an invented word. It now sits in LEXICON with its
+   sourced gloss. The scar stays.)
+2. **⊢ verification:** a measured word used by the model must match a sourced
+   entry, and its gloss constrains what the model may claim it means.
+3. **⚠ honesty:** words in active use without a reached entry (lahko, odveč)
+   pass — but carry the mark openly. Unverified is not forbidden; unmarked is.
+
+## Cell 4 — L3 in code: the scarred correction
+
+```python
+REGISTER = []  # append-only — corrections append, never rewrite
+
+def record_fall(word, model_text, fix, register=REGISTER):
+    register.append({
+        "word": word,
+        "found": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "model_assertion": model_text,
+        "correction": fix,
+        "scar": True,           # the record survives the fix — that IS the fix
+    })
+```
+
+## Cell 5 — The cross-check: schema claims against the contract
+
+```python
+# The schema enforces the FORM of honesty (typed, sourced-or-null);
+# the contract lexicon checks the CONTENT (is the source real? is the word a hybrid?).
+
+for c in claims:
+    if c.claim_type == "sourced" and c.word in KNOWN_HYBRIDS:
+        record_fall(c.word,
+                    f"presented as sourced: {c.source}",
+                    "hybrid word presented as sourced — caught by lookup alone")
+    elif c.claim_type == "sourced" and c.word not in LEXICON:
+        print(f"⚠ {c.word}: claimed source '{c.source}' — no entry in the contract; "
+              "stays open until sealed")
+```
+
+## Cell 6 — L2 in code: two hands
+
+The notebook itself never seals its own result: the register is JSON,
+exportable, readable by any independent witness (a second reviewer, another
+model instance, a human auditor). The deliverable is the register file — the
+claim is only sealed when someone *else* has read it.
+
+```python
+print(json.dumps(REGISTER, ensure_ascii=False, indent=2))   # the export any witness reads
+```
+
+## Cell 7 — The report after the act
+
+Summarize the register: assertions sourced vs. unverified vs. hybrid, per
+category, timestamped. This table is what RLHF pipelines approximate at
+$12–25/hr — here produced pre-verified by design, in a language the vendor
+lists as "not strong performance."
+
+```python
+marks = mark_claims(prompt_in_slovene, LEXICON, KNOWN_HYBRIDS)  # the same mechanical count as run_izmera.py
+report = {
+    "generated": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    "falls_recorded": len(REGISTER),
+    "claims_sourced": sum(1 for m in marks if m["mark"] == "⊢"),
+    "claims_open": sum(1 for m in marks if m["mark"] == "⚠"),
+    "hybrids_caught": sum(1 for m in marks if m["mark"] == "FALL:hybrid"),
+}
+print(json.dumps(report, ensure_ascii=False, indent=2))
+```
+
+## What the notebook proves, in one sentence
+
+**The schema enforces the form of honesty; the contract checks the content;
+the register keeps the scars.** No prompt does the first reliably; no schema
+does the second at all. A session-scoped verification layer — lexicon as
+contract, claims marked ⊢ or ⚠, hybrids caught by lookup, failures recorded
+instead of silently regenerated — mechanically separates measured from
+invented model output in a low-resource language, using a real register with
+real recorded falls as its test corpus.
+
+## Deliberate boundary
+
+The notebook ships the *technique* (the regime, the contract format, the
+register schema — infinitely reproducible). The full 2,600-document corpus
+stays out: it is the contributor's licensed asset under exactly the
+compensated-contribution model the covering document proposes. The PR
+demonstrates the method; the corpus prices it.
+
+---

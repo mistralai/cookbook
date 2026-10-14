@@ -27,7 +27,7 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [document_understanding.ipynb](mistral/ocr/document_understanding.ipynb) | OCR, function calling | Document Understanding and Tool Usage with OCR |
 | [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
-| [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
+| [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As the Judge | Evaluate RAG with LLM as a Judge and structured outputs |
 | [sts_demo.py](mistral/tts/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
@@ -95,7 +95,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [document_understanding.ipynb](mistral/ocr/document_understanding.ipynb) | OCR, function calling | Document Understanding and Tool Usage with OCR |
 | [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
-| [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
+| [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As the Judge | Evaluate RAG with LLM as a Judge and structured outputs |
 | [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
 | [Custom MCP Server](mistral/lechat_custom_mcp_server/custom-mcp-server.md) | MCP, connectors | Build a custom MCP server (tic-tac-toe) and connect it to Vibe |
@@ -157,3 +157,5 @@ The preview renders committed notebook content without executing notebook code. 
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
+| [Verification-Before-Assertion: claim verification for low-resource languages](third_party/verification-before-assertion/notebook.md) | evaluation, structured outputs | Luka Pintarič |
+
