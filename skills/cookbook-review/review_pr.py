@@ -59,7 +59,7 @@ MISTRAL_HEADERS = {
 }
 
 SKILLS_DIR = Path("skills/cookbook-review")
-REVIEW_MODEL = "mistral-medium-latest"
+REVIEW_MODEL = "zai-glm-5-3"
 
 # Truncate very long files so the review stays focused and within context limits.
 MAX_REVIEW_LINES = 600
@@ -499,7 +499,8 @@ def call_mistral(
             {"role": "user", "content": user},
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.1,
+        "temperature": 0.3,
+        "reasoning_effort": "low"
     }
 
     for attempt in range(4):
@@ -513,7 +514,10 @@ def call_mistral(
             continue
         resp.raise_for_status()
         raw = resp.json()["choices"][0]["message"]["content"]
-        return json.loads(raw)
+        if isinstance(raw, str):
+            return json.loads(raw)
+        elif isinstance(raw, list):
+            return json.loads(raw[-1]["text"])
     # Final attempt failed with 429
     resp.raise_for_status()
 
