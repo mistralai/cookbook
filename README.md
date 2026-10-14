@@ -157,3 +157,4 @@ The preview renders committed notebook content without executing notebook code. 
 | [Mistral and MLflow Tracing](third_party/MLflow/mistral-mlflow-tracing.ipynb)                                         | Tracing, Observability          | MLflow     |
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
+| [langgraph_multi_agent_orchestration.ipynb](third_party/langchain/langgraph_multi_agent_orchestration.ipynb)          | multi-agent, orchestration      | Langchain  |
