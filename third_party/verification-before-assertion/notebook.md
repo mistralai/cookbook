@@ -35,14 +35,42 @@ KNOWN_HYBRIDS = {
 }
 ```
 
-## Cell 2 — Generate output in the low-resource language
+## Cell 2 — Structured outputs: the contract as a schema (L1 made structural)
 
 ```python
-response = client.chat.complete(
-    model="mistral-large-latest",
-    messages=[{"role": "user", "content": prompt_in_slovene}]
+from pydantic import BaseModel
+from typing import Literal, Optional
+
+# The schema cannot verify that a source is TRUE. What it can do — and what no
+# prompt reliably can — is forbid the uniform voice: every claim must arrive
+# typed, and "sourced" must carry a source string or admit none.
+
+class Claim(BaseModel):
+    word: str
+    claim_type: Literal["sourced", "open", "hybrid"]
+    gloss: str
+    source: Optional[str] = None   # the model must name a source, or confess "none"
+
+class VerifiedOutput(BaseModel):
+    claims: list[Claim]
+
+SYSTEM = (
+    "You are writing in Slovene under a verification contract. "
+    "For every word you use as measured: claim_type='sourced' requires a real "
+    "dictionary source (SSKJ² / Fran) in `source`; if you have none, use "
+    "claim_type='open' with source=null. Never invent compound words as terminology."
 )
-model_text = response.choices[0].message.content
+
+response = client.chat.parse(
+    model="mistral-small-latest",
+    messages=[
+        {"role": "system", "content": SYSTEM},
+        {"role": "user", "content": prompt_in_slovene},
+    ],
+    response_format=VerifiedOutput,   # schema-enforced: typed claims, sourced-or-null
+    temperature=0,
+)
+claims = response.choices[0].message.parsed.claims
 ```
 
 ## Cell 3 — L1 in code: entry before utterance
@@ -87,14 +115,30 @@ def record_fall(word, model_text, fix, register=REGISTER):
     })
 ```
 
-## Cell 5 — L2 in code: two hands
+## Cell 5 — The cross-check: schema claims against the contract
+
+```python
+# The schema enforces the FORM of honesty (typed, sourced-or-null);
+# the contract lexicon checks the CONTENT (is the source real? is the word a hybrid?).
+
+for c in claims:
+    if c.claim_type == "sourced" and c.word in KNOWN_HYBRIDS:
+        record_fall(c.word,
+                    f"presented as sourced: {c.source}",
+                    "hybrid word presented as sourced — caught by lookup alone")
+    elif c.claim_type == "sourced" and c.word not in LEXICON:
+        print(f"⚠ {c.word}: claimed source '{c.source}' — no entry in the contract; "
+              "stays open until sealed")
+```
+
+## Cell 6 — L2 in code: two hands
 
 The notebook itself never seals its own result: the register is JSON,
 exportable, readable by any independent witness (a second reviewer, another
 model instance, a human auditor). The deliverable is the register file — the
 claim is only sealed when someone *else* has read it.
 
-## Cell 6 — The report after the act
+## Cell 7 — The report after the act
 
 Summarize the register: assertions sourced vs. unverified vs. hybrid, per
 category, timestamped. This table is what RLHF pipelines approximate at
@@ -103,10 +147,13 @@ lists as "not strong performance."
 
 ## What the notebook proves, in one sentence
 
-A session-scoped verification layer — lexicon as contract, claims marked ⊢ or ⚠,
-hybrids caught by lookup, failures recorded instead of silently regenerated —
-mechanically separates measured from invented model output in a low-resource
-language, using a real register with real recorded falls as its test corpus.
+**The schema enforces the form of honesty; the contract checks the content;
+the register keeps the scars.** No prompt does the first reliably; no schema
+does the second at all. A session-scoped verification layer — lexicon as
+contract, claims marked ⊢ or ⚠, hybrids caught by lookup, failures recorded
+instead of silently regenerated — mechanically separates measured from
+invented model output in a low-resource language, using a real register with
+real recorded falls as its test corpus.
 
 ## Deliberate boundary
 
@@ -117,4 +164,3 @@ compensated-contribution model the covering document proposes. The PR
 demonstrates the method; the corpus prices it.
 
 ---
-
