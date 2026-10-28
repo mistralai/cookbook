@@ -4,8 +4,6 @@ requires-python = "==3.12.*"
 
 [options]
 prerelease-mode = "allow"
-exclude-newer = "2026-10-14T13:11:25.568311Z"
-exclude-newer-span = "P2D"
 
 [options.exclude-newer-package]
 mistralai-agents = false

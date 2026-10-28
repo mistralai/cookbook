@@ -34,7 +34,7 @@ To complete this cookbook, you will need:
 - [uv](https://docs.astral.sh/uv/), recent enough to support `exclude-newer-package`. Every command in this cookbook runs through uv.
 - git. The [GitHub CLI](https://cli.github.com/) (`gh`) is optional: it's one of two ways to create your GitHub repository in Step 4.1.
 - A Mistral account with access to Agents and Workflows in Studio, and a Mistral API key from that workspace. You'll create the key in [Environment setup](#environment-setup).
-- A GitHub account. You'll push this project to a new repository. It can be public or private, as long as the GitHub connector you set up in Step 1 can read it. Managed deploys build from that repository, and the agent reads the sample app's code from it.
+- A GitHub account. You'll push this project to a new repository. It can be public or private, as long as the GitHub connector you set up in Step 1 can read it. The agent reads the sample app's code from it, and if you deploy to Studio, managed deploys build from it.
 - A Sentry account. The free Developer plan is enough.
 - A Slack workspace where you can create and install apps, with a public channel to test in. The agent only answers in public channels.
 
@@ -61,7 +61,7 @@ investigation-agent/
 ├── .env                       # your local settings (never committed)
 ├── .gitignore
 ├── agent/
-│   ├── Dockerfile
+│   ├── Dockerfile             # only if you deploy (Step 11)
 │   ├── ask.py
 │   ├── instructions.md
 │   ├── main.py
@@ -77,7 +77,7 @@ investigation-agent/
 ├── triggers/
 │   └── slack.json
 └── workflow/
-    ├── Dockerfile
+    ├── Dockerfile             # only if you deploy (Step 11)
     ├── activities/
     │   ├── __init__.py
     │   ├── agent.py
@@ -99,9 +99,15 @@ git init -b main
 mkdir -p agent/skills/query-github agent/skills/query-sentry sample-app triggers workflow/activities
 ```
 
+Open the `investigation-agent` folder in the IDE or editor of your choice. You'll create every file in this cookbook inside it.
+
 You'll create the GitHub repository and push to it in Step 4.1. Unless a step says otherwise, run every command from this repository root.
 
 Create `.gitignore` in the repository root, so your settings and local caches never reach GitHub:
+
+```bash
+touch .gitignore
+```
 
 **`.gitignore`**
 
@@ -117,12 +123,16 @@ To complete this cookbook, you'll need a Mistral API key. In [Studio](https://co
 
 Create `.env` in the repository root with every setting the project reads, and set your Mistral API key. You'll fill in the other values as you go:
 
+```bash
+touch .env
+```
+
 **`.env`**
 
 ```
 # Used by `agents deploy` (and a local worker). The managed services read their values from workspace secrets.
 MISTRAL_API_KEY=your-mistral-api-key
-# Your connector names exactly as Studio shows them, e.g. sentry_d183. Store the same values as workspace secrets (see Step 8).
+# Your connector names exactly as Studio shows them, e.g. sentry_d183. Store the same values as workspace secrets if you deploy (see Step 11.2).
 SENTRY_CONNECTOR_NAME=
 GITHUB_CONNECTOR_NAME=
 # Local worker only.
@@ -150,11 +160,15 @@ The agent reaches Sentry and GitHub through **Connectors** in your Studio worksp
    GITHUB_CONNECTOR_NAME=github_7a2f
    ```
 
-The GitHub connector does two jobs: the agent uses it to read code, and managed deploys use it to fetch your repository and build the images.
+The GitHub connector does two jobs: the agent uses it to read code, and if you deploy to Studio, managed deploys use it to fetch your repository and build the images.
 
 ## Step 2: Add the sample app
 
 The sample app exists only to produce a real bug for the agent to investigate. Running it sends one `ValueError` to Sentry, tagged with your current git commit, so the agent can follow the stack trace to the exact code on GitHub. You don't need to understand it, just create the three files.
+
+```bash
+touch sample-app/pyproject.toml
+```
 
 **`sample-app/pyproject.toml`**
 
@@ -170,6 +184,10 @@ package = false
 
 Create `sample-app/pricing.py`, the module that contains the bug:
 
+```bash
+touch sample-app/pricing.py
+```
+
 **`sample-app/pricing.py`**
 
 ```python
@@ -182,6 +200,10 @@ def parse_amount(value: str) -> int:
 ```
 
 Create `sample-app/checkout.py`, the script that sends the error to Sentry:
+
+```bash
+touch sample-app/checkout.py
+```
 
 **`sample-app/checkout.py`**
 
@@ -238,6 +260,10 @@ The agent is a standalone uv project in `agent/`. The `agents` CLI loads it, run
 
 Create `agent/pyproject.toml`:
 
+```bash
+touch agent/pyproject.toml
+```
+
 **`agent/pyproject.toml`**
 
 ```toml
@@ -260,6 +286,10 @@ exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = fal
 ### 3.2 Write the instructions
 
 Create `agent/instructions.md`. This is the agent's system prompt. It keeps the agent strictly read-only, asks it to investigate rather than suggest, sets a Slack-friendly answer format, and tells it which skill to load for which question:
+
+```bash
+touch agent/instructions.md
+```
 
 **`agent/instructions.md`**
 
@@ -284,6 +314,10 @@ Skills are focused playbooks that the agent loads on demand, so the base instruc
 
 Create `agent/skills/query-sentry/SKILL.md`, which covers how to find an issue and read its events and stack trace:
 
+```bash
+touch agent/skills/query-sentry/SKILL.md
+```
+
 **`agent/skills/query-sentry/SKILL.md`**
 
 ```markdown
@@ -302,6 +336,10 @@ Read-only: never change issue state, assignments, ownership, or alerts. Never re
 ```
 
 Create `agent/skills/query-github/SKILL.md`, which covers how to open the code behind a stack frame and find the change that likely caused it:
+
+```bash
+touch agent/skills/query-github/SKILL.md
+```
 
 **`agent/skills/query-github/SKILL.md`**
 
@@ -328,6 +366,10 @@ Connectors expose every tool the third-party MCP server offers, including tools 
 - Any other call gets a `[refused]` answer instead of running.
 
 Create `agent/tool_allowlist.py`:
+
+```bash
+touch agent/tool_allowlist.py
+```
 
 **`agent/tool_allowlist.py`**
 
@@ -417,6 +459,10 @@ The hook keeps its allowlist at module level on purpose: workflow sessions rejec
 
 Create `agent/main.py`. It wires everything together: the model, an iteration limit, the instructions, the connectors (in allowlist order), the hook and the skill bundles.
 
+```bash
+touch agent/main.py
+```
+
 **`agent/main.py`**
 
 ```python
@@ -452,29 +498,13 @@ agent = agents.Agent(
 
 The name `investigation-agent-runtime` matters: the workflow opens sessions on the agent by this name in Step 5.
 
-### 3.6 Add the container image
+### 3.6 Add a terminal client
 
-Managed deploys build this Dockerfile from your pushed commit, with `agent/` as the build context. It installs the dependencies, copies the agent files and starts the worker.
+Create `agent/ask.py`. It's a small Session API client for asking the agent a question from your terminal: it prints a line for each tool call as the agent investigates, then the answer. It isn't part of the deployed agent, and you'll only use it for local testing.
 
-Create `agent/Dockerfile`:
-
-**`agent/Dockerfile`**
-
-```dockerfile
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
-ENV UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never PATH="/app/.venv/bin:$PATH"
-WORKDIR /app
-COPY pyproject.toml ./
-RUN uv sync --no-dev --no-install-project
-COPY main.py tool_allowlist.py instructions.md ./
-COPY skills ./skills
-USER 1000:1000
-CMD ["agents", "run-worker"]
+```bash
+touch agent/ask.py
 ```
-
-### 3.7 Add a terminal client
-
-Create `agent/ask.py`. It's a small Session API client for asking the agent a question from your terminal: it prints a line for each tool call as the agent investigates, then the answer. It isn't part of the image, and you'll only use it for local testing.
 
 **`agent/ask.py`**
 
@@ -510,7 +540,7 @@ if __name__ == "__main__":
     asyncio.run(main(" ".join(sys.argv[1:]) or DEFAULT_QUESTION))
 ```
 
-### 3.8 Check that the agent loads
+### 3.7 Check that the agent loads
 
 `agents info` imports `main.py` and prints what the CLI resolved: the name, model, connectors, hook and skills. Run it from `agent/`, loading `.env` so the connector names are set:
 
@@ -518,6 +548,26 @@ if __name__ == "__main__":
 cd agent
 uv run --env-file ../.env agents info
 cd ..
+```
+
+You should see output like this, with your own connector names under `connectors`:
+
+```text
+agent: investigation-agent-runtime
+  model: mistral-large-4
+  description: Answers Slack engineering investigation questions with read-only Sentry and Git…
+  instructions: [ROLE] You are an engineering investigation assistant in a Slack thread. Answer…
+  builtin tools: find_organizations, find_projects, get_commit, get_file_contents, get_latest_release, get_release_by_tag, get_sentry_resource, get_tag, issue_read, list_branches, list_commits, list_issues, list_pull_requests, list_releases, list_tags, pull_request_read, search_code, search_commits, search_events, search_issues, search_pull_requests, search_repositories
+  sandbox: none
+  tools: (none)
+  connectors:
+    - github_app
+    - sentry_d183
+  skills:
+    - query-github: Read GitHub code, commits, pull requests, issues, and releases, and tie an erro…
+    - query-sentry: Query Sentry issues, events, stack traces, releases, environments, and tags for…
+  hooks:
+    - ConnectorToolAllowlist
 ```
 
 The first run installs the dependencies and writes `agent/uv.lock`. If `agents info` reports `SENTRY_CONNECTOR_NAME is not set`, go back to Step 1 and fill in `.env`.
@@ -618,6 +668,10 @@ Workflow code must be deterministic, so every side effect (Slack calls, agent se
 
 Create `workflow/pyproject.toml`:
 
+```bash
+touch workflow/pyproject.toml
+```
+
 **`workflow/pyproject.toml`**
 
 ```toml
@@ -634,6 +688,10 @@ exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = fal
 ### 5.2 Add the shared models
 
 Create `workflow/models.py`. These Pydantic models are passed between the workflows and the activities. `ThreadState` is the thread workflow's whole state, which is carried over when the workflow continues as new.
+
+```bash
+touch workflow/models.py
+```
 
 **`workflow/models.py`**
 
@@ -687,6 +745,10 @@ Create `workflow/formatting.py`. These are pure functions with no I/O, so the wo
 - `ts_key` sorts Slack timestamps correctly.
 - `turn_prompt` builds the prompt from the new thread messages and the tagged requests.
 - `agent_reply_text` strips mentions (so the agent never pings anyone) and converts the agent's Markdown to Slack's mrkdwn format.
+
+```bash
+touch workflow/formatting.py
+```
 
 **`workflow/formatting.py`**
 
@@ -766,6 +828,10 @@ def agent_reply_text(text: str) -> str:
 
 Create `workflow/activities/__init__.py`, which makes `activities` a package:
 
+```bash
+touch workflow/activities/__init__.py
+```
+
 **`workflow/activities/__init__.py`**
 
 ```python
@@ -781,6 +847,10 @@ Create `workflow/activities/slack.py`, which holds every Slack call:
 - `add_reaction` and `remove_reaction` add an 👀 reaction while the agent works.
 
 The Slack token comes only from `SLACK_BOT_TOKEN_INVESTIGATION_AGENT`.
+
+```bash
+touch workflow/activities/slack.py
+```
 
 **`workflow/activities/slack.py`**
 
@@ -916,6 +986,10 @@ Create `workflow/activities/agent.py`, which talks to the agent:
 - `create_session` opens an Agent Session on `investigation-agent-runtime`, or on your local agent when `INVESTIGATION_AGENT_NAME` is set.
 - `run_session_turn` runs one turn and returns the final assistant message. The `turn_id` is an idempotency key, so a retried activity never starts a second turn.
 
+```bash
+touch workflow/activities/agent.py
+```
+
 **`workflow/activities/agent.py`**
 
 ```python
@@ -972,6 +1046,10 @@ async def run_session_turn(session_id: str, turn_id: str, prompt: str) -> str:
 ```
 
 Create `workflow/activities/routing.py`. `route_message` derives a stable execution ID from the Slack thread, sends the message to that thread's running workflow, and starts the workflow when none is running. It handles the race where two mentions arrive at the same time.
+
+```bash
+touch workflow/activities/routing.py
+```
 
 **`workflow/activities/routing.py`**
 
@@ -1040,6 +1118,10 @@ async def start(client: Workflows, execution_id: str, request: SlackRequest) -> 
 ### 5.5 Add the workflows
 
 Create `workflow/investigation.py`, which defines both workflows. Activities are imported inside `workflow.unsafe.imports_passed_through()` so the workflow sandbox doesn't re-import them.
+
+```bash
+touch workflow/investigation.py
+```
 
 **`workflow/investigation.py`**
 
@@ -1184,9 +1266,13 @@ A few behaviours worth knowing:
 - If a turn fails, the user gets *"I hit an error while investigating this. Tag me again to retry."*, and the next tag starts a fresh session.
 - Agent sessions expire after about 10 hours, so the workflow starts a new one after 8 hours and replays the thread into it.
 
-### 5.6 Add the worker and its image
+### 5.6 Add the worker
 
 Create `workflow/worker.py`, the entry point that registers both workflows and polls for work:
+
+```bash
+touch workflow/worker.py
+```
 
 **`workflow/worker.py`**
 
@@ -1203,27 +1289,15 @@ if __name__ == "__main__":
     asyncio.run(workflows.run_worker([InvestigationRouter, InvestigationThread]))
 ```
 
-Create `workflow/Dockerfile`. Unlike the agent image, its build context is the **repository root**, which is why the paths start with `workflow/`:
-
-**`workflow/Dockerfile`**
-
-```dockerfile
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
-ENV UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never PATH="/app/.venv/bin:$PATH" UPLOAD_GRAPH=true
-WORKDIR /app
-COPY workflow/pyproject.toml ./
-RUN uv sync --no-dev --no-install-project
-COPY workflow/*.py ./
-COPY workflow/activities ./activities
-USER 1000:1000
-CMD ["python", "worker.py"]
-```
-
 ## Step 6: Add the trigger filter
 
 Slack sends an event for every mention of the bot, including messages posted by bots. The Studio trigger uses this filter to start the router only for human app mentions that have text. `request_from_trigger` in `formatting.py` applies the same rule as a backstop.
 
 Create `triggers/slack.json`:
+
+```bash
+touch triggers/slack.json
+```
 
 **`triggers/slack.json`**
 
@@ -1233,13 +1307,7 @@ Create `triggers/slack.json`:
 }
 ```
 
-You'll paste the filter expression into Studio in Step 11. Now commit and push everything:
-
-```bash
-git add .
-git commit -m "Add the Slack workflows and trigger filter"
-git push
-```
+You'll paste the filter expression into Studio in Step 9.
 
 ## Step 7: Create the Slack app
 
@@ -1258,11 +1326,123 @@ Create the Slack app that users tag, and give its bot the permissions the workfl
    | `reactions:write` | Adding the 👀 reaction |
 
 3. Click **Install to Workspace** and approve. Copy the **Bot User OAuth Token** (`xoxb-...`).
-4. Under **Basic Information → App Credentials**, copy the **Signing Secret**. You'll need it in Step 11.
+4. Under **Basic Information → App Credentials**, copy the **Signing Secret**. You'll need it in Step 9.
 
-Leave **Event Subscriptions** for now. Slack verifies the request URL as soon as you enter it, so you'll set it up once the workflows are deployed.
+Leave **Event Subscriptions** for now. Slack verifies the request URL as soon as you enter it, so you'll set it up once the workflows are running.
 
-## Step 8: Create the workspace secrets
+## Step 8: Run the workflows locally
+
+Run the agent and the workflow worker on your machine. Add the workflow settings to `.env`:
+
+```
+INVESTIGATION_AGENT_MISTRAL_API_KEY=your-mistral-api-key
+SLACK_BOT_TOKEN_INVESTIGATION_AGENT=xoxb-your-bot-token
+```
+
+- `INVESTIGATION_AGENT_MISTRAL_API_KEY` is the same Mistral API key as `MISTRAL_API_KEY`. The workflows open agent sessions with it.
+- `SLACK_BOT_TOKEN_INVESTIGATION_AGENT` is the bot token from Step 7.
+- Keep `INVESTIGATION_AGENT_NAME` and `DEPLOYMENT_NAME` as they are. `INVESTIGATION_AGENT_NAME` makes the worker open sessions on your local agent, and `DEPLOYMENT_NAME` is the queue the local worker polls.
+
+In a first terminal, start the agent as you did in Step 4.4:
+
+```bash
+cd agent
+uv run --env-file ../.env sh -c 'unset DEPLOYMENT_NAME; exec agents serve . --name "$INVESTIGATION_AGENT_NAME"'
+```
+
+In a second terminal, from the repository root, start the workflow worker:
+
+```bash
+cd workflow
+uv run --env-file ../.env python worker.py
+```
+
+Leave both running. The worker registers `investigation-agent-router` and `investigation-agent-thread`, and both appear under **Workflows** in Studio.
+
+## Step 9: Connect Slack to the workflows
+
+Connect Slack to the router workflow with a Studio webhook and trigger, then send the app's events to that webhook:
+
+1. **Create the webhook.** In Studio, go to **Webhooks → Create**, pick **Slack** as the provider and paste the app's **Signing Secret** from Step 7. Copy the URL Studio shows. Treat this URL as a credential.
+2. **Create the trigger.** Go to **Triggers → Create**, pick that webhook, and choose the action **Start workflow** with `investigation-agent-router`. As the filter, paste the expression from `triggers/slack.json`:
+
+   ```text
+   event.type == 'app_mention' && event.text && event.bot_id == null && event.subtype != 'bot_message'
+   ```
+
+3. **Point Slack at the webhook.** In your Slack app, open **Event Subscriptions** and turn on **Enable Events**. Paste the webhook URL as the **Request URL** and wait for it to show as verified. Under **Subscribe to bot events**, add `app_mention`, then click **Save Changes**. If Slack asks you to reinstall the app, do so.
+
+## Step 10: Try it in Slack
+
+Run a full investigation from Slack while the agent and the worker from Step 8 are running:
+
+1. In a public channel, invite the bot: `/invite @Investigation Agent`.
+2. If you haven't already sent the sample error (Step 4.3), send it now.
+3. Tag the bot:
+
+   > @Investigation Agent What's causing the latest ValueError in Sentry, and which code is responsible?
+
+The bot adds 👀 to your message while it investigates, then replies in the thread with a short conclusion, a few bullets and an **Evidence** section that links to the Sentry issue and the code on GitHub. Its first reply in a thread ends with *"Tag me to interact in this thread."*
+
+To ask a follow-up, tag the bot again in the same thread. It continues in the same agent session and also reads any untagged messages posted in the thread since its last answer. You can also paste a Slack message link into a question, and the bot reads that conversation too.
+
+## Step 11: Deploy to Studio (optional)
+
+The bot only answers while both terminals from Step 8 are running. To keep it running without your machine, deploy the agent and the workflows to Studio. The webhook and trigger from Step 9 stay the same, so you don't need to change anything in Slack.
+
+### 11.1 Add the container images
+
+Managed deploys build each service from a Dockerfile in your repository.
+
+Create `agent/Dockerfile`. Its build context is `agent/`. It installs the dependencies, copies the agent files and starts the worker:
+
+```bash
+touch agent/Dockerfile
+```
+
+**`agent/Dockerfile`**
+
+```dockerfile
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+ENV UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never PATH="/app/.venv/bin:$PATH"
+WORKDIR /app
+COPY pyproject.toml ./
+RUN uv sync --no-dev --no-install-project
+COPY main.py tool_allowlist.py instructions.md ./
+COPY skills ./skills
+USER 1000:1000
+CMD ["agents", "run-worker"]
+```
+
+Create `workflow/Dockerfile`. Its build context is the **repository root**, which is why the paths start with `workflow/`:
+
+```bash
+touch workflow/Dockerfile
+```
+
+**`workflow/Dockerfile`**
+
+```dockerfile
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+ENV UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never PATH="/app/.venv/bin:$PATH" UPLOAD_GRAPH=true
+WORKDIR /app
+COPY workflow/pyproject.toml ./
+RUN uv sync --no-dev --no-install-project
+COPY workflow/*.py ./
+COPY workflow/activities ./activities
+USER 1000:1000
+CMD ["python", "worker.py"]
+```
+
+Deploys build from the commit you pushed, not your local files. Commit and push everything:
+
+```bash
+git add .
+git commit -m "Add the Slack workflows and trigger filter"
+git push
+```
+
+### 11.2 Create the workspace secrets
 
 Deployed services have no `.env`. They read their settings from workspace secrets, which you bind to environment variables at deploy time. In Studio, open **Secrets** and create these four:
 
@@ -1275,11 +1455,9 @@ Deployed services have no `.env`. They read their settings from workspace secret
 
 The names are up to you, but the commands and steps below use these.
 
-## Step 9: Deploy the agent
+### 11.3 Deploy the agent
 
-Always deploy the agent before the workflows, because the workflows open sessions on it by name.
-
-Deploys build from the commit you pushed, not your local files, so make sure your latest changes are pushed (Step 6). Then deploy from `agent/`:
+Always deploy the agent before the workflows, because the workflows open sessions on it by name. Deploy from `agent/`:
 
 ```bash
 cd agent
@@ -1295,7 +1473,9 @@ cd ..
 
 The command waits for the worker to start. If it fails, it prints the rollout error and the worker's last output.
 
-## Step 10: Deploy the workflows
+### 11.4 Deploy the workflows
+
+Stop the local worker and agent from Step 8 with `Ctrl+C` first. If a local worker keeps running alongside the deployment, both pick up the same mentions.
 
 In Studio, go to **Workflows → Deployments → Create**:
 
@@ -1306,61 +1486,25 @@ In Studio, go to **Workflows → Deployments → Create**:
    - `investigation_agent_mistral_api_key` as `INVESTIGATION_AGENT_MISTRAL_API_KEY`
    - `slack_bot_token_investigation_agent` as `SLACK_BOT_TOKEN_INVESTIGATION_AGENT`
 5. Leave hardening turned on. It's on by default, and Studio pins the deployment's service account, so only this deployment can register the `investigation-agent-router` and `investigation-agent-thread` workflows. Without it, any worker in your workspace that registers a workflow with the same name could pick up your Slack mentions.
-6. Create the deployment and wait for it to become active. Both `investigation-agent-router` and `investigation-agent-thread` then appear under **Workflows**.
+6. Create the deployment and wait for it to become active.
 
-## Step 11: Connect Slack to the workflows
-
-Connect Slack to the router workflow with a Studio webhook and trigger, then send the app's events to that webhook:
-
-1. **Create the webhook.** In Studio, go to **Webhooks → Create**, pick **Slack** as the provider and paste the app's **Signing Secret** from Step 7. Copy the URL Studio shows. Treat this URL as a credential.
-2. **Create the trigger.** Go to **Triggers → Create**, pick that webhook, and choose the action **Start workflow** with `investigation-agent-router`. As the filter, paste the expression from `triggers/slack.json`:
-
-   ```text
-   event.type == 'app_mention' && event.text && event.bot_id == null && event.subtype != 'bot_message'
-   ```
-
-3. **Point Slack at the webhook.** In your Slack app, open **Event Subscriptions** and turn on **Enable Events**. Paste the webhook URL as the **Request URL** and wait for it to show as verified. Under **Subscribe to bot events**, add `app_mention`, then click **Save Changes**. If Slack asks you to reinstall the app, do so.
-
-## Step 12: Try it in Slack
-
-Run a full investigation from Slack:
-
-1. In a public channel, invite the bot: `/invite @Investigation Agent`.
-2. If you haven't already sent the sample error (Step 4.3), send it now.
-3. Tag the bot:
-
-   > @Investigation Agent What's causing the latest ValueError in Sentry, and which code is responsible?
-
-The bot adds 👀 to your message while it investigates, then replies in the thread with a short conclusion, a few bullets and an **Evidence** section that links to the Sentry issue and the code on GitHub. Its first reply in a thread ends with *"Tag me to interact in this thread."*
-
-To ask a follow-up, tag the bot again in the same thread. It continues in the same agent session and also reads any untagged messages posted in the thread since its last answer. You can also paste a Slack message link into a question, and the bot reads that conversation too.
+The deployed workflows don't set `INVESTIGATION_AGENT_NAME`, so they open sessions on the deployed agent, `investigation-agent-runtime`. Tag the bot in Slack again (Step 10) to check that the deployed version answers.
 
 ## Updating, operating and cleaning up
 
-Use these steps to ship changes, debug the workflows on your machine, and remove everything you created.
+Use these steps to ship changes and remove everything you created.
 
 **Shipping a change**
 
+When you run locally, restart the agent and the worker from Step 8 to pick up your changes. When you've deployed:
+
 1. Commit and push.
-2. Redeploy the agent with the command from Step 9, including both `--secret-binding` options.
+2. Redeploy the agent with the command from Step 11.3, including both `--secret-binding` options.
 3. In Studio, open your workflow deployment and click **Redeploy**.
 
 Keep this order. Before you change which activities a workflow calls, or the order it calls them in, wait for running thread workflows to finish (they exit after a day without tags): a running execution replayed against different code can fail.
 
-**Running the workflows locally**
-
-To debug the workflows, you can run the worker on your machine against a local agent:
-
-1. Fill in `INVESTIGATION_AGENT_MISTRAL_API_KEY` and `SLACK_BOT_TOKEN_INVESTIGATION_AGENT` in `.env`. Keep `INVESTIGATION_AGENT_NAME` and `DEPLOYMENT_NAME` as they are.
-2. Start the local agent with `agents serve` (Step 4.4).
-3. In a second terminal, start the worker:
-
-   ```bash
-   cd workflow
-   uv run --env-file ../.env python worker.py
-   ```
-
-Because `INVESTIGATION_AGENT_NAME` is set, the local worker opens sessions on your local agent instead of the deployed one. Never run a local worker while the managed workflow deployment is serving the same trigger: both would pick up the same mentions. Stop the managed deployment first, and start it again afterwards.
+To debug locally after deploying, stop the managed workflow deployment in Studio, then start the agent and worker from Step 8. Never run a local worker while the managed deployment is serving the same trigger. Start the managed deployment again when you're done.
 
 **Rules of thumb**
 
@@ -1370,22 +1514,23 @@ Because `INVESTIGATION_AGENT_NAME` is set, the local worker opens sessions on yo
 
 **Cleaning up**
 
-Shut down the deployed agent and the local development agent from `agent/`:
+Shut down the local development agent from `agent/`. If you deployed in Step 11, shut down the deployed agent too:
 
 ```bash
 cd agent
-uv run --env-file ../.env agents shutdown investigation-agent-runtime
 uv run --env-file ../.env agents shutdown investigation-agent-dev
+uv run --env-file ../.env agents shutdown investigation-agent-runtime
+cd ..
 ```
 
-Shutting down the deployed agent also deletes its managed worker. Then, in Studio, delete the workflow deployment, the trigger, the webhook and the four secrets, and uninstall the Slack app from your workspace.
+Shutting down the deployed agent also deletes its managed worker. Then, in Studio, delete the trigger and the webhook, and if you deployed, the workflow deployment and the four secrets. Finally, uninstall the Slack app from your workspace.
 
 ## Troubleshooting
 
 These are the most common problems and how to fix them.
 
 **`SENTRY_CONNECTOR_NAME is not set` (or `GITHUB_CONNECTOR_NAME`)**
-Locally, fill in `.env` (Step 1) and run the command with `--env-file ../.env`. On a deployed agent, redeploy with both `--secret-binding` options (Step 9).
+Locally, fill in `.env` (Step 1) and run the command with `--env-file ../.env`. On a deployed agent, redeploy with both `--secret-binding` options (Step 11.3).
 
 **`uv` can't find `mistralai-agents`, or returns `403 Forbidden`**
 An environment-level package index may be overriding PyPI. Run the command with `UV_DEFAULT_INDEX=https://pypi.org/simple`. If the release is filtered out by an `exclude-newer` policy, check that the `exclude-newer-package` block is in the `pyproject.toml`.
@@ -1396,11 +1541,11 @@ Check that the Sentry connector and the API key belong to the same user, that th
 **The bot doesn't react to a mention**
 - The channel must be public, and the bot must be a member.
 - In the Slack app, **Event Subscriptions** must show a verified Request URL and the `app_mention` bot event.
-- In Studio, check that the trigger targets `investigation-agent-router`, its filter matches Step 11, and the workflow deployment is active. The router's run history shows why a mention was skipped: `done: unsupported_event` or `done: non_public_channel`.
+- In Studio, check that the trigger targets `investigation-agent-router`, its filter matches Step 9, and the worker from Step 8 (or the workflow deployment) is running. The router's run history shows why a mention was skipped: `done: unsupported_event` or `done: non_public_channel`.
 - Make sure no local worker is running alongside the managed deployment.
 
 **The bot replies *"I hit an error while investigating this. Tag me again to retry."***
-The agent turn failed. Check that the agent deployment is running, that `INVESTIGATION_AGENT_MISTRAL_API_KEY` is a valid key for the user who connected the connectors, and open the session under **Agent sessions** in Studio to see where it stopped.
+The agent turn failed. Check that the agent is running (`agents serve` locally, or the agent deployment), that `INVESTIGATION_AGENT_MISTRAL_API_KEY` is a valid key for the user who connected the connectors, and open the session under **Agent sessions** in Studio to see where it stopped.
 
 **The agent deployment fails to start**
 Usually a missing secret binding. Read the error printed by `agents deploy`, and redeploy with both `--secret-binding` options.
