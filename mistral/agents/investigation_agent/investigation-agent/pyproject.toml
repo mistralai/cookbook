@@ -1,0 +1,31 @@
+# Dev tooling only: each of agent/ and workflow/ has its own pyproject.toml and image.
+[project]
+name = "investigation-agent-dev"
+version = "0.1.0"
+requires-python = "==3.12.*"
+dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[sessions-client]==1.1.0rc8", "mistralai-workflows==3.15.0", "pydantic>=2,<3", "sentry-sdk>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.14", "ty>=0.0.59"]
+[tool.uv]
+package = false
+prerelease = "allow"
+exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["agent", "workflow", "sample-app"]
+[tool.ruff]
+line-length = 240
+target-version = "py312"
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "RUF", "T20"]
+[tool.ruff.lint.per-file-ignores]
+# A terminal tool whose output is the answer; it never runs in the worker.
+"agent/ask.py" = ["T201"]
+
+[tool.ruff.lint.isort]
+# agent/, workflow/ and sample-app/ run as flat top-level modules inside their images.
+known-first-party = ["activities", "checkout", "formatting", "investigation", "main", "models", "pricing", "tool_allowlist"]
+[tool.ty.environment]
+python-version = "3.12"
+root = ["agent", "workflow", "sample-app", "."]
