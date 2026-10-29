@@ -471,7 +471,7 @@ agent = agents.Agent(
     # Keep only the skill tool. The default sandbox (NoSandbox) gives no file system or shell tools.
     builtins=agents.Builtins(subagents=False, programmatic_tool_calling=False),
     # Read-only connectors configured in the Studio workspace.
-    connectors=[agents.connector(name, run_as="auto", auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
+    connectors=[agents.connector(name, auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
     # Denies any tool call that tool_allowlist.py has not reviewed.
     permission_policy=READ_ONLY_POLICY,
     # Each folder in skills/ is a skill bundle shipped with the agent.
