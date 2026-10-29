@@ -62,7 +62,6 @@ investigation-agent/
 ├── .gitignore
 ├── agent/
 │   ├── Dockerfile             # only if you deploy (Step 11)
-│   ├── ask.py
 │   ├── instructions.md
 │   ├── main.py
 │   ├── pyproject.toml
@@ -480,49 +479,7 @@ agent = agents.Agent(
 
 The name `investigation-agent-runtime` matters: the workflow opens sessions on the agent by this name in Step 5.
 
-### 3.6 Add a terminal client
-
-Create `agent/ask.py`. It's a small Session API client for asking the agent a question from your terminal: it prints a line for each tool call as the agent investigates, then the answer. It isn't part of the deployed agent, and you'll only use it for local testing.
-
-```bash
-touch agent/ask.py
-```
-
-**`agent/ask.py`**
-
-```python
-"""Ask the agent one question over the Session API and print the reply. Run it while `agents serve` is up."""
-
-import asyncio
-import os
-import sys
-
-from mistralai.agents import agents
-from mistralai.vibe.harness.app_server.session import HistoryEntryCompletedEvent, MessageHistoryEntry, TextContentBlock
-
-DEFAULT_QUESTION = "What's causing the latest ValueError in Sentry, and which code is responsible?"
-
-
-async def main(question: str) -> None:
-    # Same name `agents serve` used, falling back to the deployed agent.
-    agent = agents.Agent.load_from(agent_name=os.environ.get("INVESTIGATION_AGENT_NAME", "").strip() or "investigation-agent-runtime")
-    async with await agent.create_session() as session:
-        async for event in session.run_turn([TextContentBlock(text=question)]):
-            if not isinstance(event.payload, HistoryEntryCompletedEvent):
-                continue
-            entry = event.payload.entry
-            # Tool calls and results have no role; show their kind so you can follow the investigation.
-            if isinstance(entry, MessageHistoryEntry) and entry.role == "assistant":
-                print("\n" + "".join(block.text for block in entry.content if isinstance(block, TextContentBlock)))
-            elif not isinstance(entry, MessageHistoryEntry):
-                print(f"[{type(entry).__name__}]", flush=True)
-
-
-if __name__ == "__main__":
-    asyncio.run(main(" ".join(sys.argv[1:]) or DEFAULT_QUESTION))
-```
-
-### 3.7 Check that the agent loads
+### 3.6 Check that the agent loads
 
 `agents info` imports `main.py` and prints what the CLI resolved: the name, model, connectors, skills and permission policy. Run it from `agent/`, loading `.env` so the connector names are set:
 
@@ -620,16 +577,16 @@ cd agent
 uv run --env-file ../.env sh -c 'unset DEPLOYMENT_NAME; exec agents serve . --name "$INVESTIGATION_AGENT_NAME"'
 ```
 
-Leave it running. In a second terminal, from the repository root, ask the default question (*"What's causing the latest ValueError in Sentry, and which code is responsible?"*):
+Leave it running. In a second terminal, from the repository root, open a chat with the agent that `agents serve` runs. If you changed `INVESTIGATION_AGENT_NAME`, use that name:
 
 ```bash
 cd agent
-uv run --env-file ../.env python ask.py
+uv run --env-file ../.env agents chat investigation-agent-dev
 ```
 
-To ask something else, pass the question as arguments: `uv run --env-file ../.env python ask.py "Which Sentry issues are new today?"`.
+Ask *"What's causing the latest ValueError in Sentry, and which code is responsible?"*. To send one question and exit, add it with `-m`: `agents chat investigation-agent-dev -m "Which Sentry issues are new today?"`. Press `Ctrl+D` to end the chat.
 
-You'll see a line for each step of the investigation, such as `[ToolCallHistoryEntry]` and `[ToolResultHistoryEntry]`, then the answer. The agent should find the issue, follow the stack trace to `parse_amount` in `sample-app/pricing.py` on GitHub, and explain that it assumes whole-dollar prices, so `"12.50"` can't be parsed.
+You'll see each tool call as the agent investigates, then the answer. The agent should find the issue, follow the stack trace to `parse_amount` in `sample-app/pricing.py` on GitHub, and explain that it assumes whole-dollar prices, so `"12.50"` can't be parsed.
 
 You can also open the session in Studio under **Agent sessions** to see every message and tool call.
 

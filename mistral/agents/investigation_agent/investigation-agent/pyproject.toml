@@ -19,10 +19,6 @@ line-length = 240
 target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "RUF", "T20"]
-[tool.ruff.lint.per-file-ignores]
-# A terminal tool whose output is the answer; it never runs in the worker.
-"agent/ask.py" = ["T201"]
-
 [tool.ruff.lint.isort]
 # agent/, workflow/ and sample-app/ run as flat top-level modules inside their images.
 known-first-party = ["activities", "checkout", "formatting", "investigation", "main", "models", "pricing", "tool_allowlist"]
