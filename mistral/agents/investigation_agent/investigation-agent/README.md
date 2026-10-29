@@ -13,11 +13,9 @@ Both connectors work on free plans, so you can run the whole demo with your own 
 3. Workspace secrets: `INVESTIGATION_AGENT_MISTRAL_API_KEY` (a Mistral API key) and `SLACK_BOT_TOKEN_INVESTIGATION_AGENT` (the bot token) for the workflow, plus `sentry_connector_name` and `github_connector_name` holding the same connector names as `.env`. The deployed agent has no `.env`; it reads the names from these secrets.
 4. Deploy the agent first. Deploys build from the pushed GitHub commit, not your local files, so fork this repo if you change anything and push before each deploy. `uv` installs the `agents` CLI from `agent/pyproject.toml` on first run, and `--env-file` loads `MISTRAL_API_KEY` and the connector names, which the CLI only reads from the environment:
    ```
-   cd agent && uv run --env-file ../.env agents deploy . \
-     --secret-binding SENTRY_CONNECTOR_NAME=secret:workspace:sentry_connector_name \
-     --secret-binding GITHUB_CONNECTOR_NAME=secret:workspace:github_connector_name
+   cd agent && uv run --env-file ../.env agents deploy .
    ```
-   Pass both bindings on every deploy: a deploy without them unbinds the secrets and the agent fails to start.
+   `agent/main.py` declares the two connector-name secrets, so the deploy binds them without extra options.
 5. Deploy the workflow from `workflow/Dockerfile` (build context is the repo root) with the `INVESTIGATION_AGENT_MISTRAL_API_KEY` and `SLACK_BOT_TOKEN_INVESTIGATION_AGENT` secrets.
 6. Create a Studio webhook trigger that starts `investigation-agent-router` with the filter in `triggers/slack.json`, and set its URL as the Slack app's Event Subscriptions Request URL, subscribed to `app_mention`. Treat the URL as a credential.
 7. Invite the bot to a public channel and tag it.

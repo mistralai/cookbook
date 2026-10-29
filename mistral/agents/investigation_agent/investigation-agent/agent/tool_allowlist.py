@@ -13,7 +13,7 @@ def connector_name(env_var: str) -> str:
     return name
 
 
-# Studio gives every connector a unique name, so each workspace supplies its own: from .env when deploying, from a bound workspace secret at runtime.
+# Studio gives every connector a unique name, so each workspace supplies its own: from .env locally, from the workspace secrets declared in main.py on a deployed worker.
 SENTRY_CONNECTOR = connector_name("SENTRY_CONNECTOR_NAME")
 GITHUB_CONNECTOR = connector_name("GITHUB_CONNECTOR_NAME")
 

@@ -23,4 +23,9 @@ agent = agents.Agent(
     permission_policy=READ_ONLY_POLICY,
     # Each folder in skills/ is a skill bundle shipped with the agent.
     skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
+    # A deployed worker has no .env: it gets the connector names from these workspace secrets.
+    secrets={
+        "SENTRY_CONNECTOR_NAME": agents.MistralSecret.workspace("sentry_connector_name", worker_env=True),
+        "GITHUB_CONNECTOR_NAME": agents.MistralSecret.workspace("github_connector_name", worker_env=True),
+    },
 )

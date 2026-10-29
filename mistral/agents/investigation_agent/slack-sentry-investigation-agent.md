@@ -388,7 +388,7 @@ def connector_name(env_var: str) -> str:
     return name
 
 
-# Studio gives every connector a unique name, so each workspace supplies its own: from .env when deploying, from a bound workspace secret at runtime.
+# Studio gives every connector a unique name, so each workspace supplies its own: from .env locally, from the workspace secrets declared in main.py on a deployed worker.
 SENTRY_CONNECTOR = connector_name("SENTRY_CONNECTOR_NAME")
 GITHUB_CONNECTOR = connector_name("GITHUB_CONNECTOR_NAME")
 
@@ -474,6 +474,11 @@ agent = agents.Agent(
     permission_policy=READ_ONLY_POLICY,
     # Each folder in skills/ is a skill bundle shipped with the agent.
     skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
+    # A deployed worker has no .env: it gets the connector names from these workspace secrets.
+    secrets={
+        "SENTRY_CONNECTOR_NAME": agents.MistralSecret.workspace("sentry_connector_name", worker_env=True),
+        "GITHUB_CONNECTOR_NAME": agents.MistralSecret.workspace("github_connector_name", worker_env=True),
+    },
 )
 ```
 
@@ -1390,7 +1395,7 @@ git push
 
 ### 11.2 Create the workspace secrets
 
-Deployed services have no `.env`. They read their settings from workspace secrets, which you bind to environment variables at deploy time. In Studio, open **Secrets** and create these four:
+Deployed services have no `.env`. They read their settings from workspace secrets, which become environment variables of the running service. In Studio, open **Secrets** and create these four:
 
 | Secret name | Value | Used by |
 |---|---|---|
@@ -1399,7 +1404,7 @@ Deployed services have no `.env`. They read their settings from workspace secret
 | `sentry_connector_name` | The same Sentry connector name as in `.env` | Agent |
 | `github_connector_name` | The same GitHub connector name as in `.env` | Agent |
 
-The names are up to you, but the commands and steps below use these.
+The agent's two secret names are set in `agent/main.py` (`secrets=`). If you choose other names, change them there. The workflow secrets are bound in Step 11.4.
 
 ### 11.3 Deploy the agent
 
@@ -1407,14 +1412,12 @@ Always deploy the agent before the workflows, because the workflows open session
 
 ```bash
 cd agent
-uv run --env-file ../.env agents deploy . \
-  --secret-binding SENTRY_CONNECTOR_NAME=secret:workspace:sentry_connector_name \
-  --secret-binding GITHUB_CONNECTOR_NAME=secret:workspace:github_connector_name
+uv run --env-file ../.env agents deploy .
 cd ..
 ```
 
 - `--env-file` loads `MISTRAL_API_KEY` and the connector names, which the CLI reads from the environment when it imports `main.py`.
-- Each `--secret-binding` sets an environment variable in the running agent from a workspace secret. **Pass both bindings on every deploy**: a deploy without them unbinds the secrets, and the agent fails to start.
+- `secrets=` in `agent/main.py` declares the two connector-name secrets, so every deploy binds them as environment variables of the running agent. You pass no extra option.
 - Because the agent uses connectors on behalf of the session user, `agents deploy` hardens the deployment automatically.
 
 The command waits for the worker to start. If it fails, it prints the rollout error and the worker's last output.
@@ -1445,7 +1448,7 @@ Use these steps to ship changes and remove everything you created.
 When you run locally, restart the agent and the worker from Step 8 to pick up your changes. When you've deployed:
 
 1. Commit and push.
-2. Redeploy the agent with the command from Step 11.3, including both `--secret-binding` options.
+2. Redeploy the agent with the command from Step 11.3.
 3. In Studio, open your workflow deployment and click **Redeploy**.
 
 Keep this order. Before you change which activities a workflow calls, or the order it calls them in, wait for running thread workflows to finish (they exit after a day without tags): a running execution replayed against different code can fail.
@@ -1476,7 +1479,7 @@ Shutting down the deployed agent also deletes its managed worker. Then, in Studi
 These are the most common problems and how to fix them.
 
 **`SENTRY_CONNECTOR_NAME is not set` (or `GITHUB_CONNECTOR_NAME`)**
-Locally, fill in `.env` (Step 1) and run the command with `--env-file ../.env`. On a deployed agent, redeploy with both `--secret-binding` options (Step 11.3).
+Locally, fill in `.env` (Step 1) and run the command with `--env-file ../.env`. On a deployed agent, check that the `sentry_connector_name` and `github_connector_name` workspace secrets exist (Step 11.2), then redeploy (Step 11.3).
 
 **`uv` can't find `mistralai-agents`, or returns `403 Forbidden`**
 An environment-level package index may be overriding PyPI. Run the command with `UV_DEFAULT_INDEX=https://pypi.org/simple`. If the release is filtered out by an `exclude-newer` policy, check that the `exclude-newer-package` block is in the `pyproject.toml`.
@@ -1494,7 +1497,7 @@ Check that the Sentry connector and the API key belong to the same user, that th
 The agent turn failed. Check that the agent is running (`agents serve` locally, or the agent deployment), that `INVESTIGATION_AGENT_MISTRAL_API_KEY` is a valid key for the user who connected the connectors, and open the session under **Agent sessions** in Studio to see where it stopped.
 
 **The agent deployment fails to start**
-Usually a missing secret binding. Read the error printed by `agents deploy`, and redeploy with both `--secret-binding` options.
+Usually a missing workspace secret. Read the error printed by `agents deploy`, create the missing secret (Step 11.2), and redeploy.
 
 ## Summary
 
