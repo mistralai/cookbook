@@ -271,7 +271,7 @@ touch agent/pyproject.toml
 name = "investigation-agent"
 version = "0.1.0"
 requires-python = "==3.12.*"
-dependencies = ["mistralai-agents==1.1.0rc8"]
+dependencies = ["mistralai-agents==1.1.0rc14"]
 [tool.mistralai.agents]
 entrypoint = "main:agent"
 [tool.uv]
@@ -679,7 +679,7 @@ touch workflow/pyproject.toml
 name = "investigation-agent-workflow"
 version = "0.1.0"
 requires-python = "==3.12.*"
-dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[sessions-client]==1.1.0rc8", "mistralai-workflows>=3.16.0,<4", "pydantic>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
+dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[sessions-client]==1.1.0rc14", "mistralai-workflows>=3.16.0,<4", "pydantic>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
 [tool.uv]
 prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
