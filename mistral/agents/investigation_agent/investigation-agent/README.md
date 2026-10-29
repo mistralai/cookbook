@@ -2,7 +2,7 @@
 
 A Slack mention triggers `investigation-agent-router`, which checks the channel is public and routes the message to the thread's `investigation-agent-thread` workflow (starting it if needed). That workflow batches tags that arrive mid-turn into the next turn, runs every turn in one Agent Session (`mistral-large-4`), replies in the thread and exits after 1 idle day.
 
-`agent/` is the Agents SDK runtime: read-only Sentry and GitHub tools, a fail-closed tool allowlist hook (`tool_allowlist.py`) and 2 skills. `workflow/` holds `investigation.py` (both workflows), every side effect in `activities/` (`slack.py`, `agent.py`, `routing.py`), helpers (`models.py`, `formatting.py`) and `worker.py`. `triggers/slack.json` holds the webhook trigger filter, `sample-app/` a small buggy checkout script that sends a real error to Sentry for the agent to investigate, and `docs/` the architecture graphs.
+`agent/` is the Agents SDK runtime: read-only Sentry and GitHub tools, a fail-closed permission policy (`tool_allowlist.py`) and 2 skills. `workflow/` holds `investigation.py` (both workflows), every side effect in `activities/` (`slack.py`, `agent.py`, `routing.py`), helpers (`models.py`, `formatting.py`) and `worker.py`. `triggers/slack.json` holds the webhook trigger filter, `sample-app/` a small buggy checkout script that sends a real error to Sentry for the agent to investigate, and `docs/` the architecture graphs.
 
 Both connectors work on free plans, so you can run the whole demo with your own accounts.
 

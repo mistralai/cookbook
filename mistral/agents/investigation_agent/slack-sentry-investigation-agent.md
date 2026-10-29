@@ -6,7 +6,7 @@ You'll build four pieces:
 
 | Folder | What it is |
 |---|---|
-| `agent/` | The agent, built with the Mistral **Agents SDK**: its model, instructions, two skills, the Sentry and GitHub connectors, and a hook that blocks every tool that isn't on a reviewed read-only list. |
+| `agent/` | The agent, built with the Mistral **Agents SDK**: its model, instructions, two skills, the Sentry and GitHub connectors, and a permission policy that denies every tool that isn't on a reviewed read-only list. |
 | `workflow/` | Two durable **Workflows** that connect Slack to the agent: a router that runs once per Slack mention, and a long-lived workflow per Slack thread that keeps one agent session and replies in the thread. |
 | `triggers/` | The filter for the Studio **webhook trigger** that turns Slack `app_mention` events into workflow runs. |
 | `sample-app/` | A tiny script with a deliberate bug. Running it sends a real error to Sentry, so the agent has something to investigate. |
@@ -358,12 +358,12 @@ Read-only: never create, comment on, review, merge, or close anything. Never rep
 
 ### 3.4 Restrict the agent to read-only tools
 
-Connectors expose every tool the third-party MCP server offers, including tools that write (resolve a Sentry issue, merge a pull request, and so on). The SDK has no per-connector tool filter, so this project enforces the read-only rule in a **pre-tool-call hook** that fails closed:
+Connectors expose every tool the third-party MCP server offers, including tools that write (resolve a Sentry issue, merge a pull request, and so on). The SDK has no per-connector tool filter, so this project enforces the read-only rule with a **permission policy** that fails closed:
 
 - It reads the connector names from `SENTRY_CONNECTOR_NAME` and `GITHUB_CONNECTOR_NAME`, and fails at startup if either is missing, so a typo can't silently drop a connector.
 - It lists the reviewed read-only tools for each connector. A tool only runs when it comes from the connector it was reviewed for.
 - `skill.read` is the only built-in tool allowed, which is how the agent loads its skills.
-- Any other call gets a `[refused]` answer instead of running.
+- `default="deny"` denies every other call, so it doesn't run.
 
 Create `agent/tool_allowlist.py`:
 
@@ -379,9 +379,6 @@ touch agent/tool_allowlist.py
 import os
 
 from mistralai.agents import agents
-from mistralai.vibe.harness.core.protocol import ProvidedToolCall, RuntimeBuiltinToolCall, TextContentBlock
-from mistralai.vibe.harness.runtime.capabilities.identifiers import normalize_core_tool_identifier
-from mistralai.vibe.harness.runtime.capabilities.models import PreToolCallHookInvocation
 
 
 def connector_name(env_var: str) -> str:
@@ -418,45 +415,33 @@ GITHUB_ALLOWED_TOOLS = frozenset(
         "search_repositories",
     }
 )
-# Order resolves tool-name collisions: Sentry wins over GitHub.
 CONNECTOR_ALLOWED_TOOLS = {SENTRY_CONNECTOR: SENTRY_ALLOWED_TOOLS, GITHUB_CONNECTOR: GITHUB_ALLOWED_TOOLS}
-# Reading the bundled skills is the only runtime builtin the agent needs.
-ALLOWED_BUILTINS = frozenset({"skill.read"})
 
 
-def connector_tool_namespace(connector_name: str) -> str:
-    """Return the tool group the SDK assigns to a connector's MCP tools."""
-    safe_name = "".join(c if c.isalnum() else "_" for c in connector_name).strip("_")
-    return normalize_core_tool_identifier(f"connector_{safe_name or 'connector'}")
+def connector_tool_patterns(connector: str, tools: frozenset[str]) -> list[str]:
+    """Return the permission patterns that match these tools of one connector, and of no other connector.
 
-
-# Allowed tool names keyed by tool group, normalized the way the SDK reports them in hook calls.
-ALLOWED_BY_TOOL_GROUP = {connector_tool_namespace(c): frozenset(normalize_core_tool_identifier(t) for t in tools) for c, tools in CONNECTOR_ALLOWED_TOOLS.items()}
-
-
-class ConnectorToolAllowlist(agents.Hook):
-    """Refuse every tool call outside the reviewed per-connector read-only set.
-
-    A connector gives the model every tool of its MCP server, write tools included, so this hook is the enforcement point.
-    Workflow sessions reject hooks with instance state, so the allowlist lives at module level.
+    A connector tool's stable ID is `connector_<connector>.<connector>_<tool>`. The namespace binds each tool to the
+    connector it was reviewed for; `*_` matches the connector prefix the model sees in the tool name.
     """
+    return [f"connector_{connector}.*_{tool}" for tool in sorted(tools)]
 
-    async def pre_tool_call(self, ctx: agents.Context, call: PreToolCallHookInvocation) -> agents.PreToolCallHookContinue | agents.PreToolCallHookSkip:
-        """Let an allowed call run with its original arguments, and answer any other call with a refusal."""
-        tool = call.tool_call.call
-        if isinstance(tool, ProvidedToolCall) and tool.tool_name in ALLOWED_BY_TOOL_GROUP.get(tool.group_name, ()):
-            return agents.PreToolCallHookContinue(effective_arguments=tool.arguments)
-        if isinstance(tool, RuntimeBuiltinToolCall) and tool.name in ALLOWED_BUILTINS:
-            return agents.PreToolCallHookContinue(effective_arguments=tool.arguments)
-        name = tool.tool_name if isinstance(tool, ProvidedToolCall) else tool.name
-        return agents.PreToolCallHookSkip(reason=[TextContentBlock(text=f"[refused] {name} is not available.")])
+
+READ_ONLY_POLICY = agents.PermissionPolicy(
+    default="deny",
+    rules=[
+        # The skill tool loads the bundled skills, and the policy checks it like any other tool.
+        agents.PermissionRule(tools=["skill.read"], decision="allow"),
+        agents.PermissionRule(tools=[p for c, tools in CONNECTOR_ALLOWED_TOOLS.items() for p in connector_tool_patterns(c, tools)], decision="allow"),
+    ],
+)
 ```
 
-The hook keeps its allowlist at module level on purpose: workflow sessions reject hooks that hold instance state.
+A rule matches the stable tool ID, `<namespace>.<name>`, not the name the model sees. For a connector, the namespace is `connector_<connector name>`, and the name is the tool name with the connector name in front, such as `connector_sentry_d183.sentry_d183_search_issues`.
 
 ### 3.5 Define the agent
 
-Create `agent/main.py`. It wires everything together: the model, an iteration limit, the instructions, the connectors (in allowlist order), the hook and the skill bundles.
+Create `agent/main.py`. It wires everything together: the model, an iteration limit, the instructions, the connectors, the permission policy and the skill bundles.
 
 ```bash
 touch agent/main.py
@@ -471,7 +456,7 @@ from pathlib import Path
 
 from mistralai.agents import agents
 
-from tool_allowlist import CONNECTOR_ALLOWED_TOOLS, ConnectorToolAllowlist
+from tool_allowlist import CONNECTOR_ALLOWED_TOOLS, READ_ONLY_POLICY
 
 ROOT = Path(__file__).parent
 
@@ -486,8 +471,8 @@ agent = agents.Agent(
     builtins=agents.Builtins(subagents=False, programmatic_tool_calling=False),
     # Read-only connectors configured in the Studio workspace.
     connectors=[agents.connector(name, run_as="auto", auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
-    # Refuses any connector tool that tool_allowlist.py has not reviewed.
-    hooks=[ConnectorToolAllowlist()],
+    # Denies any tool call that tool_allowlist.py has not reviewed.
+    permission_policy=READ_ONLY_POLICY,
     # Each folder in skills/ is a skill bundle shipped with the agent.
     skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
 )
@@ -539,7 +524,7 @@ if __name__ == "__main__":
 
 ### 3.7 Check that the agent loads
 
-`agents info` imports `main.py` and prints what the CLI resolved: the name, model, connectors, hook and skills. Run it from `agent/`, loading `.env` so the connector names are set:
+`agents info` imports `main.py` and prints what the CLI resolved: the name, model, connectors, skills and permission policy. Run it from `agent/`, loading `.env` so the connector names are set:
 
 ```bash
 cd agent
@@ -1553,7 +1538,7 @@ This cookbook built a Slack bot that investigates production errors: you tag it 
 
 **What you built**
 
-- An agent built with the Agents SDK, with instructions, two skills, and a fail-closed hook that allows only reviewed read-only connector tools
+- An agent built with the Agents SDK, with instructions, two skills, and a fail-closed permission policy that allows only reviewed read-only connector tools
 - A router workflow that turns each Slack mention into work for the right thread
 - A per-thread workflow that keeps one agent session per Slack thread, batches tags, and replies in the thread
 - A webhook trigger with a filter that starts the router only for human app mentions

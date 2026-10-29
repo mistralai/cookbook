@@ -4,7 +4,7 @@ from pathlib import Path
 
 from mistralai.agents import agents
 
-from tool_allowlist import CONNECTOR_ALLOWED_TOOLS, ConnectorToolAllowlist
+from tool_allowlist import CONNECTOR_ALLOWED_TOOLS, READ_ONLY_POLICY
 
 ROOT = Path(__file__).parent
 
@@ -19,8 +19,8 @@ agent = agents.Agent(
     builtins=agents.Builtins(subagents=False, programmatic_tool_calling=False),
     # Read-only connectors configured in the Studio workspace.
     connectors=[agents.connector(name, run_as="auto", auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
-    # Refuses any connector tool that tool_allowlist.py has not reviewed.
-    hooks=[ConnectorToolAllowlist()],
+    # Denies any tool call that tool_allowlist.py has not reviewed.
+    permission_policy=READ_ONLY_POLICY,
     # Each folder in skills/ is a skill bundle shipped with the agent.
     skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
 )
