@@ -496,24 +496,31 @@ uv run --env-file ../.env agents info
 cd ..
 ```
 
-You should see output like this, with your own connector names under `connectors`:
+You should see output like this, with your own connector names under `connectors` and in the permission policy:
 
 ```text
 agent: investigation-agent-runtime
   model: mistral-large-4
   description: Answers Slack engineering investigation questions with read-only Sentry and Git…
   instructions: [ROLE] You are an engineering investigation assistant in a Slack thread. Answer…
-  builtin tools: find_organizations, find_projects, get_commit, get_file_contents, get_latest_release, get_release_by_tag, get_sentry_resource, get_tag, issue_read, list_branches, list_commits, list_issues, list_pull_requests, list_releases, list_tags, pull_request_read, search_code, search_commits, search_events, search_issues, search_pull_requests, search_repositories
   sandbox: none
   tools: (none)
   connectors:
-    - github_app
+    - github_7a2f
     - sentry_d183
+  mcps: (none)
   skills:
     - query-github: Read GitHub code, commits, pull requests, issues, and releases, and tie an erro…
     - query-sentry: Query Sentry issues, events, stack traces, releases, environments, and tags for…
-  hooks:
-    - ConnectorToolAllowlist
+  guardrails: (none)
+  hooks: (none)
+  subagents: (none)
+  subagent policy: (none)
+  permission mode: auto
+  permission policy:
+    - skill.read: allow
+    - connector_sentry_d183.*_find_organizations, connector_sentry_d183.*_find_projects, connector_sentry_d183.*_get_sentry_resource, connector_sentry_d183.*_search_events, connector_sentry_d183.*_search_issues, connector_github_7a2f.*_get_commit, connector_github_7a2f.*_get_file_contents, connector_github_7a2f.*_get_latest_release, connector_github_7a2f.*_get_release_by_tag, connector_github_7a2f.*_get_tag, connector_github_7a2f.*_issue_read, connector_github_7a2f.*_list_branches, connector_github_7a2f.*_list_commits, connector_github_7a2f.*_list_issues, connector_github_7a2f.*_list_pull_requests, connector_github_7a2f.*_list_releases, connector_github_7a2f.*_list_tags, connector_github_7a2f.*_pull_request_read, connector_github_7a2f.*_search_code, connector_github_7a2f.*_search_commits, connector_github_7a2f.*_search_pull_requests, connector_github_7a2f.*_search_repositories: allow
+    - anything else: deny
 ```
 
 The first run installs the dependencies and writes `agent/uv.lock`. If `agents info` reports `SENTRY_CONNECTOR_NAME is not set`, go back to Step 1 and fill in `.env`.
