@@ -441,7 +441,7 @@ dev = [
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.9,<4" },
     { name = "mistralai-agents", extras = ["sessions-client"], specifier = "==1.1.0rc8" },
-    { name = "mistralai-workflows", specifier = "==3.15.0" },
+    { name = "mistralai-workflows", specifier = ">=3.16.0,<4" },
     { name = "pydantic", specifier = ">=2,<3" },
     { name = "sentry-sdk", specifier = ">=2,<3" },
     { name = "slack-sdk", specifier = ">=3.33,<4" },
@@ -708,7 +708,7 @@ wheels = [
 
 [[package]]
 name = "mistralai-workflows"
-version = "3.15.0"
+version = "3.17.0"
 source = { registry = "https://socket-registry.mistralai.com/pypi/simple/" }
 dependencies = [
     { name = "asynciolimiter" },
@@ -724,15 +724,16 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyjwt" },
+    { name = "requests" },
     { name = "starlette" },
     { name = "structlog" },
     { name = "temporalio" },
     { name = "tenacity" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://socket-registry.mistralai.com/pypi/packages/83/a0/3f22295f72c1bd9c91f65e9999e8a4e4ec41279d5025d487313c2253606e/mistralai_workflows-3.15.0.tar.gz", hash = "sha256:9393fa7ca47ff5496498e476041195d3e916de5ab9248b98d14eb8b8d0e87278", size = 587091, upload-time = "2026-09-14T12:51:32.24Z" }
+sdist = { url = "https://socket-registry.mistralai.com/pypi/packages/6d/b9/7776fddd6812cf30bb1cd27f981018b34c0c84971c3405fbb26f087f0aa6/mistralai_workflows-3.17.0.tar.gz", hash = "sha256:4e4771f4ee04942454f51616f10ce5b8f706863996488432a0e5bb40893a47eb", size = 636762, upload-time = "2026-10-29T11:52:19.932Z" }
 wheels = [
-    { url = "https://socket-registry.mistralai.com/pypi/packages/b7/96/30eb4b82df54ba38cc5099f11b8421f24516e7a4e53cf2c05d146c38bd17/mistralai_workflows-3.15.0-py3-none-any.whl", hash = "sha256:0d3759cedd93aa5fe05576ac140ea6300578aea32751415619b826cc05ac7b27", size = 467977, upload-time = "2026-09-14T12:51:30.38Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/ab/fd/a9f2b0622762f7573a7c0d00b0d3059193b89a39174f110785f182b4d3d7/mistralai_workflows-3.17.0-py3-none-any.whl", hash = "sha256:b6b189a595b94c9f498b22dfc0314376f2903b24d2383ef95fd92260a41e227d", size = 483438, upload-time = "2026-10-29T11:52:17.539Z" },
 ]
 
 [[package]]
