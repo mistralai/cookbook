@@ -116,7 +116,7 @@ class InvestigationThread:
         try:
             # Start a new session if there is none yet or it is about to expire; the new session must re-read the whole thread.
             if not self.state.session_id or not self.state.session_at or workflow.now() - self.state.session_at > SESSION_TTL:
-                self.state.session_id, self.state.session_at, self.state.context_cursor_ts = await create_session(), workflow.now(), None
+                self.state.session_id, self.state.session_at, self.state.context_cursor_ts = await create_session(f"investigation-session-{turn_id}"), workflow.now(), None
             # The batch tags are already in the prompt; an existing session has also seen every known tag and reply.
             skip = self.state.known_ts if self.state.context_cursor_ts else [r.message_ts for r in batch]
             context = await read_context(self.state, skip)
