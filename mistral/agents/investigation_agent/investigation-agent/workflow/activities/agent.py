@@ -12,17 +12,15 @@ DEPLOYED_AGENT_NAME = "investigation-agent-runtime"
 AGENT_NAME = os.environ.get("INVESTIGATION_AGENT_NAME", "").strip() or DEPLOYED_AGENT_NAME
 
 
-def agent_api() -> tuple[str, str]:
-    """Return the Agents control plane URL and the API key used to reach it."""
-    url = os.environ.get("AGENTS_SDK_DEPLOY_CONTROL_PLANE_URL", "https://api.mistral.ai/v2/agents").rstrip("/")
-    return url, os.environ["INVESTIGATION_AGENT_MISTRAL_API_KEY"].strip()
+def api_key() -> str:
+    """Return the Mistral API key the workflow opens Agent Sessions with. The SDK finds the Agents control plane itself."""
+    return os.environ["INVESTIGATION_AGENT_MISTRAL_API_KEY"].strip()
 
 
 @workflows.activity(start_to_close_timeout=timedelta(seconds=45), retry_policy_max_attempts=1)
 async def create_session() -> str:
     """Create a new Agent Session and return its ID. The thread workflow reuses it for every turn."""
-    url, key = agent_api()
-    async with await agents.Agent.load_from(agent_name=AGENT_NAME, server_url=url, api_key=key).create_session() as session:
+    async with await agents.Agent.load_from(agent_name=AGENT_NAME, api_key=api_key()).create_session() as session:
         return session.session_id
 
 
@@ -32,8 +30,7 @@ async def run_session_turn(session_id: str, turn_id: str, prompt: str) -> str:
 
     `turn_id` is the idempotency key, so a replayed activity does not start a second turn.
     """
-    url, key = agent_api()
-    async with await agents.Agent.load_session(session_id, server_url=url, api_key=key) as session:
+    async with await agents.Agent.load_session(session_id, api_key=api_key()) as session:
         async for event in session.run_turn([TextContentBlock(text=prompt)], idempotency_key=turn_id):
             # A workflow cannot answer callbacks, so a callback or a dead session fails the turn.
             if isinstance(event.payload, CallbackOpenedEvent | SessionTerminatedEvent):
