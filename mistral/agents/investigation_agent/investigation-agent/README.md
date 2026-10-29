@@ -41,5 +41,7 @@ You can ask the agent locally from your terminal, which only needs the Sentry an
 
 To run the agent on your machine, set `INVESTIGATION_AGENT_NAME` in `.env` (for example `investigation-agent-dev`) and run `make serve`. It serves the agent under that name, so it never collides with the deployed `investigation-agent-runtime`, and stays running. While it is up, ask it a question from a second terminal with `make ask Q="your question"` (without `Q` it asks about the sample-app error). A local workflow worker (`cd workflow && uv run --env-file ../.env python worker.py`) reads the same variable and opens sessions on the local agent; the deployed workflow leaves it unset and uses the deployed agent.
 
+Access: every person who can tag the bot in a public channel reads Sentry and GitHub with the connector access of the user who owns `INVESTIGATION_AGENT_MISTRAL_API_KEY`, private repositories included. Use an account that can read only data the whole Slack workspace may see.
+
 Ops rules: deploy the agent before the workflow; never run local and managed workers concurrently; drain executions before changing the activity sequence; never log Slack text, payloads or secrets.
 

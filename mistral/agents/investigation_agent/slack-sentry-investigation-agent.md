@@ -120,6 +120,8 @@ __pycache__/
 
 To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key. Create it as the same user who will connect Sentry and GitHub in Step 1. Connectors call Sentry and GitHub as the user who opens the agent session, and the deployed workflow opens sessions with this key.
 
+> **Important:** Every person who can tag the bot reads Sentry and GitHub with the access of this key's user, private repositories included. The bot answers in any public channel, so every member of your Slack workspace can use it. Use an account whose connectors can read only data that the whole workspace may see, for example a dedicated account that can read only the demo repository and Sentry project.
+
 Create `.env` in the repository root with every setting the project reads, and set your Mistral API key. You'll fill in the other values as you go:
 
 ```bash
