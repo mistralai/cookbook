@@ -44,7 +44,6 @@ GITHUB_ALLOWED_TOOLS = frozenset(
 )
 # Order resolves tool-name collisions: Sentry wins over GitHub.
 CONNECTOR_ALLOWED_TOOLS = {SENTRY_CONNECTOR: SENTRY_ALLOWED_TOOLS, GITHUB_CONNECTOR: GITHUB_ALLOWED_TOOLS}
-ALLOWED_TOOLS = frozenset().union(*CONNECTOR_ALLOWED_TOOLS.values())
 # Reading the bundled skills is the only runtime builtin the agent needs.
 ALLOWED_BUILTINS = frozenset({"skill.read"})
 
@@ -62,7 +61,7 @@ ALLOWED_BY_TOOL_GROUP = {connector_tool_namespace(c): frozenset(normalize_core_t
 class ConnectorToolAllowlist(agents.Hook):
     """Refuse every tool call outside the reviewed per-connector read-only set.
 
-    `Agent(enabled_tools=...)` only filters runtime builtins; connector MCP tools reach the model unfiltered, so this hook is the enforcement point.
+    A connector gives the model every tool of its MCP server, write tools included, so this hook is the enforcement point.
     Workflow sessions reject hooks with instance state, so the allowlist lives at module level.
     """
 

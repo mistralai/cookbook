@@ -358,7 +358,7 @@ Read-only: never create, comment on, review, merge, or close anything. Never rep
 
 ### 3.4 Restrict the agent to read-only tools
 
-Connectors expose every tool the third-party MCP server offers, including tools that write (resolve a Sentry issue, merge a pull request, and so on). `Agent(enabled_tools=...)` only filters the runtime's built-in tools, not connector tools, so this project enforces the read-only rule in a **pre-tool-call hook** that fails closed:
+Connectors expose every tool the third-party MCP server offers, including tools that write (resolve a Sentry issue, merge a pull request, and so on). The SDK has no per-connector tool filter, so this project enforces the read-only rule in a **pre-tool-call hook** that fails closed:
 
 - It reads the connector names from `SENTRY_CONNECTOR_NAME` and `GITHUB_CONNECTOR_NAME`, and fails at startup if either is missing, so a typo can't silently drop a connector.
 - It lists the reviewed read-only tools for each connector. A tool only runs when it comes from the connector it was reviewed for.
@@ -420,7 +420,6 @@ GITHUB_ALLOWED_TOOLS = frozenset(
 )
 # Order resolves tool-name collisions: Sentry wins over GitHub.
 CONNECTOR_ALLOWED_TOOLS = {SENTRY_CONNECTOR: SENTRY_ALLOWED_TOOLS, GITHUB_CONNECTOR: GITHUB_ALLOWED_TOOLS}
-ALLOWED_TOOLS = frozenset().union(*CONNECTOR_ALLOWED_TOOLS.values())
 # Reading the bundled skills is the only runtime builtin the agent needs.
 ALLOWED_BUILTINS = frozenset({"skill.read"})
 
@@ -438,7 +437,7 @@ ALLOWED_BY_TOOL_GROUP = {connector_tool_namespace(c): frozenset(normalize_core_t
 class ConnectorToolAllowlist(agents.Hook):
     """Refuse every tool call outside the reviewed per-connector read-only set.
 
-    `Agent(enabled_tools=...)` only filters runtime builtins; connector MCP tools reach the model unfiltered, so this hook is the enforcement point.
+    A connector gives the model every tool of its MCP server, write tools included, so this hook is the enforcement point.
     Workflow sessions reject hooks with instance state, so the allowlist lives at module level.
     """
 
@@ -472,7 +471,7 @@ from pathlib import Path
 
 from mistralai.agents import agents
 
-from tool_allowlist import ALLOWED_TOOLS, CONNECTOR_ALLOWED_TOOLS, ConnectorToolAllowlist
+from tool_allowlist import CONNECTOR_ALLOWED_TOOLS, ConnectorToolAllowlist
 
 ROOT = Path(__file__).parent
 
@@ -483,16 +482,14 @@ agent = agents.Agent(
     description="Answers Slack engineering investigation questions with read-only Sentry and GitHub tools.",
     max_iterations=32,
     instructions=(ROOT / "instructions.md").read_text(),
-    # Matches no runtime builtin, so file system, bash and process tools are all disabled.
-    enabled_tools=sorted(ALLOWED_TOOLS),
-    harness=agents.Harness(
-        # Read-only connectors configured in the Studio workspace.
-        connectors=[agents.connector(name, run_as="auto", auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
-        # Refuses any connector tool that tool_allowlist.py has not reviewed.
-        hooks=[ConnectorToolAllowlist()],
-        # Each folder in skills/ is a skill bundle shipped with the agent.
-        local_skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
-    ),
+    # Keep only the skill tool. The default sandbox (NoSandbox) gives no file system or shell tools.
+    builtins=agents.Builtins(subagents=False, programmatic_tool_calling=False),
+    # Read-only connectors configured in the Studio workspace.
+    connectors=[agents.connector(name, run_as="auto", auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
+    # Refuses any connector tool that tool_allowlist.py has not reviewed.
+    hooks=[ConnectorToolAllowlist()],
+    # Each folder in skills/ is a skill bundle shipped with the agent.
+    skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
 )
 ```
 
