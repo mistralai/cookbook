@@ -468,8 +468,8 @@ agent = agents.Agent(
     description="Answers Slack engineering investigation questions with read-only Sentry and GitHub tools.",
     max_iterations=32,
     instructions=(ROOT / "instructions.md").read_text(),
-    # Keep only the skill tool.
-    builtins=agents.Builtins(subagents=False, programmatic_tool_calling=False),
+    # No subagents. Connectors need programmatic tool calling, so it stays on; the permission policy covers those calls too.
+    builtins=agents.Builtins(subagents=False),
     # A served agent ships its skills as sandbox files. access="none" holds them without giving the model any file or shell tool.
     sandbox=agents.BashkitSandbox(access="none"),
     # Read-only connectors configured in the Studio workspace.
