@@ -140,6 +140,22 @@ wheels = [
 ]
 
 [[package]]
+name = "bashkit"
+version = "0.19.0"
+source = { registry = "https://socket-registry.mistralai.com/pypi/simple/" }
+sdist = { url = "https://socket-registry.mistralai.com/pypi/packages/d5/ea/38ce656694eda414822cb13d987e7fd968d5b47d0353054b7de3795da2a4/bashkit-0.19.0.tar.gz", hash = "sha256:7220345c3a935d001318b0ef3e33d213c7dcd40765bd6c8e9c6d2ef0604d67e5", size = 11055050, upload-time = "2026-10-15T21:18:57.061Z" }
+wheels = [
+    { url = "https://socket-registry.mistralai.com/pypi/packages/62/4f/8e80457156be5e2c0876da25da83bcd959e1e81695fdcca9969f31ea8e25/bashkit-0.19.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:c6cb2bb91d28549d95e50f22f04c456f9c305c7c37076906d1b054346dfe997b", size = 16570326, upload-time = "2026-10-15T21:18:37.394Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/9f/85/ee5901ddc0a41c1f4f2a6ef6df2c1d9666956bdc24599ca2b49ac5f8acb9/bashkit-0.19.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:d4ced6bb65e8b681c0f617d76efce1e41d55017c9c05e882dbeb948d53dc7a1a", size = 15632270, upload-time = "2026-10-15T21:18:40.474Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/08/3c/c560f5b4f89da7801b33df98b2bbffddd5acf237d43330f5e2957b91571b/bashkit-0.19.0-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8073ef77cef8ed2d566f43b5cfdc79b53c1edae9b868a07cdbedc1d9860a18df", size = 16363912, upload-time = "2026-10-15T21:18:42.848Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/2b/55/200c20eb641592efb5fb97882a191cfc2964ee6b3a2338299b8db1032b26/bashkit-0.19.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b55d92ee687475378b19be15fb77b9fb8a354f9a457e94a08e228385d0b17d4b", size = 17285144, upload-time = "2026-10-15T21:18:46.034Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/fa/cc/cef30a4fee09fba9654af0fcb52dd36d5b49b4de78171c13a68dcf67226d/bashkit-0.19.0-cp39-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:5bd0fc4cee3943a131063b2ba3865f37913cc2b3d1c6fa959d0cd76daf43f5da", size = 16488244, upload-time = "2026-10-15T21:18:48.415Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/9b/fe/565fa7571b1ef098584aebdf58ccb9357f69171ac850bad87eebdb81a081/bashkit-0.19.0-cp39-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:a65b519516515aa232f65b6532dbcff0052bbb077c77d3ac6450e84ff8d613ec", size = 17580628, upload-time = "2026-10-15T21:18:50.794Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/e1/f0/b0d401d107b7f87476413fe5bb8a60f01bb4872aa848e404000c30b221a0/bashkit-0.19.0-cp39-abi3-pyemscripten_2025_0_wasm32.whl", hash = "sha256:a2d700a489830159abc5c5dabbe87932ae6074406ebcc3b1b167760ed59f182d", size = 6497229, upload-time = "2026-10-15T21:18:52.823Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/fb/d8/3f25ac1349ee434f345706ef5d7dcbefc49e785423cbd8feb4f429087a2d/bashkit-0.19.0-cp39-abi3-win_amd64.whl", hash = "sha256:ab7829159246904c43a12171176a790f086de1dbc1782e0a88bbf8c7efb31b5e", size = 18276336, upload-time = "2026-10-15T21:18:54.807Z" },
+]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.15.0"
 source = { registry = "https://socket-registry.mistralai.com/pypi/simple/" }
@@ -430,7 +446,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "aiohttp" },
-    { name = "mistralai-agents", extra = ["sessions-client"] },
+    { name = "mistralai-agents", extra = ["bashkit", "sessions-client"] },
     { name = "mistralai-workflows" },
     { name = "pydantic" },
     { name = "sentry-sdk" },
@@ -449,7 +465,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.9,<4" },
-    { name = "mistralai-agents", extras = ["sessions-client"], specifier = "==1.1.0rc14" },
+    { name = "mistralai-agents", extras = ["bashkit", "sessions-client"], specifier = "==1.1.0rc14" },
     { name = "mistralai-workflows", specifier = ">=3.16.0,<4" },
     { name = "pydantic", specifier = ">=2,<3" },
     { name = "sentry-sdk", specifier = ">=2,<3" },
@@ -667,6 +683,9 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+bashkit = [
+    { name = "bashkit" },
+]
 sessions-client = [
     { name = "httpx" },
     { name = "mistralai-vibe-harness" },

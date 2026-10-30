@@ -3,7 +3,7 @@
 name = "investigation-agent-dev"
 version = "0.1.0"
 requires-python = "==3.12.*"
-dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[sessions-client]==1.1.0rc14", "mistralai-workflows>=3.16.0,<4", "pydantic>=2,<3", "sentry-sdk>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
+dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[bashkit,sessions-client]==1.1.0rc14", "mistralai-workflows>=3.16.0,<4", "pydantic>=2,<3", "sentry-sdk>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
 [dependency-groups]
 dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.14", "ty>=0.0.59"]
 [tool.uv]

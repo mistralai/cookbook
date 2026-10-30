@@ -272,7 +272,7 @@ touch agent/pyproject.toml
 name = "investigation-agent"
 version = "0.1.0"
 requires-python = "==3.12.*"
-dependencies = ["mistralai-agents==1.1.0rc14"]
+dependencies = ["mistralai-agents[bashkit]==1.1.0rc14"]
 [tool.mistralai.agents]
 entrypoint = "main:agent"
 [tool.uv]
@@ -280,7 +280,7 @@ prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
 ```
 
-- `mistralai-agents` is pinned to an exact release candidate, so `prerelease = "allow"` lets uv install it.
+- `mistralai-agents` is pinned to an exact release candidate, so `prerelease = "allow"` lets uv install it. The `bashkit` extra installs the sandbox that holds the agent's skill files.
 - `entrypoint = "main:agent"` tells the `agents` CLI to load the `agent` object from `main.py`.
 - The `exclude-newer-package` block keeps any `exclude-newer` policy you may have set in uv from filtering out recent SDK releases.
 
@@ -468,8 +468,10 @@ agent = agents.Agent(
     description="Answers Slack engineering investigation questions with read-only Sentry and GitHub tools.",
     max_iterations=32,
     instructions=(ROOT / "instructions.md").read_text(),
-    # Keep only the skill tool. The default sandbox (NoSandbox) gives no file system or shell tools.
+    # Keep only the skill tool.
     builtins=agents.Builtins(subagents=False, programmatic_tool_calling=False),
+    # A served agent ships its skills as sandbox files. access="none" holds them without giving the model any file or shell tool.
+    sandbox=agents.BashkitSandbox(access="none"),
     # Read-only connectors configured in the Studio workspace.
     connectors=[agents.connector(name, auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
     # Denies any tool call that tool_allowlist.py has not reviewed.
