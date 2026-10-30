@@ -419,13 +419,12 @@ GITHUB_ALLOWED_TOOLS = frozenset(
 CONNECTOR_ALLOWED_TOOLS = {SENTRY_CONNECTOR: SENTRY_ALLOWED_TOOLS, GITHUB_CONNECTOR: GITHUB_ALLOWED_TOOLS}
 
 
-def connector_tool_patterns(connector: str, tools: frozenset[str]) -> list[str]:
-    """Return the permission patterns that match these tools of one connector, and of no other connector.
+def connector_tool_ids(connector: str, tools: frozenset[str]) -> list[str]:
+    """Return the stable tool IDs of these tools of one connector: `connector_<connector>.<tool>`.
 
-    A connector tool's stable ID is `connector_<connector>.<connector>_<tool>`. The namespace binds each tool to the
-    connector it was reviewed for; `*_` matches the connector prefix the model sees in the tool name.
+    The namespace binds each tool to the connector it was reviewed for, so a same-named tool of another connector stays denied.
     """
-    return [f"connector_{connector}.*_{tool}" for tool in sorted(tools)]
+    return [f"connector_{connector}.{tool}" for tool in sorted(tools)]
 
 
 READ_ONLY_POLICY = agents.PermissionPolicy(
@@ -433,12 +432,12 @@ READ_ONLY_POLICY = agents.PermissionPolicy(
     rules=[
         # The skill tool loads the bundled skills, and the policy checks it like any other tool.
         agents.PermissionRule(tools=["skill.read"], decision="allow"),
-        agents.PermissionRule(tools=[p for c, tools in CONNECTOR_ALLOWED_TOOLS.items() for p in connector_tool_patterns(c, tools)], decision="allow"),
+        agents.PermissionRule(tools=[p for c, tools in CONNECTOR_ALLOWED_TOOLS.items() for p in connector_tool_ids(c, tools)], decision="allow"),
     ],
 )
 ```
 
-A rule matches the stable tool ID, `<namespace>.<name>`, not the name the model sees. For a connector, the namespace is `connector_<connector name>`, and the name is the tool name with the connector name in front, such as `connector_sentry_d183.sentry_d183_search_issues`.
+A rule matches the stable tool ID, `<namespace>.<name>`, not the name the model sees. For a connector tool, the ID is `connector_<connector name>.<tool name>`, such as `connector_sentry_d183.search_issues`.
 
 ### 3.5 Define the agent
 
