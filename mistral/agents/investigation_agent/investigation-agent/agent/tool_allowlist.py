@@ -3,9 +3,6 @@
 import os
 
 from mistralai.agents import agents
-from mistralai.vibe.harness.core.protocol import ProvidedToolCall, RuntimeBuiltinToolCall, TextContentBlock
-from mistralai.vibe.harness.runtime.capabilities.identifiers import normalize_core_tool_identifier
-from mistralai.vibe.harness.runtime.capabilities.models import PreToolCallHookInvocation
 
 
 def connector_name(env_var: str) -> str:
@@ -16,11 +13,11 @@ def connector_name(env_var: str) -> str:
     return name
 
 
-# Studio gives every connector a unique name, so each workspace supplies its own: from .env when deploying, from a bound workspace secret at runtime.
+# Studio gives every connector a unique name, so each workspace supplies its own: from .env locally, from the workspace secrets declared in main.py on a deployed worker.
 SENTRY_CONNECTOR = connector_name("SENTRY_CONNECTOR_NAME")
 GITHUB_CONNECTOR = connector_name("GITHUB_CONNECTOR_NAME")
 
-SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_events", "search_issues"})
+SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_errors", "search_issues"})
 GITHUB_ALLOWED_TOOLS = frozenset(
     {
         "get_commit",
@@ -42,36 +39,22 @@ GITHUB_ALLOWED_TOOLS = frozenset(
         "search_repositories",
     }
 )
-# Order resolves tool-name collisions: Sentry wins over GitHub.
 CONNECTOR_ALLOWED_TOOLS = {SENTRY_CONNECTOR: SENTRY_ALLOWED_TOOLS, GITHUB_CONNECTOR: GITHUB_ALLOWED_TOOLS}
-ALLOWED_TOOLS = frozenset().union(*CONNECTOR_ALLOWED_TOOLS.values())
-# Reading the bundled skills is the only runtime builtin the agent needs.
-ALLOWED_BUILTINS = frozenset({"skill.read"})
 
 
-def connector_tool_namespace(connector_name: str) -> str:
-    """Return the tool group the SDK assigns to a connector's MCP tools."""
-    safe_name = "".join(c if c.isalnum() else "_" for c in connector_name).strip("_")
-    return normalize_core_tool_identifier(f"connector_{safe_name or 'connector'}")
+def connector_tool_ids(connector: str, tools: frozenset[str]) -> list[str]:
+    """Return the stable tool IDs of these tools of one connector: `connector_<connector>.<tool>`.
 
-
-# Allowed tool names keyed by tool group, normalized the way the SDK reports them in hook calls.
-ALLOWED_BY_TOOL_GROUP = {connector_tool_namespace(c): frozenset(normalize_core_tool_identifier(t) for t in tools) for c, tools in CONNECTOR_ALLOWED_TOOLS.items()}
-
-
-class ConnectorToolAllowlist(agents.Hook):
-    """Refuse every tool call outside the reviewed per-connector read-only set.
-
-    `Agent(enabled_tools=...)` only filters runtime builtins; connector MCP tools reach the model unfiltered, so this hook is the enforcement point.
-    Workflow sessions reject hooks with instance state, so the allowlist lives at module level.
+    The namespace binds each tool to the connector it was reviewed for, so a same-named tool of another connector stays denied.
     """
+    return [f"connector_{connector}.{tool}" for tool in sorted(tools)]
 
-    async def pre_tool_call(self, ctx: agents.Context, call: PreToolCallHookInvocation) -> agents.PreToolCallHookContinue | agents.PreToolCallHookSkip:
-        """Let an allowed call run with its original arguments, and answer any other call with a refusal."""
-        tool = call.tool_call.call
-        if isinstance(tool, ProvidedToolCall) and tool.tool_name in ALLOWED_BY_TOOL_GROUP.get(tool.group_name, ()):
-            return agents.PreToolCallHookContinue(effective_arguments=tool.arguments)
-        if isinstance(tool, RuntimeBuiltinToolCall) and tool.name in ALLOWED_BUILTINS:
-            return agents.PreToolCallHookContinue(effective_arguments=tool.arguments)
-        name = tool.tool_name if isinstance(tool, ProvidedToolCall) else tool.name
-        return agents.PreToolCallHookSkip(reason=[TextContentBlock(text=f"[refused] {name} is not available.")])
+
+READ_ONLY_POLICY = agents.PermissionPolicy(
+    default="deny",
+    rules=[
+        # The skill tool loads the bundled skills, and the policy checks it like any other tool.
+        agents.PermissionRule(tools=["skill.read"], decision="allow"),
+        agents.PermissionRule(tools=[p for c, tools in CONNECTOR_ALLOWED_TOOLS.items() for p in connector_tool_ids(c, tools)], decision="allow"),
+    ],
+)

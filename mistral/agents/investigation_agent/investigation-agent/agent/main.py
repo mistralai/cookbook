@@ -4,7 +4,7 @@ from pathlib import Path
 
 from mistralai.agents import agents
 
-from tool_allowlist import ALLOWED_TOOLS, CONNECTOR_ALLOWED_TOOLS, ConnectorToolAllowlist
+from tool_allowlist import CONNECTOR_ALLOWED_TOOLS, READ_ONLY_POLICY
 
 ROOT = Path(__file__).parent
 
@@ -15,14 +15,19 @@ agent = agents.Agent(
     description="Answers Slack engineering investigation questions with read-only Sentry and GitHub tools.",
     max_iterations=32,
     instructions=(ROOT / "instructions.md").read_text(),
-    # Matches no runtime builtin, so file system, bash and process tools are all disabled.
-    enabled_tools=sorted(ALLOWED_TOOLS),
-    harness=agents.Harness(
-        # Read-only connectors configured in the Studio workspace.
-        connectors=[agents.connector(name, run_as="auto", auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
-        # Refuses any connector tool that tool_allowlist.py has not reviewed.
-        hooks=[ConnectorToolAllowlist()],
-        # Each folder in skills/ is a skill bundle shipped with the agent.
-        local_skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
-    ),
+    # No subagents. Connectors need programmatic tool calling, so it stays on; the permission policy covers those calls too.
+    builtins=agents.Builtins(subagents=False),
+    # A served agent ships its skills as sandbox files. access="none" holds them without giving the model any file or shell tool.
+    sandbox=agents.BashkitSandbox(access="none"),
+    # Read-only connectors configured in the Studio workspace.
+    connectors=[agents.connector(name, auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
+    # Denies any tool call that tool_allowlist.py has not reviewed.
+    permission_policy=READ_ONLY_POLICY,
+    # Each folder in skills/ is a skill bundle shipped with the agent.
+    skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
+    # A deployed worker has no .env: it gets the connector names from these workspace secrets.
+    secrets={
+        "SENTRY_CONNECTOR_NAME": agents.MistralSecret.workspace("sentry_connector_name", worker_env=True),
+        "GITHUB_CONNECTOR_NAME": agents.MistralSecret.workspace("github_connector_name", worker_env=True),
+    },
 )

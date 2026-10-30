@@ -27,5 +27,6 @@ send-error:
 	cd sample-app && uv run --env-file ../.env python checkout.py
 
 # Asks the agent `make serve` is running one question: make ask Q="your question". Without Q it asks about the sample-app error.
+ASK_DEFAULT := What's causing the latest ValueError in Sentry, and which code is responsible?
 ask:
-	cd agent && uv run --env-file ../.env python ask.py "$$Q"
+	cd agent && uv run --env-file ../.env sh -c 'exec agents chat "$${INVESTIGATION_AGENT_NAME:?Set INVESTIGATION_AGENT_NAME in .env}" -m "$$1"' ask "$(or $(Q),$(ASK_DEFAULT))"

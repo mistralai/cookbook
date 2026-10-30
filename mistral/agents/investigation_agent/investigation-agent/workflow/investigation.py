@@ -23,8 +23,9 @@ FAILED_TURN_REPLY = "I hit an error while investigating this. Tag me again to re
 FOOTER = "Tag me to interact in this thread."
 # Number of recent message timestamps kept for deduplication.
 KNOWN_TS_LIMIT = 200
-# Remote Agent Sessions expire after roughly 10 hours, well before the thread workflow does.
-SESSION_TTL = timedelta(hours=8)
+# A served or deployed Agent Session ends after 4 hours idle or 24 hours in total, so start a new one shortly before either limit.
+SESSION_MAX_IDLE = timedelta(hours=3, minutes=30)
+SESSION_MAX_AGE = timedelta(hours=23)
 
 
 class TriggerRequest(BaseModel, extra="allow"):
@@ -114,18 +115,28 @@ class InvestigationThread:
     async def run_turn(self, batch: list[SlackRequest], latest: SlackRequest, turn_id: str) -> str:
         """Run the agent turn and return the Slack-formatted answer, or an error reply if any step failed."""
         try:
-            # Start a new session if there is none yet or it is about to expire; the new session must re-read the whole thread.
-            if not self.state.session_id or not self.state.session_at or workflow.now() - self.state.session_at > SESSION_TTL:
-                self.state.session_id, self.state.session_at, self.state.context_cursor_ts = await create_session(), workflow.now(), None
+            session_id = await self.session_for(turn_id)
             # The batch tags are already in the prompt; an existing session has also seen every known tag and reply.
             skip = self.state.known_ts if self.state.context_cursor_ts else [r.message_ts for r in batch]
             context = await read_context(self.state, skip)
             texts = [await expand_permalinks(r.text) for r in batch]
-            text = await run_session_turn(self.state.session_id, turn_id, turn_prompt(texts, context))
+            text = await run_session_turn(session_id, turn_id, turn_prompt(texts, context))
         except workflows.ActivityError as error:
             # Drop the session so the next tag starts clean, and tell the user to retry.
             logger.warning("investigation_agent_turn_failed", error_type=type(error.__cause__).__name__)
             self.state.session_id = None
             return FAILED_TURN_REPLY
         self.state.context_cursor_ts = max([m.ts for m in context] + [r.message_ts for r in batch], key=ts_key)
+        self.state.last_turn_at = workflow.now()
         return agent_reply_text(text)
+
+    async def session_for(self, turn_id: str) -> str:
+        """Return the thread's Agent Session, or start a new one if there is none yet or it is close to its idle or lifetime limit."""
+        state, now = self.state, workflow.now()
+        last_active = state.last_turn_at or state.session_at
+        if state.session_id and state.session_at and last_active and now - state.session_at <= SESSION_MAX_AGE and now - last_active <= SESSION_MAX_IDLE:
+            return state.session_id
+        session_id = await create_session(f"investigation-session-{turn_id}")
+        # The new session has seen nothing, so the next turn re-reads the whole thread.
+        state.session_id, state.session_at, state.last_turn_at, state.context_cursor_ts = session_id, now, None, None
+        return session_id

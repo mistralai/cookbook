@@ -6,7 +6,7 @@ You'll build four pieces:
 
 | Folder | What it is |
 |---|---|
-| `agent/` | The agent, built with the Mistral **Agents SDK**: its model, instructions, two skills, the Sentry and GitHub connectors, and a hook that blocks every tool that isn't on a reviewed read-only list. |
+| `agent/` | The agent, built with the Mistral **Agents SDK**: its model, instructions, two skills, the Sentry and GitHub connectors, and a permission policy that denies every tool that isn't on a reviewed read-only list. |
 | `workflow/` | Two durable **Workflows** that connect Slack to the agent: a router that runs once per Slack mention, and a long-lived workflow per Slack thread that keeps one agent session and replies in the thread. |
 | `triggers/` | The filter for the Studio **webhook trigger** that turns Slack `app_mention` events into workflow runs. |
 | `sample-app/` | A tiny script with a deliberate bug. Running it sends a real error to Sentry, so the agent has something to investigate. |
@@ -62,7 +62,6 @@ investigation-agent/
 ├── .gitignore
 ├── agent/
 │   ├── Dockerfile             # only if you deploy (Step 11)
-│   ├── ask.py
 │   ├── instructions.md
 │   ├── main.py
 │   ├── pyproject.toml
@@ -120,6 +119,8 @@ __pycache__/
 ### Required environment variables
 
 To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key. Create it as the same user who will connect Sentry and GitHub in Step 1. Connectors call Sentry and GitHub as the user who opens the agent session, and the deployed workflow opens sessions with this key.
+
+> **Important:** Every person who can tag the bot reads Sentry and GitHub with the access of this key's user, private repositories included. The bot answers in any public channel, so every member of your Slack workspace can use it. Use an account whose connectors can read only data that the whole workspace may see, for example a dedicated account that can read only the demo repository and Sentry project.
 
 Create `.env` in the repository root with every setting the project reads, and set your Mistral API key. You'll fill in the other values as you go:
 
@@ -271,7 +272,7 @@ touch agent/pyproject.toml
 name = "investigation-agent"
 version = "0.1.0"
 requires-python = "==3.12.*"
-dependencies = ["mistralai-agents==1.1.0rc8"]
+dependencies = ["mistralai-agents[bashkit]==1.1.0rc14"]
 [tool.mistralai.agents]
 entrypoint = "main:agent"
 [tool.uv]
@@ -279,7 +280,7 @@ prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
 ```
 
-- `mistralai-agents` is pinned to an exact release candidate, so `prerelease = "allow"` lets uv install it.
+- `mistralai-agents` is pinned to an exact release candidate, so `prerelease = "allow"` lets uv install it. The `bashkit` extra installs the sandbox that holds the agent's skill files.
 - `entrypoint = "main:agent"` tells the `agents` CLI to load the `agent` object from `main.py`.
 - The `exclude-newer-package` block keeps any `exclude-newer` policy you may have set in uv from filtering out recent SDK releases.
 
@@ -358,12 +359,12 @@ Read-only: never create, comment on, review, merge, or close anything. Never rep
 
 ### 3.4 Restrict the agent to read-only tools
 
-Connectors expose every tool the third-party MCP server offers, including tools that write (resolve a Sentry issue, merge a pull request, and so on). `Agent(enabled_tools=...)` only filters the runtime's built-in tools, not connector tools, so this project enforces the read-only rule in a **pre-tool-call hook** that fails closed:
+Connectors expose every tool the third-party MCP server offers, including tools that write (resolve a Sentry issue, merge a pull request, and so on). The SDK has no per-connector tool filter, so this project enforces the read-only rule with a **permission policy** that fails closed:
 
 - It reads the connector names from `SENTRY_CONNECTOR_NAME` and `GITHUB_CONNECTOR_NAME`, and fails at startup if either is missing, so a typo can't silently drop a connector.
 - It lists the reviewed read-only tools for each connector. A tool only runs when it comes from the connector it was reviewed for.
 - `skill.read` is the only built-in tool allowed, which is how the agent loads its skills.
-- Any other call gets a `[refused]` answer instead of running.
+- `default="deny"` denies every other call, so it doesn't run.
 
 Create `agent/tool_allowlist.py`:
 
@@ -379,9 +380,6 @@ touch agent/tool_allowlist.py
 import os
 
 from mistralai.agents import agents
-from mistralai.vibe.harness.core.protocol import ProvidedToolCall, RuntimeBuiltinToolCall, TextContentBlock
-from mistralai.vibe.harness.runtime.capabilities.identifiers import normalize_core_tool_identifier
-from mistralai.vibe.harness.runtime.capabilities.models import PreToolCallHookInvocation
 
 
 def connector_name(env_var: str) -> str:
@@ -392,11 +390,11 @@ def connector_name(env_var: str) -> str:
     return name
 
 
-# Studio gives every connector a unique name, so each workspace supplies its own: from .env when deploying, from a bound workspace secret at runtime.
+# Studio gives every connector a unique name, so each workspace supplies its own: from .env locally, from the workspace secrets declared in main.py on a deployed worker.
 SENTRY_CONNECTOR = connector_name("SENTRY_CONNECTOR_NAME")
 GITHUB_CONNECTOR = connector_name("GITHUB_CONNECTOR_NAME")
 
-SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_events", "search_issues"})
+SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_errors", "search_issues"})
 GITHUB_ALLOWED_TOOLS = frozenset(
     {
         "get_commit",
@@ -418,46 +416,32 @@ GITHUB_ALLOWED_TOOLS = frozenset(
         "search_repositories",
     }
 )
-# Order resolves tool-name collisions: Sentry wins over GitHub.
 CONNECTOR_ALLOWED_TOOLS = {SENTRY_CONNECTOR: SENTRY_ALLOWED_TOOLS, GITHUB_CONNECTOR: GITHUB_ALLOWED_TOOLS}
-ALLOWED_TOOLS = frozenset().union(*CONNECTOR_ALLOWED_TOOLS.values())
-# Reading the bundled skills is the only runtime builtin the agent needs.
-ALLOWED_BUILTINS = frozenset({"skill.read"})
 
 
-def connector_tool_namespace(connector_name: str) -> str:
-    """Return the tool group the SDK assigns to a connector's MCP tools."""
-    safe_name = "".join(c if c.isalnum() else "_" for c in connector_name).strip("_")
-    return normalize_core_tool_identifier(f"connector_{safe_name or 'connector'}")
+def connector_tool_ids(connector: str, tools: frozenset[str]) -> list[str]:
+    """Return the stable tool IDs of these tools of one connector: `connector_<connector>.<tool>`.
 
-
-# Allowed tool names keyed by tool group, normalized the way the SDK reports them in hook calls.
-ALLOWED_BY_TOOL_GROUP = {connector_tool_namespace(c): frozenset(normalize_core_tool_identifier(t) for t in tools) for c, tools in CONNECTOR_ALLOWED_TOOLS.items()}
-
-
-class ConnectorToolAllowlist(agents.Hook):
-    """Refuse every tool call outside the reviewed per-connector read-only set.
-
-    `Agent(enabled_tools=...)` only filters runtime builtins; connector MCP tools reach the model unfiltered, so this hook is the enforcement point.
-    Workflow sessions reject hooks with instance state, so the allowlist lives at module level.
+    The namespace binds each tool to the connector it was reviewed for, so a same-named tool of another connector stays denied.
     """
+    return [f"connector_{connector}.{tool}" for tool in sorted(tools)]
 
-    async def pre_tool_call(self, ctx: agents.Context, call: PreToolCallHookInvocation) -> agents.PreToolCallHookContinue | agents.PreToolCallHookSkip:
-        """Let an allowed call run with its original arguments, and answer any other call with a refusal."""
-        tool = call.tool_call.call
-        if isinstance(tool, ProvidedToolCall) and tool.tool_name in ALLOWED_BY_TOOL_GROUP.get(tool.group_name, ()):
-            return agents.PreToolCallHookContinue(effective_arguments=tool.arguments)
-        if isinstance(tool, RuntimeBuiltinToolCall) and tool.name in ALLOWED_BUILTINS:
-            return agents.PreToolCallHookContinue(effective_arguments=tool.arguments)
-        name = tool.tool_name if isinstance(tool, ProvidedToolCall) else tool.name
-        return agents.PreToolCallHookSkip(reason=[TextContentBlock(text=f"[refused] {name} is not available.")])
+
+READ_ONLY_POLICY = agents.PermissionPolicy(
+    default="deny",
+    rules=[
+        # The skill tool loads the bundled skills, and the policy checks it like any other tool.
+        agents.PermissionRule(tools=["skill.read"], decision="allow"),
+        agents.PermissionRule(tools=[p for c, tools in CONNECTOR_ALLOWED_TOOLS.items() for p in connector_tool_ids(c, tools)], decision="allow"),
+    ],
+)
 ```
 
-The hook keeps its allowlist at module level on purpose: workflow sessions reject hooks that hold instance state.
+A rule matches the stable tool ID, `<namespace>.<name>`, not the name the model sees. For a connector tool, the ID is `connector_<connector name>.<tool name>`, such as `connector_sentry_d183.search_issues`.
 
 ### 3.5 Define the agent
 
-Create `agent/main.py`. It wires everything together: the model, an iteration limit, the instructions, the connectors (in allowlist order), the hook and the skill bundles.
+Create `agent/main.py`. It wires everything together: the model, an iteration limit, the instructions, the connectors, the permission policy and the skill bundles.
 
 ```bash
 touch agent/main.py
@@ -472,7 +456,7 @@ from pathlib import Path
 
 from mistralai.agents import agents
 
-from tool_allowlist import ALLOWED_TOOLS, CONNECTOR_ALLOWED_TOOLS, ConnectorToolAllowlist
+from tool_allowlist import CONNECTOR_ALLOWED_TOOLS, READ_ONLY_POLICY
 
 ROOT = Path(__file__).parent
 
@@ -483,66 +467,29 @@ agent = agents.Agent(
     description="Answers Slack engineering investigation questions with read-only Sentry and GitHub tools.",
     max_iterations=32,
     instructions=(ROOT / "instructions.md").read_text(),
-    # Matches no runtime builtin, so file system, bash and process tools are all disabled.
-    enabled_tools=sorted(ALLOWED_TOOLS),
-    harness=agents.Harness(
-        # Read-only connectors configured in the Studio workspace.
-        connectors=[agents.connector(name, run_as="auto", auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
-        # Refuses any connector tool that tool_allowlist.py has not reviewed.
-        hooks=[ConnectorToolAllowlist()],
-        # Each folder in skills/ is a skill bundle shipped with the agent.
-        local_skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
-    ),
+    # No subagents. Connectors need programmatic tool calling, so it stays on; the permission policy covers those calls too.
+    builtins=agents.Builtins(subagents=False),
+    # A served agent ships its skills as sandbox files. access="none" holds them without giving the model any file or shell tool.
+    sandbox=agents.BashkitSandbox(access="none"),
+    # Read-only connectors configured in the Studio workspace.
+    connectors=[agents.connector(name, auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
+    # Denies any tool call that tool_allowlist.py has not reviewed.
+    permission_policy=READ_ONLY_POLICY,
+    # Each folder in skills/ is a skill bundle shipped with the agent.
+    skills=[agents.LocalSkillBundle.from_directory(path) for path in sorted((ROOT / "skills").iterdir())],
+    # A deployed worker has no .env: it gets the connector names from these workspace secrets.
+    secrets={
+        "SENTRY_CONNECTOR_NAME": agents.MistralSecret.workspace("sentry_connector_name", worker_env=True),
+        "GITHUB_CONNECTOR_NAME": agents.MistralSecret.workspace("github_connector_name", worker_env=True),
+    },
 )
 ```
 
 The name `investigation-agent-runtime` matters: the workflow opens sessions on the agent by this name in Step 5.
 
-### 3.6 Add a terminal client
+### 3.6 Check that the agent loads
 
-Create `agent/ask.py`. It's a small Session API client for asking the agent a question from your terminal: it prints a line for each tool call as the agent investigates, then the answer. It isn't part of the deployed agent, and you'll only use it for local testing.
-
-```bash
-touch agent/ask.py
-```
-
-**`agent/ask.py`**
-
-```python
-"""Ask the agent one question over the Session API and print the reply. Run it while `agents serve` is up."""
-
-import asyncio
-import os
-import sys
-
-from mistralai.agents import agents
-from mistralai.vibe.harness.app_server.session import HistoryEntryCompletedEvent, MessageHistoryEntry, TextContentBlock
-
-DEFAULT_QUESTION = "What's causing the latest ValueError in Sentry, and which code is responsible?"
-
-
-async def main(question: str) -> None:
-    # Same name `agents serve` used, falling back to the deployed agent.
-    agent = agents.Agent.load_from(agent_name=os.environ.get("INVESTIGATION_AGENT_NAME", "").strip() or "investigation-agent-runtime")
-    async with await agent.create_session() as session:
-        async for event in session.run_turn([TextContentBlock(text=question)]):
-            if not isinstance(event.payload, HistoryEntryCompletedEvent):
-                continue
-            entry = event.payload.entry
-            # Tool calls and results have no role; show their kind so you can follow the investigation.
-            if isinstance(entry, MessageHistoryEntry) and entry.role == "assistant":
-                print("\n" + "".join(block.text for block in entry.content if isinstance(block, TextContentBlock)))
-            elif not isinstance(entry, MessageHistoryEntry):
-                print(f"[{type(entry).__name__}]", flush=True)
-
-
-if __name__ == "__main__":
-    asyncio.run(main(" ".join(sys.argv[1:]) or DEFAULT_QUESTION))
-```
-
-### 3.7 Check that the agent loads
-
-`agents info` imports `main.py` and prints what the CLI resolved: the name, model, connectors, hook and skills. Run it from `agent/`, loading `.env` so the connector names are set:
+`agents info` imports `main.py` and prints what the CLI resolved: the name, model, connectors, skills and permission policy. Run it from `agent/`, loading `.env` so the connector names are set:
 
 ```bash
 cd agent
@@ -550,24 +497,32 @@ uv run --env-file ../.env agents info
 cd ..
 ```
 
-You should see output like this, with your own connector names under `connectors`:
+You should see output like this, with your own connector names under `connectors` and in the permission policy:
 
 ```text
 agent: investigation-agent-runtime
   model: mistral-large-4
   description: Answers Slack engineering investigation questions with read-only Sentry and Git…
   instructions: [ROLE] You are an engineering investigation assistant in a Slack thread. Answer…
-  builtin tools: find_organizations, find_projects, get_commit, get_file_contents, get_latest_release, get_release_by_tag, get_sentry_resource, get_tag, issue_read, list_branches, list_commits, list_issues, list_pull_requests, list_releases, list_tags, pull_request_read, search_code, search_commits, search_events, search_issues, search_pull_requests, search_repositories
-  sandbox: none
+  sandbox access: none
+  sandbox: executable
   tools: (none)
   connectors:
-    - github_app
+    - github_7a2f
     - sentry_d183
+  mcps: (none)
   skills:
     - query-github: Read GitHub code, commits, pull requests, issues, and releases, and tie an erro…
     - query-sentry: Query Sentry issues, events, stack traces, releases, environments, and tags for…
-  hooks:
-    - ConnectorToolAllowlist
+  guardrails: (none)
+  hooks: (none)
+  subagents: (none)
+  subagent policy: (none)
+  permission mode: auto
+  permission policy:
+    - skill.read: allow
+    - connector_sentry_d183.find_organizations, connector_sentry_d183.find_projects, connector_sentry_d183.get_sentry_resource, connector_sentry_d183.search_errors, connector_sentry_d183.search_issues, connector_github_7a2f.get_commit, connector_github_7a2f.get_file_contents, connector_github_7a2f.get_latest_release, connector_github_7a2f.get_release_by_tag, connector_github_7a2f.get_tag, connector_github_7a2f.issue_read, connector_github_7a2f.list_branches, connector_github_7a2f.list_commits, connector_github_7a2f.list_issues, connector_github_7a2f.list_pull_requests, connector_github_7a2f.list_releases, connector_github_7a2f.list_tags, connector_github_7a2f.pull_request_read, connector_github_7a2f.search_code, connector_github_7a2f.search_commits, connector_github_7a2f.search_pull_requests, connector_github_7a2f.search_repositories: allow
+    - anything else: deny
 ```
 
 The first run installs the dependencies and writes `agent/uv.lock`. If `agents info` reports `SENTRY_CONNECTOR_NAME is not set`, go back to Step 1 and fill in `.env`.
@@ -638,16 +593,16 @@ cd agent
 uv run --env-file ../.env sh -c 'unset DEPLOYMENT_NAME; exec agents serve . --name "$INVESTIGATION_AGENT_NAME"'
 ```
 
-Leave it running. In a second terminal, from the repository root, ask the default question (*"What's causing the latest ValueError in Sentry, and which code is responsible?"*):
+Leave it running. In a second terminal, from the repository root, open a chat with the agent that `agents serve` runs. If you changed `INVESTIGATION_AGENT_NAME`, use that name:
 
 ```bash
 cd agent
-uv run --env-file ../.env python ask.py
+uv run --env-file ../.env agents chat investigation-agent-dev
 ```
 
-To ask something else, pass the question as arguments: `uv run --env-file ../.env python ask.py "Which Sentry issues are new today?"`.
+Ask *"What's causing the latest ValueError in Sentry, and which code is responsible?"*. To send one question and exit, add it with `-m`: `agents chat investigation-agent-dev -m "Which Sentry issues are new today?"`. Press `Ctrl+D` to end the chat.
 
-You'll see a line for each step of the investigation, such as `[ToolCallHistoryEntry]` and `[ToolResultHistoryEntry]`, then the answer. The agent should find the issue, follow the stack trace to `parse_amount` in `sample-app/pricing.py` on GitHub, and explain that it assumes whole-dollar prices, so `"12.50"` can't be parsed.
+You'll see each tool call as the agent investigates, then the answer. The agent should find the issue, follow the stack trace to `parse_amount` in `sample-app/pricing.py` on GitHub, and explain that it assumes whole-dollar prices, so `"12.50"` can't be parsed.
 
 You can also open the session in Studio under **Agent sessions** to see every message and tool call.
 
@@ -679,7 +634,7 @@ touch workflow/pyproject.toml
 name = "investigation-agent-workflow"
 version = "0.1.0"
 requires-python = "==3.12.*"
-dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[sessions-client]==1.1.0rc8", "mistralai-workflows==3.15.0", "pydantic>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
+dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[sessions-client]==1.1.0rc14", "mistralai-workflows>=3.16.0,<4", "pydantic>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
 [tool.uv]
 prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
@@ -726,9 +681,10 @@ class ThreadState(BaseModel):
 
     channel: str = ""
     thread_ts: str = ""
-    # Agent Session reused for every turn of the thread, and when it was created.
+    # Agent Session reused for every turn of the thread, when it was created, and when its last turn ended.
     session_id: str | None = None
     session_at: datetime | None = None
+    last_turn_at: datetime | None = None
     # Tags received while a turn was running; they are answered together in the next turn.
     pending: list[SlackRequest] = Field(default_factory=list)
     # Recent message and reply timestamps, used to drop duplicate tags and to keep them out of the context.
@@ -983,8 +939,8 @@ async def remove_reaction(request: SlackRequest) -> None:
 
 Create `workflow/activities/agent.py`, which talks to the agent:
 
-- `create_session` opens an Agent Session on `investigation-agent-runtime`, or on your local agent when `INVESTIGATION_AGENT_NAME` is set.
-- `run_session_turn` runs one turn and returns the final assistant message. The `turn_id` is an idempotency key, so a retried activity never starts a second turn.
+- `create_session` starts an Agent Session on `investigation-agent-runtime`, or on your local agent when `INVESTIGATION_AGENT_NAME` is set. Its idempotency key makes a retry return the same session.
+- `run_session_turn` runs one turn and returns the final assistant message. The `turn_id` is an idempotency key, so a retried activity waits on the same turn and never starts a second one.
 
 ```bash
 touch workflow/activities/agent.py
@@ -993,56 +949,51 @@ touch workflow/activities/agent.py
 **`workflow/activities/agent.py`**
 
 ```python
-"""Agent Session activities: create a session on the agent runtime and run one turn in it."""
+"""Agent Session activities: start a session on the agent runtime and run one turn in it."""
 
 import os
 from datetime import timedelta
 
 import mistralai.workflows as workflows
 from mistralai.agents import agents
-from mistralai.vibe.harness.app_server.session import CallbackOpenedEvent, MessageHistoryEntry, SessionTerminatedEvent, TextContentBlock, TurnTerminatedEvent
 
 # The deployed agent's name, which must match agent/main.py. Set INVESTIGATION_AGENT_NAME to reach a local `agents serve` agent instead.
 DEPLOYED_AGENT_NAME = "investigation-agent-runtime"
 AGENT_NAME = os.environ.get("INVESTIGATION_AGENT_NAME", "").strip() or DEPLOYED_AGENT_NAME
+# Shorter than the activity timeout, so a slow turn ends the wait cleanly and the retry waits on the same turn.
+TURN_WAIT_SECONDS = 10 * 60
 
 
-def agent_api() -> tuple[str, str]:
-    """Return the Agents control plane URL and the API key used to reach it."""
-    url = os.environ.get("AGENTS_SDK_DEPLOY_CONTROL_PLANE_URL", "https://api.mistral.ai/v2/agents").rstrip("/")
-    return url, os.environ["INVESTIGATION_AGENT_MISTRAL_API_KEY"].strip()
+def agents_client() -> agents.Client:
+    """Build a client with the Mistral API key the workflow opens Agent Sessions with. The SDK finds the Agents control plane itself."""
+    return agents.Client(api_key=os.environ["INVESTIGATION_AGENT_MISTRAL_API_KEY"].strip())
 
 
-@workflows.activity(start_to_close_timeout=timedelta(seconds=45), retry_policy_max_attempts=1)
-async def create_session() -> str:
-    """Create a new Agent Session and return its ID. The thread workflow reuses it for every turn."""
-    url, key = agent_api()
-    async with await agents.Agent.load_from(agent_name=AGENT_NAME, server_url=url, api_key=key).create_session() as session:
-        return session.session_id
+@workflows.activity(start_to_close_timeout=timedelta(seconds=45), retry_policy_max_attempts=3)
+async def create_session(idempotency_key: str) -> str:
+    """Start a new Agent Session and return its ID. A retry with the same key returns the same session."""
+    async with agents_client() as client:
+        session = await agents.Agent.load_from(agent_name=AGENT_NAME, client=client).start_session(idempotency_key=idempotency_key)
+        return session.id
 
 
-@workflows.activity(start_to_close_timeout=timedelta(minutes=12), retry_policy_max_attempts=2)
+@workflows.activity(start_to_close_timeout=timedelta(minutes=12), retry_policy_max_attempts=3)
 async def run_session_turn(session_id: str, turn_id: str, prompt: str) -> str:
     """Run one turn in an existing session and return the final assistant text of that turn.
 
-    `turn_id` is the idempotency key, so a replayed activity does not start a second turn.
+    `turn_id` is the idempotency key, so a retried activity waits on the same turn instead of starting a second one.
     """
-    url, key = agent_api()
-    async with await agents.Agent.load_session(session_id, server_url=url, api_key=key) as session:
-        async for event in session.run_turn([TextContentBlock(text=prompt)], idempotency_key=turn_id):
-            # A workflow cannot answer callbacks, so a callback or a dead session fails the turn.
-            if isinstance(event.payload, CallbackOpenedEvent | SessionTerminatedEvent):
-                raise RuntimeError(f"Agent turn stopped: {type(event.payload).__name__}")
-            if isinstance(event.payload, TurnTerminatedEvent):
-                done = event.payload.turn
-                if done.termination is None or done.termination.outcome != "completed":
-                    raise RuntimeError("Agent turn did not complete")
-                # Keep only the last assistant message of this turn: earlier ones are intermediate tool-calling steps.
-                items = session.state.history.items if session.state.history else []
-                mine = [e for e in items if isinstance(e, MessageHistoryEntry) and e.role == "assistant" and e.turn_id == done.id]
-                last = max(mine, key=lambda e: e.index, default=None)
-                return "".join(b.text for b in last.content if isinstance(b, TextContentBlock)).strip() if last else ""
-    raise RuntimeError("Agent event stream ended before the turn terminated")
+    async with agents_client() as client:
+        session = agents.Agent.load_from(agent_name=AGENT_NAME, client=client).session(session_id)
+        match await session.run(prompt, idempotency_key=turn_id, timeout=TURN_WAIT_SECONDS):
+            case agents.Completed(output):
+                return str(output or "").strip()
+            case agents.Running():
+                # The turn goes on. Fail this attempt so the retry waits on the same turn again.
+                raise RuntimeError("Agent turn is still running")
+            case state:
+                # A workflow cannot answer callbacks, so a blocked, interrupted or failed turn fails.
+                raise RuntimeError(f"Agent turn did not complete: {type(state).__name__}")
 ```
 
 Create `workflow/activities/routing.py`. `route_message` derives a stable execution ID from the Slack thread, sends the message to that thread's running workflow, and starts the workflow when none is running. It handles the race where two mentions arrive at the same time.
@@ -1151,8 +1102,9 @@ FAILED_TURN_REPLY = "I hit an error while investigating this. Tag me again to re
 FOOTER = "Tag me to interact in this thread."
 # Number of recent message timestamps kept for deduplication.
 KNOWN_TS_LIMIT = 200
-# Remote Agent Sessions expire after roughly 10 hours, well before the thread workflow does.
-SESSION_TTL = timedelta(hours=8)
+# A served or deployed Agent Session ends after 4 hours idle or 24 hours in total, so start a new one shortly before either limit.
+SESSION_MAX_IDLE = timedelta(hours=3, minutes=30)
+SESSION_MAX_AGE = timedelta(hours=23)
 
 
 class TriggerRequest(BaseModel, extra="allow"):
@@ -1242,21 +1194,31 @@ class InvestigationThread:
     async def run_turn(self, batch: list[SlackRequest], latest: SlackRequest, turn_id: str) -> str:
         """Run the agent turn and return the Slack-formatted answer, or an error reply if any step failed."""
         try:
-            # Start a new session if there is none yet or it is about to expire; the new session must re-read the whole thread.
-            if not self.state.session_id or not self.state.session_at or workflow.now() - self.state.session_at > SESSION_TTL:
-                self.state.session_id, self.state.session_at, self.state.context_cursor_ts = await create_session(), workflow.now(), None
+            session_id = await self.session_for(turn_id)
             # The batch tags are already in the prompt; an existing session has also seen every known tag and reply.
             skip = self.state.known_ts if self.state.context_cursor_ts else [r.message_ts for r in batch]
             context = await read_context(self.state, skip)
             texts = [await expand_permalinks(r.text) for r in batch]
-            text = await run_session_turn(self.state.session_id, turn_id, turn_prompt(texts, context))
+            text = await run_session_turn(session_id, turn_id, turn_prompt(texts, context))
         except workflows.ActivityError as error:
             # Drop the session so the next tag starts clean, and tell the user to retry.
             logger.warning("investigation_agent_turn_failed", error_type=type(error.__cause__).__name__)
             self.state.session_id = None
             return FAILED_TURN_REPLY
         self.state.context_cursor_ts = max([m.ts for m in context] + [r.message_ts for r in batch], key=ts_key)
+        self.state.last_turn_at = workflow.now()
         return agent_reply_text(text)
+
+    async def session_for(self, turn_id: str) -> str:
+        """Return the thread's Agent Session, or start a new one if there is none yet or it is close to its idle or lifetime limit."""
+        state, now = self.state, workflow.now()
+        last_active = state.last_turn_at or state.session_at
+        if state.session_id and state.session_at and last_active and now - state.session_at <= SESSION_MAX_AGE and now - last_active <= SESSION_MAX_IDLE:
+            return state.session_id
+        session_id = await create_session(f"investigation-session-{turn_id}")
+        # The new session has seen nothing, so the next turn re-reads the whole thread.
+        state.session_id, state.session_at, state.last_turn_at, state.context_cursor_ts = session_id, now, None, None
+        return session_id
 ```
 
 A few behaviours worth knowing:
@@ -1264,7 +1226,7 @@ A few behaviours worth knowing:
 - The thread workflow receives new tags through the `message` **update**. Duplicate tags are dropped using the timestamps in `known_ts`.
 - Reactions and replies are best-effort: if Slack fails, the workflow logs a warning and keeps going, so the next tag still gets answered.
 - If a turn fails, the user gets *"I hit an error while investigating this. Tag me again to retry."*, and the next tag starts a fresh session.
-- Agent sessions expire after about 10 hours, so the workflow starts a new one after 8 hours and replays the thread into it.
+- A deployed agent session ends after 4 hours idle or 24 hours in total. The workflow starts a new session shortly before either limit (after 3.5 hours idle or 23 hours in total) and replays the thread into it.
 
 ### 5.6 Add the worker
 
@@ -1444,7 +1406,7 @@ git push
 
 ### 11.2 Create the workspace secrets
 
-Deployed services have no `.env`. They read their settings from workspace secrets, which you bind to environment variables at deploy time. In Studio, open **Secrets** and create these four:
+Deployed services have no `.env`. They read their settings from workspace secrets, which become environment variables of the running service. In Studio, open **Secrets** and create these four:
 
 | Secret name | Value | Used by |
 |---|---|---|
@@ -1453,7 +1415,7 @@ Deployed services have no `.env`. They read their settings from workspace secret
 | `sentry_connector_name` | The same Sentry connector name as in `.env` | Agent |
 | `github_connector_name` | The same GitHub connector name as in `.env` | Agent |
 
-The names are up to you, but the commands and steps below use these.
+The agent's two secret names are set in `agent/main.py` (`secrets=`). If you choose other names, change them there. The workflow secrets are bound in Step 11.4.
 
 ### 11.3 Deploy the agent
 
@@ -1461,14 +1423,12 @@ Always deploy the agent before the workflows, because the workflows open session
 
 ```bash
 cd agent
-uv run --env-file ../.env agents deploy . \
-  --secret-binding SENTRY_CONNECTOR_NAME=secret:workspace:sentry_connector_name \
-  --secret-binding GITHUB_CONNECTOR_NAME=secret:workspace:github_connector_name
+uv run --env-file ../.env agents deploy .
 cd ..
 ```
 
 - `--env-file` loads `MISTRAL_API_KEY` and the connector names, which the CLI reads from the environment when it imports `main.py`.
-- Each `--secret-binding` sets an environment variable in the running agent from a workspace secret. **Pass both bindings on every deploy**: a deploy without them unbinds the secrets, and the agent fails to start.
+- `secrets=` in `agent/main.py` declares the two connector-name secrets, so every deploy binds them as environment variables of the running agent. You pass no extra option.
 - Because the agent uses connectors on behalf of the session user, `agents deploy` hardens the deployment automatically.
 
 The command waits for the worker to start. If it fails, it prints the rollout error and the worker's last output.
@@ -1499,7 +1459,7 @@ Use these steps to ship changes and remove everything you created.
 When you run locally, restart the agent and the worker from Step 8 to pick up your changes. When you've deployed:
 
 1. Commit and push.
-2. Redeploy the agent with the command from Step 11.3, including both `--secret-binding` options.
+2. Redeploy the agent with the command from Step 11.3.
 3. In Studio, open your workflow deployment and click **Redeploy**.
 
 Keep this order. Before you change which activities a workflow calls, or the order it calls them in, wait for running thread workflows to finish (they exit after a day without tags): a running execution replayed against different code can fail.
@@ -1530,7 +1490,7 @@ Shutting down the deployed agent also deletes its managed worker. Then, in Studi
 These are the most common problems and how to fix them.
 
 **`SENTRY_CONNECTOR_NAME is not set` (or `GITHUB_CONNECTOR_NAME`)**
-Locally, fill in `.env` (Step 1) and run the command with `--env-file ../.env`. On a deployed agent, redeploy with both `--secret-binding` options (Step 11.3).
+Locally, fill in `.env` (Step 1) and run the command with `--env-file ../.env`. On a deployed agent, check that the `sentry_connector_name` and `github_connector_name` workspace secrets exist (Step 11.2), then redeploy (Step 11.3).
 
 **`uv` can't find `mistralai-agents`, or returns `403 Forbidden`**
 An environment-level package index may be overriding PyPI. Run the command with `UV_DEFAULT_INDEX=https://pypi.org/simple`. If the release is filtered out by an `exclude-newer` policy, check that the `exclude-newer-package` block is in the `pyproject.toml`.
@@ -1548,7 +1508,7 @@ Check that the Sentry connector and the API key belong to the same user, that th
 The agent turn failed. Check that the agent is running (`agents serve` locally, or the agent deployment), that `INVESTIGATION_AGENT_MISTRAL_API_KEY` is a valid key for the user who connected the connectors, and open the session under **Agent sessions** in Studio to see where it stopped.
 
 **The agent deployment fails to start**
-Usually a missing secret binding. Read the error printed by `agents deploy`, and redeploy with both `--secret-binding` options.
+Usually a missing workspace secret. Read the error printed by `agents deploy`, create the missing secret (Step 11.2), and redeploy.
 
 ## Summary
 
@@ -1556,7 +1516,7 @@ This cookbook built a Slack bot that investigates production errors: you tag it 
 
 **What you built**
 
-- An agent built with the Agents SDK, with instructions, two skills, and a fail-closed hook that allows only reviewed read-only connector tools
+- An agent built with the Agents SDK, with instructions, two skills, and a fail-closed permission policy that allows only reviewed read-only connector tools
 - A router workflow that turns each Slack mention into work for the right thread
 - A per-thread workflow that keeps one agent session per Slack thread, batches tags, and replies in the thread
 - A webhook trigger with a filter that starts the router only for human app mentions
