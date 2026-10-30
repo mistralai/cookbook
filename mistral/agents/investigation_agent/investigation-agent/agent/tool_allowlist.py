@@ -17,7 +17,7 @@ def connector_name(env_var: str) -> str:
 SENTRY_CONNECTOR = connector_name("SENTRY_CONNECTOR_NAME")
 GITHUB_CONNECTOR = connector_name("GITHUB_CONNECTOR_NAME")
 
-SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_events", "search_issues"})
+SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_errors", "search_issues"})
 GITHUB_ALLOWED_TOOLS = frozenset(
     {
         "get_commit",

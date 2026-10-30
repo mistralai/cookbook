@@ -394,7 +394,7 @@ def connector_name(env_var: str) -> str:
 SENTRY_CONNECTOR = connector_name("SENTRY_CONNECTOR_NAME")
 GITHUB_CONNECTOR = connector_name("GITHUB_CONNECTOR_NAME")
 
-SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_events", "search_issues"})
+SENTRY_ALLOWED_TOOLS = frozenset({"find_organizations", "find_projects", "get_sentry_resource", "search_errors", "search_issues"})
 GITHUB_ALLOWED_TOOLS = frozenset(
     {
         "get_commit",
@@ -519,7 +519,7 @@ agent: investigation-agent-runtime
   permission mode: auto
   permission policy:
     - skill.read: allow
-    - connector_sentry_d183.*_find_organizations, connector_sentry_d183.*_find_projects, connector_sentry_d183.*_get_sentry_resource, connector_sentry_d183.*_search_events, connector_sentry_d183.*_search_issues, connector_github_7a2f.*_get_commit, connector_github_7a2f.*_get_file_contents, connector_github_7a2f.*_get_latest_release, connector_github_7a2f.*_get_release_by_tag, connector_github_7a2f.*_get_tag, connector_github_7a2f.*_issue_read, connector_github_7a2f.*_list_branches, connector_github_7a2f.*_list_commits, connector_github_7a2f.*_list_issues, connector_github_7a2f.*_list_pull_requests, connector_github_7a2f.*_list_releases, connector_github_7a2f.*_list_tags, connector_github_7a2f.*_pull_request_read, connector_github_7a2f.*_search_code, connector_github_7a2f.*_search_commits, connector_github_7a2f.*_search_pull_requests, connector_github_7a2f.*_search_repositories: allow
+    - connector_sentry_d183.*_find_organizations, connector_sentry_d183.*_find_projects, connector_sentry_d183.*_get_sentry_resource, connector_sentry_d183.*_search_errors, connector_sentry_d183.*_search_issues, connector_github_7a2f.*_get_commit, connector_github_7a2f.*_get_file_contents, connector_github_7a2f.*_get_latest_release, connector_github_7a2f.*_get_release_by_tag, connector_github_7a2f.*_get_tag, connector_github_7a2f.*_issue_read, connector_github_7a2f.*_list_branches, connector_github_7a2f.*_list_commits, connector_github_7a2f.*_list_issues, connector_github_7a2f.*_list_pull_requests, connector_github_7a2f.*_list_releases, connector_github_7a2f.*_list_tags, connector_github_7a2f.*_pull_request_read, connector_github_7a2f.*_search_code, connector_github_7a2f.*_search_commits, connector_github_7a2f.*_search_pull_requests, connector_github_7a2f.*_search_repositories: allow
     - anything else: deny
 ```
 
