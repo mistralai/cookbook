@@ -28,6 +28,8 @@ graph LR
 
 Intercom's 14-day free trial and a free Slack workspace are enough to run the whole thing.
 
+This cookbook walks you through creating every file. You can view [the complete project on GitHub](https://github.com/mistralai/cookbook/tree/main/mistral/agents/slack_triage_workflow/slack-triage-workflow).
+
 ## Prerequisites
 
 To complete this cookbook, you will need:
