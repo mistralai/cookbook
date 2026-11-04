@@ -497,32 +497,36 @@ uv run --env-file ../.env agents info
 cd ..
 ```
 
-You should see output like this, with your own connector names under `connectors` and in the permission policy:
+You should see output like this, with your own connector names under `connectors` and in the permission rules:
 
 ```text
-agent: investigation-agent-runtime
-  model: mistral-large-4
-  description: Answers Slack engineering investigation questions with read-only Sentry and Git…
-  instructions: [ROLE] You are an engineering investigation assistant in a Slack thread. Answer…
-  sandbox access: none
-  sandbox: executable
-  tools: (none)
-  connectors:
-    - github_7a2f
-    - sentry_d183
-  mcps: (none)
-  skills:
-    - query-github: Read GitHub code, commits, pull requests, issues, and releases, and tie an erro…
-    - query-sentry: Query Sentry issues, events, stack traces, releases, environments, and tags for…
-  guardrails: (none)
-  hooks: (none)
-  subagents: (none)
-  subagent policy: (none)
-  permission mode: auto
-  permission policy:
-    - skill.read: allow
-    - connector_sentry_d183.find_organizations, connector_sentry_d183.find_projects, connector_sentry_d183.get_sentry_resource, connector_sentry_d183.search_errors, connector_sentry_d183.search_issues, connector_github_7a2f.get_commit, connector_github_7a2f.get_file_contents, connector_github_7a2f.get_latest_release, connector_github_7a2f.get_release_by_tag, connector_github_7a2f.get_tag, connector_github_7a2f.issue_read, connector_github_7a2f.list_branches, connector_github_7a2f.list_commits, connector_github_7a2f.list_issues, connector_github_7a2f.list_pull_requests, connector_github_7a2f.list_releases, connector_github_7a2f.list_tags, connector_github_7a2f.pull_request_read, connector_github_7a2f.search_code, connector_github_7a2f.search_commits, connector_github_7a2f.search_pull_requests, connector_github_7a2f.search_repositories: allow
-    - anything else: deny
+investigation-agent-runtime  mistral-large-4
+
+  description      Answers Slack engineering investigation questions with read-only Sentry and Git…
+  instructions     [ROLE] You are an engineering investigation assistant in a Slack thread. Answer…
+  sandbox          executable · access none
+  tools            (none)
+
+  connectors
+    sentry_d183   auto_auth off
+    github_7a2f   auto_auth off
+
+  mcps             (none)
+
+  skills
+    query-github   Read GitHub code, commits, pull requests, issues, and releases, and tie an erro…
+    query-sentry   Query Sentry issues, events, stack traces, releases, environments, and tags for…
+
+  guardrails       (none)
+  hooks            (none)
+  subagents        (none)
+  subagent policy  (none)
+  permissions      auto
+
+  permission rules
+    skill.read   allow
+    connector_sentry_d183.find_organizations, connector_sentry_d183.find_projects, connector_sentry_d183.get_sentry_resource, connector_sentry_d183.search_errors, connector_sentry_d183.search_issues, connector_github_7a2f.get_commit, connector_github_7a2f.get_file_contents, connector_github_7a2f.get_latest_release, connector_github_7a2f.get_release_by_tag, connector_github_7a2f.get_tag, connector_github_7a2f.issue_read, connector_github_7a2f.list_branches, connector_github_7a2f.list_commits, connector_github_7a2f.list_issues, connector_github_7a2f.list_pull_requests, connector_github_7a2f.list_releases, connector_github_7a2f.list_tags, connector_github_7a2f.pull_request_read, connector_github_7a2f.search_code, connector_github_7a2f.search_commits, connector_github_7a2f.search_pull_requests, connector_github_7a2f.search_repositories   allow
+    anything else   deny
 ```
 
 The first run installs the dependencies and writes `agent/uv.lock`. If `agents info` reports `SENTRY_CONNECTOR_NAME is not set`, go back to Step 1 and fill in `.env`.
