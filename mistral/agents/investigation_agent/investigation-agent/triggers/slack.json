@@ -1,0 +1,3 @@
+{
+  "mention": "event.type == 'app_mention' && event.text && event.bot_id == null && event.subtype != 'bot_message'"
+}
