@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 4,
+  "requested": [
+    "mistralai-capabilities/backend/fastapi",
+    "mistralai-capabilities/backend/workflows",
+    "mistralai-capabilities/database/postgres",
+    "mistralai-capabilities/deployment/apps"
+  ],
+  "installed": [
+    {
+      "capability": "mistralai-capabilities/backend/fastapi",
+      "version": "0.1.61"
+    },
+    {
+      "capability": "mistralai-capabilities/backend/workflows",
+      "version": "0.1.61"
+    },
+    {
+      "capability": "mistralai-capabilities/base/core",
+      "version": "0.1.61"
+    },
+    {
+      "capability": "mistralai-capabilities/database/postgres",
+      "version": "0.1.61"
+    },
+    {
+      "capability": "mistralai-capabilities/deployment/apps",
+      "version": "0.1.61"
+    },
+    {
+      "capability": "mistralai-capabilities/deployment/apps-fastapi",
+      "version": "0.1.61"
+    },
+    {
+      "capability": "mistralai-capabilities/feature/fastapi-postgres",
+      "version": "0.1.61"
+    },
+    {
+      "capability": "mistralai-capabilities/feature/fastapi-workflows",
+      "version": "0.1.61"
+    }
+  ]
+}

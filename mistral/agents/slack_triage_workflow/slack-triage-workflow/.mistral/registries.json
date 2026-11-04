@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 4,
+  "registries": [
+    {
+      "id": "mistralai-capabilities",
+      "acquisition": {
+        "type": "url",
+        "url": "https://registry.npmjs.org/",
+        "npmPackage": "@mistralai-capabilities/registry"
+      }
+    }
+  ]
+}
