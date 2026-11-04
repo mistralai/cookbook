@@ -470,7 +470,7 @@ agent = agents.Agent(
     # No subagents. Connectors need programmatic tool calling, so it stays on; the permission policy covers those calls too.
     builtins=agents.Builtins(subagents=False),
     # A served agent ships its skills as sandbox files. access="none" holds them without giving the model any file or shell tool.
-    sandbox=agents.BashkitSandbox(access="none"),
+    environment=agents.BashkitSandbox(access="none"),
     # Read-only connectors configured in the Studio workspace.
     connectors=[agents.connector(name, auto_auth=False) for name in CONNECTOR_ALLOWED_TOOLS],
     # Denies any tool call that tool_allowlist.py has not reviewed.
