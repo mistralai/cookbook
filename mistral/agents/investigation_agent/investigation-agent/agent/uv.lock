@@ -356,7 +356,7 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "mistralai-agents", extras = ["bashkit"], specifier = "==1.1.0rc15" }]
+requires-dist = [{ name = "mistralai-agents", extras = ["bashkit"], specifier = "==1.1.0rc16" }]
 
 [[package]]
 name = "joserfc"
@@ -536,7 +536,7 @@ workflow-payload-compression = [
 
 [[package]]
 name = "mistralai-agents"
-version = "1.1.0rc15"
+version = "1.1.0rc16"
 source = { registry = "https://socket-registry.mistralai.com/pypi/simple/" }
 dependencies = [
     { name = "cachetools" },
@@ -554,9 +554,9 @@ dependencies = [
     { name = "typer" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://socket-registry.mistralai.com/pypi/packages/b1/e1/846be7c9315fbf678b160b6b2ac9ce31077e69adeb653333db4ec35305cf/mistralai_agents-1.1.0rc15.tar.gz", hash = "sha256:6d14a25b5a9778c751dc38506fd40fbceae22f5184240081f3ffa04599811398", size = 575122, upload-time = "2026-10-30T16:34:58.528Z" }
+sdist = { url = "https://socket-registry.mistralai.com/pypi/packages/32/a6/666ea2bcb97f1bc56449d0ba134a0c96582a69287d7aed72bad761ace40d/mistralai_agents-1.1.0rc16.tar.gz", hash = "sha256:f556b93423a71b9b8933cc4808543f78fac00023db191b19fe4878182162c86d", size = 610784, upload-time = "2026-11-03T16:13:22.276Z" }
 wheels = [
-    { url = "https://socket-registry.mistralai.com/pypi/packages/6b/84/0048cba49018b47421642c3feaecf1207c814cc7d390e947ba14410cd4c9/mistralai_agents-1.1.0rc15-py3-none-any.whl", hash = "sha256:dcca8b7f4e5f624220d475a10a3bd23fc4fd77422580228dde839c51567fa242", size = 611936, upload-time = "2026-10-30T16:34:56.376Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/cf/ff/075c4e5074c007c5ebb912d34883844eebfcdf6b2094e103adf45fcc54bd/mistralai_agents-1.1.0rc16-py3-none-any.whl", hash = "sha256:ab7c6c5c19e4f71558613e9ab73cb3be0b91922be5b98b6fdf98bf4ae497e159", size = 636262, upload-time = "2026-11-03T16:13:20.039Z" },
 ]
 
 [package.optional-dependencies]
@@ -580,7 +580,7 @@ wheels = [
 
 [[package]]
 name = "mistralai-vibe-harness"
-version = "0.1.14"
+version = "0.1.15"
 source = { registry = "https://socket-registry.mistralai.com/pypi/simple/" }
 dependencies = [
     { name = "httpx" },
@@ -593,11 +593,11 @@ dependencies = [
     { name = "tenacity" },
 ]
 wheels = [
-    { url = "https://socket-registry.mistralai.com/pypi/packages/ff/c0/c387ff9c6ba589c621bacb625a8f6c479ecea1cc7494e583fd67c4106f9b/mistralai_vibe_harness-0.1.14-cp312-abi3-macosx_10_12_x86_64.whl", hash = "sha256:4d6df95075fe68bd30f489742001947949e16ce8e04f87475cdbb61b011e6357", size = 23218485, upload-time = "2026-10-30T16:33:51.866Z" },
-    { url = "https://socket-registry.mistralai.com/pypi/packages/4f/70/25b7296dce7541724f5e0e62b4752d7b761b59613b14a5a9c6f21e4d2fde/mistralai_vibe_harness-0.1.14-cp312-abi3-macosx_11_0_arm64.whl", hash = "sha256:cb08eacebddf8b39d5044ea2902ebb638f231ab283bea374fbd04d2d0a6ca1c6", size = 21808776, upload-time = "2026-10-30T16:33:55.34Z" },
-    { url = "https://socket-registry.mistralai.com/pypi/packages/1b/87/7ac6cec414a0b2e8c7473c1322611d7f6d7b5170c7b96cf7ebfa8d4b58a1/mistralai_vibe_harness-0.1.14-cp312-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:887db04086cf3f1b3b37dfe1dfe696277817123caec241b96cb487694d2a8e62", size = 23147390, upload-time = "2026-10-30T16:33:58.745Z" },
-    { url = "https://socket-registry.mistralai.com/pypi/packages/c1/18/bda4fb3048ffaac69ca18f95d1315a01c3608effa4c7560324aa313fade0/mistralai_vibe_harness-0.1.14-cp312-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:207cb3b3e2ae6cd6b303bbce2681b1f479f1d83e0306602a2bc8263c06517a25", size = 24535950, upload-time = "2026-10-30T16:34:02.371Z" },
-    { url = "https://socket-registry.mistralai.com/pypi/packages/b0/22/f945b9edf9c5685bf747a7644f329e356fa181147b096f980d69a3eae8f2/mistralai_vibe_harness-0.1.14-cp312-abi3-win_amd64.whl", hash = "sha256:04ac1078ef1297c0f2f396ab1a2c5e90228718b2c255ce9a855cda41b735467a", size = 23947145, upload-time = "2026-10-30T16:34:05.925Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/9a/39/fb1ffaba1c07788922b4108d5426a27df66a244eb99f4aaa5da2d9a0f7f6/mistralai_vibe_harness-0.1.15-cp312-abi3-macosx_10_12_x86_64.whl", hash = "sha256:efcb801a6e04126bf35822fd318874aa5856e7cf775e26af8d9d8a3650a7a04b", size = 23257275, upload-time = "2026-11-03T16:11:31.267Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/01/55/a589bead196b127ae444a58990bb85ef5caa29a81a3305b41284a052ef0e/mistralai_vibe_harness-0.1.15-cp312-abi3-macosx_11_0_arm64.whl", hash = "sha256:913a513a35c3292a13ecc4b01a0d8f78b664866bbe741e95437a0d5a8fb6d0fb", size = 21850845, upload-time = "2026-11-03T16:11:34.428Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/d2/ea/aab049cf26090a28cc2cfcffadccac9655884ce6a4ea663a0e98129812b6/mistralai_vibe_harness-0.1.15-cp312-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:e7891b927d8947ce5d382676c855031803bd6d6aa7debd914ae36e06e0a580ce", size = 23200633, upload-time = "2026-11-03T16:11:37.861Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/3b/ce/2c890f35df18a5eecd680271038a366970e1f23f4429a0480406e359f1d3/mistralai_vibe_harness-0.1.15-cp312-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:e157e6ca0de403db50793bccaa2262ea3ebb48b18ceeccd9ba5de16505b3d7ff", size = 24579871, upload-time = "2026-11-03T16:11:40.985Z" },
+    { url = "https://socket-registry.mistralai.com/pypi/packages/0e/ca/46f81c5bd7a3feff23786b4cfeb15cb04ef92abb5da587db00ca4c5501c0/mistralai_vibe_harness-0.1.15-cp312-abi3-win_amd64.whl", hash = "sha256:2c4978cd302c18233b65efc55d4a62976b4fea1782764622ca253f38ec15f292", size = 23982570, upload-time = "2026-11-03T16:11:44.16Z" },
 ]
 
 [package.optional-dependencies]
