@@ -28,9 +28,10 @@ class ThreadState(BaseModel):
 
     channel: str = ""
     thread_ts: str = ""
-    # Agent Session reused for every turn of the thread, and when it was created.
+    # Agent Session reused for every turn of the thread, when it was created, and when its last turn ended.
     session_id: str | None = None
     session_at: datetime | None = None
+    last_turn_at: datetime | None = None
     # Tags received while a turn was running; they are answered together in the next turn.
     pending: list[SlackRequest] = Field(default_factory=list)
     # Recent message and reply timestamps, used to drop duplicate tags and to keep them out of the context.
