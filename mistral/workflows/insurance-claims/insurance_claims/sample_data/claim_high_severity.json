@@ -1,0 +1,9 @@
+{
+  "claim_id": "CLM-2024-001",
+  "claimant_name": "Maria Gonzalez",
+  "description": "I was stopped at a red light when a truck ran the intersection and T-boned my car at full speed. My airbags deployed and I was taken to hospital. The car is completely destroyed — I was told at the scene it looked like a total loss. The front and entire driver side are crushed.",
+  "photos": [
+    "src/worker/workflows/insurance_claims/sample_data/photos/claim_high_totaled_front.jpg",
+    "src/worker/workflows/insurance_claims/sample_data/photos/claim_high_totaled_side.jpg"
+  ]
+}

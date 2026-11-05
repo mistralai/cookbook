@@ -1,0 +1,8 @@
+{
+  "claim_id": "CLM-2024-002",
+  "claimant_name": "David Park",
+  "description": "Someone rear-ended me in a parking garage. There's a pretty big dent in the rear bumper and the tail-light looks cracked. The car drives okay but there is some rattling from the trunk area. No injuries.",
+  "photos": [
+    "src/worker/workflows/insurance_claims/sample_data/photos/claim_medium_dent_rear.jpg"
+  ]
+}
