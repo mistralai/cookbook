@@ -1,4 +1,4 @@
-"""Settings for expert matching: the models that read a CV and pick a role."""
+"""Settings for expert matching: the models that read a profile and pick a role."""
 
 from env._base import BaseEnv
 

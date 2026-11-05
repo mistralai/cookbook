@@ -55,7 +55,7 @@ class MatchResult(BaseModel):
 @workflows.workflow.define(
     name="match-expert",
     workflow_display_name="Match expert",
-    workflow_description="Read an expert's CV and pick the project role that suits the expert best.",
+    workflow_description="Read an expert's profile and pick the project role that suits the expert best.",
 )
 class MatchExpert:
     @workflows.workflow.entrypoint

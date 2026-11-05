@@ -59,12 +59,12 @@ async def _refresh(expert: Expert) -> Expert:
 
 @router.post("", status_code=status.HTTP_202_ACCEPTED)
 async def upload(file: UploadFile) -> ExpertOut:
-    """Upload an expert's CV as a PDF and start matching it to a role."""
+    """Upload an expert's profile as a PDF and start matching it to a role."""
     roles = await list_roles()
     if not roles:
         raise HTTPException(status.HTTP_409_CONFLICT, "Add a role first")
     uploaded = await mistral_client().files.upload_async(
-        file={"file_name": file.filename or "cv.pdf", "content": await file.read()},
+        file={"file_name": file.filename or "profile.pdf", "content": await file.read()},
         purpose="ocr",
     )
     run = await start_workflow(

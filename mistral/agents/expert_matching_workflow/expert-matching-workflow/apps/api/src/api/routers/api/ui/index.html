@@ -18,11 +18,11 @@
 </head>
 <body>
   <h1>Expert matching</h1>
-  <p>Upload an expert's CV. The agent reads it and picks the open role that suits the expert best.</p>
+  <p>Upload an expert's profile. The agent reads it and picks the open role that suits the expert best.</p>
 
   <form id="upload">
     <input type="file" name="file" accept="application/pdf" required>
-    <button>Upload CV</button>
+    <button>Upload profile</button>
     <span id="upload-status" class="muted"></span>
   </form>
 
@@ -58,7 +58,7 @@
     }
 
     function describe(expert) {
-      if (expert.status === "processing") return `<td>${escape(expert.file_name)}<br><span class="muted">Reading the CV…</span></td><td></td><td></td>`;
+      if (expert.status === "processing") return `<td>${escape(expert.file_name)}<br><span class="muted">Reading the profile…</span></td><td></td><td></td>`;
       if (expert.status === "failed") return `<td>${escape(expert.file_name)}<br><span class="error">Matching failed</span></td><td></td><td></td>`;
       const role = roles.find((r) => r.id === expert.role_id);
       const review = expert.review === "pending"
