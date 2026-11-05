@@ -1,8 +1,8 @@
-# Match experts to project roles from their CVs with Mistral Apps
+# Match experts to project roles from their profiles with Mistral Apps
 
-Build a Mistral App that reads an expert's CV, picks the open project role that suits the expert best, and explains why, so a reviewer can approve or decline the match.
+Build a Mistral App that reads an expert's profile, picks the open project role that suits the expert best, and explains why, so a reviewer can approve or decline the match.
 
-Staffing a project starts with reading CVs and comparing each one to the open roles. This cookbook builds a Mistral App that does the first pass. You upload a CV as a PDF in a small web page, and the `match-expert` workflow reads it with Mistral OCR. A document annotation turns the CV into a structured profile: name, headline, years of experience, skills, and a summary. `mistral-medium-latest` then compares the profile with the open roles and picks the best one, with a short reason. The page shows each match, and a reviewer approves or declines it.
+Staffing a project starts with reading expert profiles and comparing each one to the open roles. This cookbook builds a Mistral App that does the first pass. You upload an expert's profile as a PDF in a small web page, and the `match-expert` workflow reads it with Mistral OCR. A document annotation turns the PDF into a structured profile: name, headline, years of experience, skills, and a summary. `mistral-medium-latest` then compares the profile with the open roles and picks the best one, with a short reason. The page shows each match, and a reviewer approves or declines it.
 
 You'll build the app from the `mistral apps init` scaffold, which gives you three modules:
 
@@ -14,14 +14,14 @@ You'll build the app from the `mistral apps init` scaffold, which gives you thre
 
 The workflow uses two activities that ship with the Workflows plugin for Mistral, `mistralai_ocr` and `chat_parse_to_model`, so it needs no activities of its own.
 
-Here's how a CV flows through the system:
+Here's how a profile flows through the system:
 
 ```mermaid
 graph LR
-    Page["Web page at /api"] -->|uploads a CV| API["API: /api/v1/experts"]
+    Page["Web page at /api"] -->|uploads a profile| API["API: /api/v1/experts"]
     API -->|stores the PDF| Files["Files API"]
     API -->|starts| Workflow["match-expert workflow"]
-    Workflow -->|reads the CV| OCR["mistral-ocr-latest<br/>with a document annotation"]
+    Workflow -->|reads the profile| OCR["mistral-ocr-latest<br/>with a document annotation"]
     Workflow -->|picks a role| Model["mistral-medium-latest"]
     API -->|roles, experts, and reviews| DB["Managed Postgres"]
 ```
@@ -39,7 +39,7 @@ To complete this cookbook, you will need:
 - The `mistral` CLI with access to Mistral Apps
 - git, and a GitHub account with the Mistral GitHub app installed on the repository you'll push to. Deploys build from that repository.
 - A Mistral account with access to Studio and Workflows, and a Mistral API key from the workspace you'll deploy to
-- A CV as a PDF to try the app with
+- An expert profile as a PDF to try the app with
 
 ## Environment setup
 
@@ -167,7 +167,7 @@ Create the settings module:
 **`packages/py/env/src/env/matching.py`**
 
 ```python
-"""Settings for expert matching: the models that read a CV and pick a role."""
+"""Settings for expert matching: the models that read a profile and pick a role."""
 
 from env._base import BaseEnv
 
@@ -212,12 +212,12 @@ class Role(SQLModel, table=True):
     description: str
 ```
 
-Create the model for the `expert` table. Each row starts as an uploaded file with a workflow run. Once the run finishes, it holds the profile read from the CV, the matched role, and the reason. `review` records the reviewer's decision:
+Create the model for the `expert` table. Each row starts as an uploaded file with a workflow run. Once the run finishes, it holds the structured profile read from the PDF, the matched role, and the reason. `review` records the reviewer's decision:
 
 **`packages/py/db/src/db/models/expert.py`**
 
 ```python
-"""An uploaded CV, the profile read from it, and the role it was matched to."""
+"""An uploaded profile PDF, the structured profile read from it, and the role it was matched to."""
 
 from datetime import UTC, datetime
 
@@ -403,12 +403,12 @@ async def list_experts(limit: int = 50) -> list[Expert]:
 
 ## Step 4: Add the workflow
 
-The worker discovers every workflow class in `worker/workflows/`. The `match-expert` workflow takes the ID of an uploaded CV and the open roles, and runs two steps:
+The worker discovers every workflow class in `worker/workflows/`. The `match-expert` workflow takes the ID of an uploaded profile and the open roles, and runs two steps:
 
-1. `mistralai_ocr` reads the CV. Its `document_annotation_format` is the JSON schema of `ExpertProfile`, so the OCR response includes the profile as JSON in `document_annotation`. The field descriptions tell the model what to extract.
+1. `mistralai_ocr` reads the profile PDF. Its `document_annotation_format` is the JSON schema of `ExpertProfile`, so the OCR response includes the profile as JSON in `document_annotation`. The field descriptions tell the model what to extract.
 2. `chat_parse_to_model` sends the profile and the roles to the matching model and parses its answer into a `RoleMatch`.
 
-Both are activities from the Workflows plugin for Mistral. If the worker restarts after the OCR step, the run resumes without reading the CV again.
+Both are activities from the Workflows plugin for Mistral. If the worker restarts after the OCR step, the run resumes without reading the PDF again.
 
 **`apps/worker/src/worker/workflows/match_expert.py`**
 
@@ -470,7 +470,7 @@ class MatchResult(BaseModel):
 @workflows.workflow.define(
     name="match-expert",
     workflow_display_name="Match expert",
-    workflow_description="Read an expert's CV and pick the project role that suits the expert best.",
+    workflow_description="Read an expert's profile and pick the project role that suits the expert best.",
 )
 class MatchExpert:
     @workflows.workflow.entrypoint
@@ -504,7 +504,7 @@ The worker reaches the Mistral API with your `MISTRAL_API_KEY` on your machine. 
 
 ## Step 5: Add the API
 
-The API stores the roles, uploads CVs, starts the workflow, and records reviews. The scaffold mounts every router module under `routers/` at its folder path, so the files below serve `/api/v1/roles` and `/api/v1/experts`.
+The API stores the roles, uploads profiles, starts the workflow, and records reviews. The scaffold mounts every router module under `routers/` at its folder path, so the files below serve `/api/v1/roles` and `/api/v1/experts`.
 
 ### 5.1 Require the Apps gateway
 
@@ -568,7 +568,7 @@ async def create(body: NewRole) -> RoleOut:
 
 ### 5.3 Add the experts routes
 
-Create the routes that upload a CV, list the experts, and record a review:
+Create the routes that upload a profile, list the experts, and record a review:
 
 - `POST /api/v1/experts` uploads the PDF to the Files API with the `ocr` purpose, starts `match-expert` without waiting for it, and stores the expert with the run's execution ID.
 - `GET /api/v1/experts` lists the experts. For each one still processing, `_refresh` reads the run. When the run has finished, it stores the result, or marks the expert as failed, and deletes the PDF from the Files API.
@@ -638,12 +638,12 @@ async def _refresh(expert: Expert) -> Expert:
 
 @router.post("", status_code=status.HTTP_202_ACCEPTED)
 async def upload(file: UploadFile) -> ExpertOut:
-    """Upload an expert's CV as a PDF and start matching it to a role."""
+    """Upload an expert's profile as a PDF and start matching it to a role."""
     roles = await list_roles()
     if not roles:
         raise HTTPException(status.HTTP_409_CONFLICT, "Add a role first")
     uploaded = await mistral_client().files.upload_async(
-        file={"file_name": file.filename or "cv.pdf", "content": await file.read()},
+        file={"file_name": file.filename or "profile.pdf", "content": await file.read()},
         purpose="ocr",
     )
     run = await start_workflow(
@@ -727,7 +727,7 @@ async def page() -> str:
 
 ### 6.2 Add the page
 
-The page has an upload form, a table of experts with their best role and the review buttons, and the list of open roles with a form to add one. While any CV is still being read, it reloads the experts every three seconds:
+The page has an upload form, a table of experts with their best role and the review buttons, and the list of open roles with a form to add one. While any profile is still being read, it reloads the experts every three seconds:
 
 **`apps/api/src/api/routers/api/ui/index.html`**
 
@@ -752,11 +752,11 @@ The page has an upload form, a table of experts with their best role and the rev
 </head>
 <body>
   <h1>Expert matching</h1>
-  <p>Upload an expert's CV. The agent reads it and picks the open role that suits the expert best.</p>
+  <p>Upload an expert's profile. The agent reads it and picks the open role that suits the expert best.</p>
 
   <form id="upload">
     <input type="file" name="file" accept="application/pdf" required>
-    <button>Upload CV</button>
+    <button>Upload profile</button>
     <span id="upload-status" class="muted"></span>
   </form>
 
@@ -792,7 +792,7 @@ The page has an upload form, a table of experts with their best role and the rev
     }
 
     function describe(expert) {
-      if (expert.status === "processing") return `<td>${escape(expert.file_name)}<br><span class="muted">Reading the CV…</span></td><td></td><td></td>`;
+      if (expert.status === "processing") return `<td>${escape(expert.file_name)}<br><span class="muted">Reading the profile…</span></td><td></td><td></td>`;
       if (expert.status === "failed") return `<td>${escape(expert.file_name)}<br><span class="error">Matching failed</span></td><td></td><td></td>`;
       const role = roles.find((r) => r.id === expert.role_id);
       const review = expert.review === "pending"
@@ -895,16 +895,16 @@ curl -H "X-Api-Key: $MISTRAL_API_KEY" http://expert-matching-workflow.apps.local
 ]
 ```
 
-Upload a CV. Replace `cv.pdf` with the path to yours:
+Upload a profile. Replace `profile.pdf` with the path to yours:
 
 ```bash
-curl -H "X-Api-Key: $MISTRAL_API_KEY" -F "file=@cv.pdf" http://expert-matching-workflow.apps.localhost:8080/api/v1/experts
+curl -H "X-Api-Key: $MISTRAL_API_KEY" -F "file=@profile.pdf" http://expert-matching-workflow.apps.localhost:8080/api/v1/experts
 ```
 
 ```json
 {
   "id": 1,
-  "file_name": "cv.pdf",
+  "file_name": "profile.pdf",
   "status": "processing",
   "name": null,
   "headline": null,
@@ -924,13 +924,13 @@ After a few seconds, list the experts:
 curl -H "X-Api-Key: $MISTRAL_API_KEY" http://expert-matching-workflow.apps.localhost:8080/api/v1/experts
 ```
 
-The workflow has read the CV and picked a role. For a CV of a senior data engineer, the result looks like this:
+The workflow has read the profile and picked a role. For the profile of a senior data engineer, the result looks like this:
 
 ```json
 [
   {
     "id": 1,
-    "file_name": "cv.pdf",
+    "file_name": "profile.pdf",
     "status": "matched",
     "name": "Ana Duarte",
     "headline": "Senior data engineer at Northwind Logistics",
@@ -954,7 +954,7 @@ curl -H "X-Api-Key: $MISTRAL_API_KEY" -H "Content-Type: application/json" -d '{"
 
 The response is the expert with `"review": "approved"`. Each run also appears in **Studio > Workflows > match-expert**, with its input, the OCR result, and the model's answer.
 
-To use the page, open `http://expert-matching-workflow.apps.localhost:8080/api` in your browser and sign in with your Mistral account. Upload a CV, wait for the match, and approve or decline it.
+To use the page, open `http://expert-matching-workflow.apps.localhost:8080/api` in your browser and sign in with your Mistral account. Upload a profile, wait for the match, and approve or decline it.
 
 Stop `mistral apps dev` when you're done.
 
@@ -989,7 +989,7 @@ git push
 
 ## Step 10: Try the deployed app
 
-Open `https://<app-url>/api` in your browser, where `<app-url>` is the URL the deploy printed, and sign in with your Mistral account. Add your own open roles at the bottom of the page, then upload a CV. The match appears in the table once the deployed workflow has read the CV.
+Open `https://<app-url>/api` in your browser, where `<app-url>` is the URL the deploy printed, and sign in with your Mistral account. Add your own open roles at the bottom of the page, then upload a profile. The match appears in the table once the deployed workflow has read the profile.
 
 The API answers the same requests as on your machine. Replace `<app-url>` with your app's URL:
 
@@ -1007,22 +1007,22 @@ Commit and push, then run `mistral apps deploy` again. To change a table, add a 
 
 **Rules of thumb**
 
-- Never log CV text, profiles, or API keys. CVs hold personal data.
+- Never log profile text, extracted profiles, or API keys. Profiles hold personal data.
 - Keep model names in settings. They come only from `OCR_MODEL` and `MATCHING_MODEL`.
 - Treat a match as a suggestion. The review step is where a person decides.
 
 **Cleaning up**
 
-The API deletes each CV from the Files API once its run finishes. In Studio, delete the app and its worker deployment. Delete the GitHub repository if you no longer need it.
+The API deletes each profile PDF from the Files API once its run finishes. In Studio, delete the app and its worker deployment. Delete the GitHub repository if you no longer need it.
 
 ## Summary
 
-This cookbook built a Mistral App that matches experts to project roles: a workflow reads each uploaded CV with Mistral OCR and a document annotation, picks the best open role with a chat model, and a reviewer approves or declines the match in a web page.
+This cookbook built a Mistral App that matches experts to project roles: a workflow reads each uploaded profile with Mistral OCR and a document annotation, picks the best open role with a chat model, and a reviewer approves or declines the match in a web page.
 
 **What you built**
 
 - A Mistral App with a FastAPI API and a lightweight web page, on a managed Postgres database, behind the Apps gateway
-- A `match-expert` workflow that turns a CV into a structured profile and picks the best role with a short reason
+- A `match-expert` workflow that turns a profile PDF into a structured profile and picks the best role with a short reason
 - `role` and `expert` tables, with a migration that adds three sample roles
 
 **Mistral features used**

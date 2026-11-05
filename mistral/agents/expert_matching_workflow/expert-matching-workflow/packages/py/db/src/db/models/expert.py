@@ -1,4 +1,4 @@
-"""An uploaded CV, the profile read from it, and the role it was matched to."""
+"""An uploaded profile PDF, the structured profile read from it, and the role it was matched to."""
 
 from datetime import UTC, datetime
 
