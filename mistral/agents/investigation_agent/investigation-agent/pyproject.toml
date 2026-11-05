@@ -8,7 +8,6 @@ dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[bashkit,sessions-client]==1
 dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.14", "ty>=0.0.59"]
 [tool.uv]
 package = false
-prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

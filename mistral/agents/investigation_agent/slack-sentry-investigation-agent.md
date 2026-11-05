@@ -276,11 +276,10 @@ dependencies = ["mistralai-agents[bashkit]==1.1.0"]
 [tool.mistralai.agents]
 entrypoint = "main:agent"
 [tool.uv]
-prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
 ```
 
-- `mistralai-agents` is pinned to an exact release candidate, so `prerelease = "allow"` lets uv install it. The `bashkit` extra installs the sandbox that holds the agent's skill files.
+- `mistralai-agents` is pinned to an exact release. The `bashkit` extra installs the sandbox that holds the agent's skill files.
 - `entrypoint = "main:agent"` tells the `agents` CLI to load the `agent` object from `main.py`.
 - The `exclude-newer-package` block keeps any `exclude-newer` policy you may have set in uv from filtering out recent SDK releases.
 
@@ -640,7 +639,6 @@ version = "0.1.0"
 requires-python = "==3.12.*"
 dependencies = ["aiohttp>=3.9,<4", "mistralai-agents[sessions-client]==1.1.0", "mistralai-workflows>=3.16.0,<4", "pydantic>=2,<3", "slack-sdk>=3.33,<4", "structlog>=24"]
 [tool.uv]
-prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
 ```
 
