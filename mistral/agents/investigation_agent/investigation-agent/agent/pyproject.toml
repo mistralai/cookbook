@@ -6,5 +6,4 @@ dependencies = ["mistralai-agents[bashkit]==1.1.0"]
 [tool.mistralai.agents]
 entrypoint = "main:agent"
 [tool.uv]
-prerelease = "allow"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
