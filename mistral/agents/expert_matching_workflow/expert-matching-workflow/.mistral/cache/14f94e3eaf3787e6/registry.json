@@ -1,0 +1,316 @@
+{
+  "id": "mistralai-capabilities",
+  "descriptorVersion": 3,
+  "sources": {
+    "ts": "https://registry.npmjs.org/",
+    "py": "https://pypi.org/simple/"
+  },
+  "kinds": [
+    {
+      "id": "base",
+      "title": "Application base",
+      "description": "The required workspace substrate every generated app is built on.",
+      "weight": 0,
+      "min": 1,
+      "max": 1
+    },
+    {
+      "id": "frontend",
+      "title": "Frontend",
+      "description": "The app's user interface. At most one may be selected.",
+      "weight": 10,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "id": "backend",
+      "title": "Backends",
+      "description": "Server-side runtimes: the HTTP API surface and the durable worker.",
+      "weight": 20,
+      "min": 0
+    },
+    {
+      "id": "database",
+      "title": "Databases",
+      "description": "Backing data services a capability can depend on: persistence and object storage.",
+      "weight": 30,
+      "min": 0
+    },
+    {
+      "id": "feature",
+      "title": "Features",
+      "description": "The product capabilities an app can offer, each pulling in the runtimes and services it needs.",
+      "weight": 40,
+      "min": 0
+    },
+    {
+      "id": "deployment",
+      "title": "Deployment",
+      "description": "Where the generated app runs, and the orchestration files that get it there.",
+      "weight": 50,
+      "min": 1
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "fastapi",
+      "version": "0.1.71",
+      "kind": "backend",
+      "title": "FastAPI",
+      "description": "The app's HTTP backend: a generic FastAPI application at apps/api with the file-based router and health routes. Feature capabilities register their routers into it.",
+      "categories": [
+        "solutions"
+      ],
+      "default": true,
+      "module": {
+        "serve": "server",
+        "route": "/api",
+        "browser": false
+      },
+      "dependencies": [
+        "mistralai-capabilities/base/core"
+      ],
+      "packages": [
+        "ts",
+        "py"
+      ],
+      "envVars": {
+        "CORS_ORIGIN": "http://localhost:3001"
+      }
+    },
+    {
+      "id": "workflows",
+      "version": "0.1.71",
+      "kind": "backend",
+      "title": "Workflows",
+      "description": "The app's durable worker: a uv project at apps/worker running the Temporal-backed workflow worker. It exposes no public port.",
+      "categories": [
+        "solutions"
+      ],
+      "module": {
+        "serve": "worker"
+      },
+      "dependencies": [
+        "mistralai-capabilities/base/core"
+      ],
+      "packages": [
+        "ts",
+        "py"
+      ],
+      "envVars": {
+        "DEPLOYMENT_NAME": "deployment-{{app_name}}-{{env:USER}}",
+        "WORKFLOWS_BASE_URL": "https://api.mistral.ai"
+      }
+    },
+    {
+      "id": "core",
+      "version": "0.1.71",
+      "kind": "base",
+      "title": "Core",
+      "description": "Required application workspace shell: Bun and uv roots, NX project discovery, repeatable install and lock commands, and shared app-local settings, logging, telemetry, client, and command-line utilities.",
+      "categories": [
+        "solutions"
+      ],
+      "required": true,
+      "packages": [
+        "ts"
+      ],
+      "envVars": {
+        "LOG_LEVEL": "INFO",
+        "LOG_FORMAT": "console",
+        "APP_NAME": "{{app_name}}",
+        "MISTRAL_API_KEY": "",
+        "MISTRAL_BASE_URL": "https://api.mistral.ai",
+        "MISTRAL_SECRETS_ENABLED": "true",
+        "TELEMETRY_ENABLED": "true",
+        "TELEMETRY_ENDPOINT": "https://api.mistral.ai/telemetry/v1/logs",
+        "TELEMETRY_SERVICE_NAME": "{{app_name}}",
+        "TELEMETRY_EXPORT_TIMEOUT_SECONDS": "5.0"
+      }
+    },
+    {
+      "id": "postgres",
+      "version": "0.1.71",
+      "kind": "database",
+      "title": "Postgres",
+      "description": "Postgres persistence: the first-boot extension script and the app-local db package (the async engine and session factory, the Alembic setup, and the models, accessors, and migrations directories that the feature capabilities owning each table fill in).",
+      "categories": [
+        "solutions"
+      ],
+      "default": true,
+      "dependencies": [
+        "mistralai-capabilities/base/core"
+      ],
+      "packages": [
+        "ts"
+      ],
+      "envVars": {
+        "DATABASE_URL": "postgresql+asyncpg://postgres:postgres@localhost:5432/postgres",
+        "POSTGRES_HOST": "",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "",
+        "POSTGRES_DB": "postgres",
+        "POSTGRES_SSL_MODE": "",
+        "DB_ECHO": "false",
+        "DB_POOL_SIZE": "5",
+        "DB_MAX_OVERFLOW": "10",
+        "DB_POOL_PRE_PING": "true",
+        "INIT_MIGRATIONS_DB_READY_TIMEOUT_SECONDS": "90.0",
+        "INIT_MIGRATIONS_DB_READY_SUCCESSES": "3",
+        "INIT_MIGRATIONS_DB_READY_INTERVAL_SECONDS": "2.0",
+        "INIT_MIGRATIONS_DB_READY_PING_TIMEOUT_SECONDS": "2.0"
+      }
+    },
+    {
+      "id": "apps",
+      "version": "0.1.71",
+      "kind": "deployment",
+      "title": "Mistral Apps",
+      "description": "Deployment to the Mistral Apps platform. A gateway sits in front of the app and puts a short-lived token on every request, scoped to the person who made it. This capability supplies that token to `utils.mistral` as the credential a caller's work spends, so a route calling the Mistral API on someone's behalf is billed and authorised as them rather than against the app's own key. The hidden `apps-fastapi` integration mounts it on the FastAPI host. The platform builds and runs the app itself, so nothing here contributes orchestration files.",
+      "categories": [
+        "solutions"
+      ],
+      "default": true,
+      "dependencies": [
+        "mistralai-capabilities/base/core"
+      ],
+      "packages": [
+        "ts",
+        "py"
+      ]
+    },
+    {
+      "id": "apps-fastapi",
+      "version": "0.1.71",
+      "kind": "deployment",
+      "title": "Mistral Apps — API",
+      "description": "Mistral Apps × API integration. Mounts the gateway's caller token on the FastAPI host through `apps/api/src/api/configure/`, so a route that calls the Mistral API on someone's behalf spends their token. Hidden: it activates automatically when both `apps` and `fastapi` are effective, and selecting it directly is shorthand for that pair.",
+      "categories": [
+        "solutions"
+      ],
+      "visible": false,
+      "activatedWhen": {
+        "allOf": [
+          "mistralai-capabilities/backend/fastapi",
+          "mistralai-capabilities/deployment/apps"
+        ]
+      },
+      "packages": [
+        "ts"
+      ]
+    },
+    {
+      "id": "fastapi-postgres",
+      "version": "0.1.71",
+      "kind": "feature",
+      "title": "FastAPI — Postgres",
+      "description": "Hidden FastAPI × Postgres integration carrying database health and shutdown hooks.",
+      "categories": [
+        "solutions"
+      ],
+      "visible": false,
+      "activatedWhen": {
+        "allOf": [
+          "mistralai-capabilities/backend/fastapi",
+          "mistralai-capabilities/database/postgres"
+        ]
+      },
+      "packages": [
+        "ts"
+      ]
+    },
+    {
+      "id": "fastapi-tanstack-start",
+      "version": "0.1.71",
+      "kind": "feature",
+      "title": "FastAPI — TanStack Start",
+      "description": "FastAPI × TanStack Start integration. Owns the typed API client apps/web generates from the FastAPI OpenAPI contract (hey-api, under src/api/), its runtime base-URL config and the VITE_API_URL env schema. Hidden: it activates automatically when FastAPI and TanStack Start are both effective.",
+      "categories": [
+        "solutions"
+      ],
+      "visible": false,
+      "activatedWhen": {
+        "allOf": [
+          "mistralai-capabilities/backend/fastapi",
+          "mistralai-capabilities/frontend/tanstack-start"
+        ]
+      },
+      "packages": [
+        "ts"
+      ],
+      "envVars": {}
+    },
+    {
+      "id": "fastapi-workflows",
+      "version": "0.1.71",
+      "kind": "feature",
+      "title": "FastAPI — Workflows",
+      "description": "Hidden FastAPI × workflows integration carrying API health metadata.",
+      "categories": [
+        "solutions"
+      ],
+      "visible": false,
+      "activatedWhen": {
+        "allOf": [
+          "mistralai-capabilities/backend/fastapi",
+          "mistralai-capabilities/backend/workflows"
+        ]
+      },
+      "packages": [
+        "ts"
+      ]
+    },
+    {
+      "id": "observability",
+      "version": "0.1.71",
+      "kind": "feature",
+      "title": "Observability",
+      "description": "Send Mistral SDK and Workflow traces to Mistral Studio, with opt-in settings for code that reads Studio spans and evaluations, and agent guidance for instrumenting application-owned operations and tool calls.",
+      "categories": [
+        "solutions"
+      ],
+      "dependencies": [
+        "mistralai-capabilities/base/core"
+      ],
+      "packages": [
+        "ts",
+        "py"
+      ],
+      "envVars": {
+        "MISTRAL_API_KEY": "",
+        "MISTRAL_OTLP_TRACES_ENDPOINT": "https://api.mistral.ai/telemetry/v1/traces",
+        "MISTRAL_SDK_TELEMETRY": "dedicated",
+        "OTEL_ENABLED": "true",
+        "OBSERVABILITY_READ_ENABLED": "false",
+        "OBSERVABILITY_API_BASE_URL": "https://api.mistral.ai",
+        "OBSERVABILITY_REQUEST_TIMEOUT_SECONDS": "30.0",
+        "OBSERVABILITY_PAGE_SIZE": "100",
+        "OBSERVABILITY_MAX_PAGES": "50"
+      }
+    },
+    {
+      "id": "tanstack-start",
+      "version": "0.1.71",
+      "kind": "frontend",
+      "title": "TanStack Start",
+      "description": "The app's frontend: a plain TanStack Start application at apps/web — file-based routes, TanStack Query, Tailwind, public packages only. Other capabilities add pages as route files.",
+      "categories": [
+        "solutions"
+      ],
+      "default": true,
+      "module": {
+        "serve": "static",
+        "route": "/",
+        "browser": true
+      },
+      "dependencies": [
+        "mistralai-capabilities/base/core"
+      ],
+      "packages": [
+        "ts"
+      ],
+      "envVars": {}
+    }
+  ]
+}
