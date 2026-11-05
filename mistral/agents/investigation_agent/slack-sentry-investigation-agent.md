@@ -1539,4 +1539,4 @@ This cookbook built a Slack bot that investigates production errors: you tag it 
 - GitHub
 - Slack
 
-[View the documentation]() <!-- TODO: add link to relevant documentation -->
+[View the documentation](https://docs.mistral.ai/studio/agents/overview)

@@ -2,7 +2,7 @@
 
 A Mistral App that matches experts to project roles. You upload an expert's profile as a PDF in a small web page, and the `match-expert` workflow reads it with Mistral OCR and a document annotation, which returns a structured profile. `mistral-medium-latest` then picks the open role that suits the expert best and explains why. A reviewer approves or declines each match in the page.
 
-The step-by-step guide is in [expert-matching-workflow.md](expert-matching-workflow.md).
+The step-by-step guide is in [expert-matching-workflow.md](../expert-matching-workflow.md).
 
 The app is built from `mistral apps init --caps fastapi,postgres,workflows,apps` and has three modules (see `apps.json`):
 
