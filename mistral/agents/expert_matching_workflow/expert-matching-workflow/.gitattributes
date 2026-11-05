@@ -1,0 +1,4 @@
+# Everything under `.mistral/` is written by the `mistral apps` CLI: the vendored registry subtree
+# (git mode), the resolved descriptors, and the selection and generation state. Collapsed in GitHub
+# diffs so a capability add or bump does not bury the review.
+.mistral/** linguist-generated

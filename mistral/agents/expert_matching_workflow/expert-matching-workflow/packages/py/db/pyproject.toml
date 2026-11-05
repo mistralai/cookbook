@@ -1,0 +1,19 @@
+[project]
+name = "db"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "env",
+    "sqlmodel>=0.0.48",
+    "sqlalchemy[asyncio]>=2.1.4",
+    "asyncpg>=0.32",
+    "alembic>=1.20",
+    "pgvector>=0.5.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+env = { workspace = true }

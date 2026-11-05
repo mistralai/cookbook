@@ -1,0 +1,25 @@
+[project]
+name = "workflows-app"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "utils",
+    "env",
+    "mistralai>=3.6.0",
+    "mistralai-workflows[mistralai]>=3.17.1",
+    "pydantic>=2.14.1",
+    "structlog>=25.5.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.22,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "worker"
+
+[tool.uv.sources]
+utils = { workspace = true }
+env = { workspace = true }
+mistralai-workflows = { index = "pypi" }
+
