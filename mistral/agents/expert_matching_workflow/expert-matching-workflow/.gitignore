@@ -70,3 +70,7 @@ coverage.xml
 .sisyphus/
 .scratch/
 .playwright-cli/
+
+# The settings package. Keeps the cookbook repo's root `ENV/` virtualenv rule from matching it.
+!/packages/py/env/
+!/packages/py/env/src/env/
