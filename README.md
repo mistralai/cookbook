@@ -137,6 +137,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [Mesop Integration - Chat with PDF](third_party/mesop/README.md)                                                      | UI chat, demo, RAG              | Mesop      |
 | [Monitoring Mistral AI using OpenTelemetry](third_party/openlit/cookbook_mistral_opentelemetry.ipynb)                 | AI Observability                | OpenLIT    |
 | [neon_text_to_sql.ipynb](third_party/Neon/neon_text_to_sql.ipynb)                                                     | code                            | Neon       |
+| [schemagate_text_to_sql.ipynb](third_party/schemagate/schemagate_text_to_sql.ipynb)                             | text-to-SQL, token cost         | schemagate |
 | [ollama_mistral_llamaindex.ipynb](third_party/LlamaIndex/ollama_mistral_llamaindex.ipynb)                             | RAG                             | LLamaIndex |
 | [Ollama Meetup Demo](third_party/Ollama/20240321_ollama_meetup)                                                       | demo                            | Ollama     |
 | [Open-source LLM engineering](third_party/Langfuse)                                                                   | LLM Observability               | Langfuse   |
