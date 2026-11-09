@@ -214,7 +214,7 @@ Based on the Mistral Writing Style Guide (see reference files below).
   - Bad: "It is necessary to ensure that the client is initialized."
   - Good: "Initialize the client before making requests."
 - **Address the reader as "you."** Don't use "the user" or "one" when you mean the person reading.
-- **Start statements with a verb.** Edit out "you can" when it isn't necessary.
+- **Start statements with a verb.** Edit out "you can" when it isn't necessary - unless it's used to introduce one of at least two possible approaches.
   - Bad: "You can also specify an optional timeout."
   - Good: "Specify an optional timeout."
 - **Avoid weak openers.** Rewrite sentences that start with *there is*, *there are*, or *there were*.
@@ -249,7 +249,7 @@ Based on the Mistral Writing Style Guide (see reference files below).
 ### Lists
 
 - **Use bullet lists for unordered items; numbered lists for sequential steps.**
-- **Keep list items parallel** in grammar and structure.
+- **Keep list items parallel** in grammar and structure. If a section has more than one list, flag as "moderate" if these are a mix of bullet lists and numbered lists.
 - **Include a comma before "and"** in a series of three or more items (Oxford comma).
   - Bad: "Python, TypeScript and curl"
   - Good: "Python, TypeScript, and curl"
