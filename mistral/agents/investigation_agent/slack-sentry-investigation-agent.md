@@ -279,7 +279,7 @@ entrypoint = "main:agent"
 exclude-newer-package = { mistralai-agents = false, mistralai-vibe-harness = false }
 ```
 
-- `mistralai-agents` is pinned to an exact release. The `bashkit` extra installs the sandbox that holds the agent's skill files.
+- `mistralai-agents` is pinned to the 1.1.0 release. The `bashkit` extra installs the sandbox that holds the agent's skill files.
 - `entrypoint = "main:agent"` tells the `agents` CLI to load the `agent` object from `main.py`.
 - The `exclude-newer-package` block keeps any `exclude-newer` policy you may have set in uv from filtering out recent SDK releases.
 
@@ -1539,4 +1539,4 @@ This cookbook built a Slack bot that investigates production errors: you tag it 
 - GitHub
 - Slack
 
-[View the documentation]() <!-- TODO: add link to relevant documentation -->
+[View the documentation](https://docs.mistral.ai/studio/agents/overview)

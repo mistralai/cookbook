@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expert matching</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+    h2 { margin-top: 2rem; }
+    form { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+    input, textarea, button { font: inherit; padding: .4rem .6rem; }
+    textarea { width: 100%; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; padding: .5rem; border-bottom: 1px solid #ddd; }
+    .muted { color: #666; font-size: .9em; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Expert matching</h1>
+  <p>Upload an expert's profile. The agent reads it and picks the open role that suits the expert best.</p>
+
+  <form id="upload">
+    <input type="file" name="file" accept="application/pdf" required>
+    <button>Upload profile</button>
+    <span id="upload-status" class="muted"></span>
+  </form>
+
+  <h2>Experts</h2>
+  <table>
+    <thead><tr><th>Expert</th><th>Best role</th><th>Review</th></tr></thead>
+    <tbody id="experts"></tbody>
+  </table>
+
+  <h2>Open roles</h2>
+  <ul id="roles"></ul>
+  <form id="new-role">
+    <input name="title" placeholder="Role title" required>
+    <input name="project" placeholder="Project" required>
+    <textarea name="description" rows="2" placeholder="What the role needs" required></textarea>
+    <button>Add role</button>
+  </form>
+
+  <script>
+    const api = (path, options) =>
+      fetch(`/api/v1/${path}`, options).then(async (response) => {
+        if (!response.ok) throw new Error((await response.json()).detail ?? response.statusText);
+        return response.json();
+      });
+    const escape = (text) => String(text ?? "").replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+    let roles = [];
+
+    async function loadRoles() {
+      roles = await api("roles");
+      document.getElementById("roles").innerHTML = roles
+        .map((r) => `<li><strong>${escape(r.title)}</strong>, ${escape(r.project)}<br><span class="muted">${escape(r.description)}</span></li>`)
+        .join("");
+    }
+
+    function describe(expert) {
+      if (expert.status === "processing") return `<td>${escape(expert.file_name)}<br><span class="muted">Reading the profile…</span></td><td></td><td></td>`;
+      if (expert.status === "failed") return `<td>${escape(expert.file_name)}<br><span class="error">Matching failed</span></td><td></td><td></td>`;
+      const role = roles.find((r) => r.id === expert.role_id);
+      const review = expert.review === "pending"
+        ? `<button onclick="review(${expert.id}, 'approved')">Approve</button> <button onclick="review(${expert.id}, 'declined')">Decline</button>`
+        : escape(expert.review);
+      return `<td><strong>${escape(expert.name)}</strong>, ${escape(expert.headline)}<br>
+          <span class="muted">${escape(expert.years_of_experience)} years · ${expert.skills.map(escape).join(", ")}</span></td>
+        <td><strong>${escape(role?.title ?? `Role ${expert.role_id}`)}</strong><br><span class="muted">${escape(expert.reason)}</span></td>
+        <td>${review}</td>`;
+    }
+
+    async function loadExperts() {
+      const experts = await api("experts");
+      document.getElementById("experts").innerHTML = experts.map((e) => `<tr>${describe(e)}</tr>`).join("");
+      if (experts.some((e) => e.status === "processing")) setTimeout(loadExperts, 3000);
+    }
+
+    async function review(id, decision) {
+      await api(`experts/${id}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ review: decision }),
+      });
+      await loadExperts();
+    }
+
+    document.getElementById("upload").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const status = document.getElementById("upload-status");
+      status.textContent = "Uploading…";
+      try {
+        await api("experts", { method: "POST", body: new FormData(event.target) });
+        status.textContent = "";
+        event.target.reset();
+        await loadExperts();
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    });
+
+    document.getElementById("new-role").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await api("roles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(event.target))),
+      });
+      event.target.reset();
+      await loadRoles();
+    });
+
+    loadRoles().then(loadExperts);
+  </script>
+</body>
+</html>
