@@ -122,6 +122,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [E2B Code Interpreter SDK with Codestral](third_party/E2B_Code_Interpreting)                                          | tool, agent                     | E2B        |
 | [function_calling_local.ipynb](third_party/Ollama/function_calling_local.ipynb)                                       | tool call                       | Ollama     |
 | [Gradio Integration - Chat with PDF](third_party/gradio/README.md)                                                    | UI chat, demo, RAG              | Gradio     |
+| [green_vibe_audit.md](third_party/Green_Vibe/green_vibe_audit.md)                                              | agent, green coding, RGESN      | Green Vibe (INR) |
 | [haystack_chat_with_docs.ipynb](third_party/Haystack/haystack_chat_with_docs.ipynb)                                   | RAG, embeddings                 | Haystack   |
 | [Indexify Integration - PDF Entity Extraction](third_party/Indexify/pdf-entity-extraction)                            | entity extraction, PDF          | Indexify   |
 | [Indexify Integration - PDF Summarization](third_party/Indexify/pdf-summarization)                                    | summarization, PDF              | Indexify   |
