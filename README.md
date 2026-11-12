@@ -36,6 +36,10 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [01-glm-game-generator.md](mistral/agents/glm_game_generator/01-glm-game-generator.md) | agents, code generation | Generate a playable HTML5 game from a text description using GLM, with automated review and fix loop |
 | [01-glm-code-modernizer.md](mistral/agents/glm_code_modernizer/01-glm-code-modernizer.md) | agents, code generation | Modernize legacy Python codebases using GLM for automated refactoring |
 | [01-realtime-fact-checker.md](mistral/audio/realtime-fact-checker/01-realtime-fact-checker.md) | agents, audio, RAG, embeddings | Build a real-time audio fact-checking agent |
+| [cargo-release/README.md](mistral/workflows/cargo-release/README.md) | workflows, OCR, structured outputs | Check cargo for dangerous goods and customs compliance with a workflow that extracts shipping documents and pauses for review |
+| [insurance-claims/README.md](mistral/workflows/insurance-claims/README.md) | workflows, vision, structured outputs | Triage insurance claims with a workflow that analyses photos in parallel and routes each claim by severity |
+| [code-modernization/README.md](mistral/workflows/code-modernization/README.md) | workflows, agents, code generation | Modernize legacy files with a workflow that runs per-file sub-workflows and pauses for human review |
+| [linear-summarization/README.md](mistral/workflows/linear-summarization/README.md) | workflows, connectors, summarization | Summarize a week of Linear issues with a workflow that reads Linear and writes a weekly summary |
 
 ## Submission Guidelines:
 
