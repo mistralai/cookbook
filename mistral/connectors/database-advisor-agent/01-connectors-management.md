@@ -14,7 +14,7 @@ This script demonstrates the full [Mistral Connector](https://docs.mistral.ai/st
 
 > **API status:** This script uses `client.beta.connectors` and `client.beta.agents`. These are **beta** endpoints and may change.
 
-A Python version of the same agent is also available [here](./01-build-a-database-advisor-agent.ipynb).
+A Python version of the same agent is also available [here](../01-build-a-database-advisor-agent.ipynb).
 
 ---
 
