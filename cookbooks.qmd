@@ -181,6 +181,14 @@ Extracting structured outputs from documents.
 
 <div class="cookbook-path">mistral/ocr/structured_ocr.ipynb</div>
 
+### [Source-grounded variant OCR](mistral/ocr/source_grounded_variant_ocr.ipynb)
+
+**Category:** OCR, evaluation
+
+Compare Mistral OCR and Tesseract on page-labelled identifiers in a published genetics paper.
+
+<div class="cookbook-path">mistral/ocr/source_grounded_variant_ocr.ipynb</div>
+
 ### [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb)
 
 **Category:** evaluation, structured outputs, LLM As a Judge

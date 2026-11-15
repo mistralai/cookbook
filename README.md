@@ -95,6 +95,7 @@ The preview renders committed notebook content without executing notebook code. 
 | [document_understanding.ipynb](mistral/ocr/document_understanding.ipynb) | OCR, function calling | Document Understanding and Tool Usage with OCR |
 | [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
+| [Source-grounded variant OCR](mistral/ocr/source_grounded_variant_ocr.ipynb) | OCR, evaluation | Compare Mistral OCR and Tesseract on page-labelled identifiers in a published genetics paper. |
 | [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
 | [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
 | [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
