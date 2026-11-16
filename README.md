@@ -158,3 +158,4 @@ The preview renders committed notebook content without executing notebook code. 
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb)) |Prompting | Optimizing prompts without any supervision
 | [Use Mistral with Kong AI Gateway](third_party/Kong/mistral_with_kong_ai_gateway.ipynb)                               | AI gateway                      | Kong       |
+| [Use SpecStream web search with Mistral](third_party/SpecStream/specstream_web_search_with_mistral.ipynb)              | web search, function calling    | SpecStream |
