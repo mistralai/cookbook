@@ -237,13 +237,13 @@ Score production traffic continuously with LLM judges (scorers and live evals)
 
 <div class="cookbook-path">mistral/observability/online_evaluation.ipynb</div>
 
-### [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb)
+### [build_evaluation_datasets.ipynb](mistral/observability/build_evaluation_datasets.ipynb)
 
 **Category:** observability, datasets, evaluation
 
 Build evaluation datasets from records, JSONL files, and production spans, and run an offline evaluation on them
 
-<div class="cookbook-path">mistral/observability/manage_datasets.ipynb</div>
+<div class="cookbook-path">mistral/observability/build_evaluation_datasets.ipynb</div>
 
 ## Third-party tools
 
