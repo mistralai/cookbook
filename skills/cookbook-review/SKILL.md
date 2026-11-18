@@ -243,7 +243,7 @@ Based on the Mistral Writing Style Guide (see reference files below).
 - **Use parallel structure** across headings at the same level.
   - Bad mix: `## Create a connector`, `## Listing connectors`, `## How to delete a connector`
   - Good: `## Create a connector`, `## List connectors`, `## Delete a connector`
-- **Avoid two headings in a row** without body text in between.
+- **Avoid two headings in a row** without body text in between, unless the second is a subheading of the first.
 - **Never open a section with a code block, table, or list.** Every heading must be followed by at least one sentence before any code or structured content. See the section content standard above.
 
 ### Lists
@@ -258,7 +258,6 @@ Based on the Mistral Writing Style Guide (see reference files below).
 ### Punctuation
 
 - **One space after periods**, not two.
-- **No spaces around em dashes.** Use `—` not ` - ` for parenthetical dashes.
 - **Don't use a colon** at the end of headings or list introductions in most cases.
 - **Use straight quotes**, not curly/smart quotes, in code and code-adjacent content.
 

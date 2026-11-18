@@ -1,0 +1,60 @@
+# syntax=docker/dockerfile:1
+# API image for apps/api. Self-contained: the build and runtime stages are the canonical Python
+# workspace image, shared with the app's other Python images. `api` is the production runtime;
+# `api-dev` is the hot-reload dev target.
+FROM python:3.14-slim AS build
+COPY --from=ghcr.io/astral-sh/uv:0.11.17 /uv /uvx /bin/
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential && \
+    rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+# uv bytecode-compiles each file under a 60 s default timeout, which a loaded build host can exceed;
+# 900 s still fails a hung compile.
+ENV UV_PYTHON_PREFERENCE=only-system \
+    UV_NO_PYTHON_DOWNLOADS=1 \
+    UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_COMPILE_BYTECODE_TIMEOUT=900
+COPY pyproject.toml uv.lock ./
+COPY tools/uv.sh tools/
+RUN --mount=type=secret,id=registry_token --mount=type=cache,target=/root/.cache/uv \
+    bash tools/uv.sh sync --all-packages --frozen --no-dev --no-install-local
+COPY . .
+RUN --mount=type=secret,id=registry_token --mount=type=cache,target=/root/.cache/uv \
+    bash tools/uv.sh sync --all-packages --frozen --no-dev
+
+FROM python:3.14-slim AS runtime
+COPY --from=ghcr.io/astral-sh/uv:0.11.17 /uv /uvx /bin/
+WORKDIR /app
+ENV UV_PYTHON_PREFERENCE=only-system \
+    UV_NO_PYTHON_DOWNLOADS=1 \
+    UV_CACHE_DIR=/tmp/uv-cache \
+    XDG_CACHE_HOME=/tmp \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/app/.venv/bin:${PATH}"
+RUN groupadd -g 1000 app && \
+    useradd -u 1000 -g 1000 -m -s /usr/sbin/nologin app
+COPY --from=build --chown=1000:1000 /app /app
+USER 1000:1000
+
+FROM runtime AS api
+ENV HOST=0.0.0.0 PORT=3000
+EXPOSE 3000
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=120s \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:${PORT:-3000}/api/health/live', timeout=5).status==200 else 1)"
+CMD ["sh", "-c", "exec uv run --frozen --no-dev --no-sync --directory apps/api uvicorn api.main:app --host \"$HOST\" --port \"$PORT\" --proxy-headers --timeout-graceful-shutdown 20"]
+
+FROM build AS development
+RUN --mount=type=secret,id=registry_token --mount=type=cache,target=/root/.cache/uv \
+    bash tools/uv.sh sync --all-packages --frozen
+ENV UV_CACHE_DIR=/tmp/uv-cache \
+    XDG_CACHE_HOME=/tmp \
+    HOME=/tmp \
+    UV_NO_SYNC=1 \
+    WATCHFILES_FORCE_POLLING=true \
+    PATH="/app/.venv/bin:${PATH}"
+
+FROM development AS api-dev
+ENV HOST=0.0.0.0 PORT=3000
+EXPOSE 3000
+CMD ["sh", "-c", "exec uv run --no-sync --directory apps/api python -m api.dev"]

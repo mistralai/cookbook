@@ -1,0 +1,46 @@
+**/node_modules
+.git
+
+**/dist
+**/build
+**/.next
+**/.nuxt
+**/.output
+**/.svelte-kit
+**/.astro
+
+**/.wrangler
+**/.alchemy
+**/.expo
+**/.vercel
+*.log
+
+# Python virtualenvs, caches and build artefacts (the images build their own .venv;
+# the host's is 700MB+ and would bloat the context and bust the COPY cache).
+**/.venv
+**/__pycache__
+**/*.py[cod]
+**/.ruff_cache
+**/.pytest_cache
+**/.mypy_cache
+coverage
+.coverage*
+**/coverage.xml
+
+# The corpus Compose mounts at runtime and agent scratch files are never needed in an image.
+ingest/
+.omo
+.sisyphus/
+.scratch/
+**/.playwright-cli
+
+# Secrets stay out of image layers; runtime configuration is injected by the selected launcher.
+**/.env
+**/.env.*
+!**/.env.example
+
+# Re-exclude node_modules, and KEEP THIS LAST: .dockerignore is last-match-wins. Re-including
+# an example environment file can also re-include its parent directories, so dependency trees must
+# be excluded again after that exception.
+**/node_modules/**
+**/.venv/**

@@ -1,0 +1,3 @@
+# The root .gitignore covers Python caches and .venv but only .env and .env*.local.
+.env*
+!.env.example

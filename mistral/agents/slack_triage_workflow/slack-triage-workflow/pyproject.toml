@@ -1,0 +1,66 @@
+[project]
+name = "app-workspace"
+version = "0.0.1"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "mistralai-capabilities-backend-fastapi==0.1.61",
+    "mistralai-capabilities-backend-workflows==0.1.61",
+    "mistralai-capabilities-deployment-apps==0.1.61",
+]
+
+[tool.uv]
+package = false
+# Dependency-confusion hardening. Do not use `unsafe-best-match`, which uv's docs flag as exposing
+# "the risk of dependency confusion attacks": it merges candidates across indexes and takes the
+# best version, so a public upload of an unclaimed private name outranks the real release.
+index-strategy = "first-index"
+# GHSA-537c-gmf6-5ccf: cryptography wheels below 48.0.1 statically link a vulnerable OpenSSL. Use an
+# override, not a constraint: every published mistralai caps `cryptography<47.0.0`, so a constraint
+# is unsatisfiable. The payload encoder only uses `AESGCM` and `InvalidTag`, unchanged in 48.x/49.x.
+#
+# `griffe` 1.x and `griffelib` 2.x both install the `griffe` module, so with both present the older
+# files overwrite the newer ones and `fastmcp.server` fails to import. `mistralai[agents]` caps
+# `griffe<2` and `fastmcp` needs `griffelib`. `griffe` 2.x is a thin package over `griffelib`.
+override-dependencies = ["cryptography>=48.0.1", "griffe>=2"]
+# A universal lock only guarantees a version is selectable per platform, not that a wheel exists
+# there: uv checks wheel availability only for the platform the lock is taken on. This repo locks on
+# macOS but deploys linux/x86_64 and linux/aarch64, so all three must be installable from one lock.
+# Without this, a Mac-taken lock can pick a greenlet version whose linux wheel is absent, which then
+# fails `uv sync` on the linux runner and in the Docker build.
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "sys_platform == 'linux' and platform_machine == 'aarch64'",
+]
+# There is no blanket `prerelease = "allow"`: it pulled alphas and RCs into the lock for packages
+# that never asked for one. Nothing here needs the exemption today. uv still allows a pre-release
+# for a direct specifier that names it, so a future rc pin needs no setting here.
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
+
+[tool.uv.sources]
+
+mistralai-capabilities-deployment-apps = { index = "pypi" }
+mistralai-capabilities-backend-workflows = { index = "pypi" }
+mistralai-capabilities-backend-fastapi = { index = "pypi" }
+# Globs, not an enumeration, so the member set follows capability selection with no hand-editing. A
+# capability's published `package/py` toolkit is not a member: the CLI wires selected toolkits into
+# root dependencies and sources. The agent project remains directory-scoped and is intentionally not
+# a root workspace member; its NX targets run its own pyproject against the shared environment.
+[tool.uv.workspace]
+members = [
+    "apps/*",
+    "apps/api",
+    "apps/worker",
+    "packages/py/*",
+]
+# `apps/web` is the only non-Python app matched by `apps/*`.
+exclude = ["apps/web"]
+
+[tool.uv.exclude-newer-package]
+"mistralai-capabilities-deployment-apps" = false
+"mistralai-capabilities-backend-workflows" = false
+"mistralai-capabilities-backend-fastapi" = false

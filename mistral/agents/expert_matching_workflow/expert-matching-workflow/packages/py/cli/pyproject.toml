@@ -1,0 +1,26 @@
+[project]
+name = "cli"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+# The app's command-line entry point. Deps are only what a capability-independent core guarantees:
+# Typer for the CLI, the shared `env`/`utils` seams, and the `mistralai` client and `structlog` that
+# contributed commands use directly. Each command module also imports its own
+# capability's packages without naming them here — every command runs through the shared workspace
+# venv, so a capability's own manifest installs them. Naming an optional capability's member here
+# would fail the lock: uv rejects a `{ workspace = true }` source whose member is absent, so one
+# deselected capability would fail the lock outright.
+dependencies = [
+    "typer>=0.27",
+    "utils",
+    "env",
+    "mistralai>=3.6.0",
+    "structlog>=25.5.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+utils = { workspace = true }
+env = { workspace = true }

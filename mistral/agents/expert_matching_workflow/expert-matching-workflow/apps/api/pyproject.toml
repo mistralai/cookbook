@@ -1,0 +1,41 @@
+[project]
+name = "api-app"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "utils",
+    "mistralai>=3.6.0",
+    "db",
+    "env",
+    "workflows-app",
+    # At least 0.137.2: the toolkit's router loader imports `fastapi.routing.iter_route_contexts`, added
+    # in that release. (It is also past 0.122, from which the security utilities answer a
+    # missing/invalid credential with 401 + WWW-Authenticate, per RFC 7235, instead of 403.)
+    #
+    # The extra brings the optional dependencies routes lean on (python-multipart for form and
+    # file uploads, email-validator for `EmailStr`); `standard` would also pull fastapi-cloud-cli,
+    # which this deployment has no use for.
+    "fastapi[standard-no-fastapi-cloud-cli]>=0.143.0",
+    # Mirrors the toolkit's `[fastapi]` extra: the CLI installs toolkits without extras.
+    "pydantic>=2.14.1",
+    "uvicorn[standard]>=0.54",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+]
+
+[tool.uv.sources]
+utils = { workspace = true }
+db = { workspace = true }
+env = { workspace = true }
+workflows-app = { workspace = true }
+
+[tool.uv.build-backend]
+# The distribution is `api-app`, so the default module path would be `src/api_app`.
+module-name = "api"
