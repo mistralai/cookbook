@@ -1,0 +1,8 @@
+{
+  "claim_id": "CLM-2024-003",
+  "claimant_name": "Sarah Thompson",
+  "description": "I came back to my parked truck and found a scratch on the rear driver door. It looks like someone keyed it. About 30 cm long scratch. No other damage and no note left.",
+  "photos": [
+    "src/worker/workflows/insurance_claims/sample_data/photos/claim_low_scratch_door.jpg"
+  ]
+}
