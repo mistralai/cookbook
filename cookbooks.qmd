@@ -229,21 +229,21 @@ STT -> LLM -> TTS Demo.
 
 <div class="cookbook-path">mistral/tts/sts_demo.py</div>
 
-### [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb)
+### [online_evaluation.ipynb](mistral/observability/online_evaluation.ipynb)
 
-**Category:** observability, evaluation
+**Category:** observability, evaluation, LLM As a Judge
 
-Run campaigns with LLM judges to classify agent behaviors at scale
+Score production traffic continuously with LLM judges (scorers and live evals)
 
-<div class="cookbook-path">mistral/observability/llm_judge_campaign_workflow.ipynb</div>
+<div class="cookbook-path">mistral/observability/online_evaluation.ipynb</div>
 
-### [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb)
+### [build_evaluation_datasets.ipynb](mistral/observability/build_evaluation_datasets.ipynb)
 
-**Category:** observability, datasets
+**Category:** observability, datasets, evaluation
 
-Create and manage datasets for evaluation or fine-tuning
+Build evaluation datasets from records, JSONL files, and production spans, and run an offline evaluation on them
 
-<div class="cookbook-path">mistral/observability/manage_datasets.ipynb</div>
+<div class="cookbook-path">mistral/observability/build_evaluation_datasets.ipynb</div>
 
 ## Third-party tools
 

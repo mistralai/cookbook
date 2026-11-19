@@ -29,8 +29,8 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
 | [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
 | [sts_demo.py](mistral/audio/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
-| [llm_judge_campaign_workflow.ipynb](mistral/observability/llm_judge_campaign_workflow.ipynb) | observability, evaluation | Run campaigns with LLM judges to classify agent behaviors at scale |
-| [manage_datasets.ipynb](mistral/observability/manage_datasets.ipynb) | observability, datasets | Create and manage datasets for evaluation or fine-tuning |
+| [online_evaluation.ipynb](mistral/observability/online_evaluation.ipynb) | observability, evaluation, LLM As a Judge | Score production traffic continuously with LLM judges (scorers and live evals) |
+| [build_evaluation_datasets.ipynb](mistral/observability/build_evaluation_datasets.ipynb) | observability, datasets, evaluation | Build evaluation datasets from records, JSONL files, and production spans, and run an offline evaluation on them |
 | [Custom MCP Server](mistral/lechat_custom_mcp_server/custom-mcp-server.md) | MCP, connectors | Build a custom MCP server (tic-tac-toe) and connect it to Vibe |
 | [Object Detection](mistral/image_understanding/bbox_getstarted.ipybn) | Vision | Object detection with mistral models. |
 | [01-build-a-database-advisor-agent.ipynb](mistral/connectors/01-build-a-database-advisor-agent.ipynb) | connectors, agents | Build an agent that compares databases using their source code via the DeepWiki connector |
