@@ -1,6 +1,6 @@
 # Photo credits
 
-Sample claim photos are sourced from Wikimedia Commons and downscaled to 800px wide for repository size. Original full-resolution images are linked below. Each photo retains its original license — see attribution and terms per file.
+Sample claim photos are sourced from Wikimedia Commons and downscaled to 800px wide for repository size. Original full-resolution images are linked below. Each photo retains its original license; see attribution and terms per file.
 
 | File | Source | Author | License |
 |---|---|---|---|

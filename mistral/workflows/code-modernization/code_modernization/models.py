@@ -13,7 +13,7 @@ class ModernizationParams(BaseModel):
 
     repo_path: str = Field(description="Absolute path to the local repo (or GitHub URL in production).")
     target: str = Field(
-        default="Python 2.7 → 3.12",
+        default="Python 2.7 to 3.12",
         description="Modernization target description passed verbatim to the LLM prompt.",
     )
 

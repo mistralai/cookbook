@@ -62,7 +62,7 @@ def _unwrap(response: Any) -> dict | list:
 
 
 # ---------------------------------------------------------------------------
-# Read-only listing activities — used by the HITL path
+# Read-only listing activities: used by the HITL path
 # ---------------------------------------------------------------------------
 
 
@@ -87,7 +87,7 @@ async def fetch_linear_projects(
 ) -> list[dict]:
     """Return all projects in the given team (id + name).
 
-    NOTE: ``limit=50`` (not 250) — the Linear connector's ``list_projects``
+    NOTE: ``limit=50`` (not 250): the Linear connector's ``list_projects``
     tool returns HTTP 400 ``invalid_request`` for any ``limit`` above 50,
     despite its declared schema saying ``maximum: 250``. Other list_*
     tools (``list_teams``, ``list_issues``) honour 250 fine; only
@@ -104,7 +104,7 @@ async def fetch_linear_projects(
 
 
 # ---------------------------------------------------------------------------
-# Validation activities — used by the direct-input path
+# Validation activities: used by the direct-input path
 # ---------------------------------------------------------------------------
 
 
@@ -153,7 +153,7 @@ async def get_project_id_by_name(
     if not project_id:
         raise ValueError(f"Project '{project_name}' not found")
 
-    # Ensure the project belongs to the requested team — the connector does
+    # Ensure the project belongs to the requested team: the connector does
     # not filter ``get_project`` by team, so we do the membership check here.
     teams_block = project_obj.get("teams") or {}
     team_nodes = (
@@ -168,7 +168,7 @@ async def get_project_id_by_name(
 
 
 # ---------------------------------------------------------------------------
-# Issue-listing activity — the data source for the weekly summary
+# Issue-listing activity: the data source for the weekly summary
 # ---------------------------------------------------------------------------
 
 
@@ -185,7 +185,7 @@ async def fetch_recent_issues(
     (= all projects in the team, matches the ``"*"`` HITL convention).
 
     Uses the ``list_issues`` tool's ISO-8601 duration syntax (``-P{days}D``)
-    instead of computing a since-timestamp client-side — this keeps the
+    instead of computing a since-timestamp client-side: this keeps the
     workflow body deterministic without needing ``temporal_wf.now()``.
     """
     arguments: dict[str, Any] = {

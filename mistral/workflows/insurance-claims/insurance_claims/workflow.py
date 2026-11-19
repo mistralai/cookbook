@@ -3,22 +3,26 @@
 This workflow demonstrates five Mistral Workflows primitives on a realistic
 insurance-industry use case:
 
-  1. Parallel activities   — all claim photos are analysed concurrently via
-                             ``execute_activities_in_parallel``, not sequentially.
-  2. Retry policies        — the flaky vision activity retries up to 3×.
-  3. Deterministic branch  — severity routing is a hard Python if/elif/else
-                             (not an LLM call) so every decision is auditable.
-  4. Structured output     — every LLM call returns a typed Pydantic model.
-  5. Observability         — Studio shows each parallel photo task, the
-                             retry timeline, and the branch taken.
+  1. Parallel activities: all claim photos are analysed concurrently via
+     ``execute_activities_in_parallel``, not sequentially.
+  2. Retry policies: the vision activity retries up to 3 times with
+     exponential backoff.
+  3. Deterministic branch: severity routing is a hard Python if/elif/else
+     (not an LLM call) so every decision is auditable.
+  4. Structured output: every LLM call returns a typed Pydantic model.
+  5. Observability: Studio shows each parallel photo task and the
+     branch taken.
 
-Workflow input shape (single Pydantic model → top-level JSON keys):
+Workflow input shape (single Pydantic model, top-level JSON keys):
   {
     "claim_id": "CLM-001",
     "claimant_name": "Jane Smith",
     "description": "...",
-    "photos": ["apps/worker/src/worker/workflows/insurance_claims/sample_data/photos/claim_low_scratch_door.jpg", ...]
+    "photos": ["src/worker/workflows/insurance_claims/sample_data/photos/claim_low_scratch_door.jpg", ...]
   }
+
+Local photo paths resolve against the worker's working directory,
+``apps/worker``, so ``src/worker/workflows/...`` is the form used above.
 """
 
 from __future__ import annotations
@@ -31,7 +35,7 @@ from mistralai.workflows import workflow
 # Activities are imported via imports_passed_through so the Temporal sandbox
 # does not try to re-import mistralai.client (which imports httpx, which
 # triggers a sandbox restriction on urllib.request.Request.__mro_entries__).
-# The activity functions themselves are safe to call from workflow code —
+# The activity functions themselves are safe to call from workflow code:
 # the decorator intercepts the call and dispatches it via Temporal's task
 # queue rather than executing the function body in the workflow thread.
 with workflow.unsafe.imports_passed_through():
@@ -55,7 +59,7 @@ from .models import (  # pydantic models are sandbox-safe; no imports_passed_thr
 def _aggregate_severity(results: list[PhotoAnalysisResult]) -> SeverityLevel:
     """Derive the worst-case severity from all photo results.
 
-    This is a pure function — no randomness, no I/O — so it is safe to call
+    This is a pure function (no randomness, no I/O), so it is safe to call
     directly inside workflow code without wrapping it in an activity.
     """
     labels = [r.damage_label for r in results]
@@ -70,7 +74,7 @@ def _route(severity: SeverityLevel) -> str:
     """Map severity to a downstream queue name.
 
     This branching is deterministic (no LLM call) because:
-      - Routing decisions must be auditable — regulators need a hard rule,
+      - Routing decisions must be auditable: regulators need a hard rule,
         not a probabilistic model output.
       - An LLM could hallucinate an unknown queue name, breaking downstream
         systems silently.
@@ -91,7 +95,7 @@ def _route(severity: SeverityLevel) -> str:
 class InsuranceClaimsTriageWorkflow:
     """Orchestrates the full insurance claims triage pipeline.
 
-    The workflow body contains zero non-deterministic code — all I/O,
+    The workflow body contains zero non-deterministic code: all I/O,
     API calls, and side effects happen inside activities.  This satisfies
     Temporal's replay requirement: if a worker restarts mid-execution,
     Temporal replays this code and every activity result is replayed from
@@ -115,22 +119,22 @@ class InsuranceClaimsTriageWorkflow:
         # Step 1: Parallel vision analysis
         #
         # execute_activities_in_parallel beats asyncio.gather here because:
-        #   • Each photo activity gets independent retries (automatic, per
-        #     the retry_policy on analyze_photo — 3 attempts, 2× backoff).
-        #   • Temporal tracks each parallel task separately in the event
+        #   - Each photo activity gets independent retries (automatic, per
+        #     the retry_policy on analyze_photo: 3 attempts, 2x backoff).
+        #   - Temporal tracks each parallel task separately in the event
         #     history, so Studio shows them as distinct timeline entries.
-        #   • If the worker crashes mid-batch, only the incomplete tasks are
-        #     re-dispatched — not the whole batch.
+        #   - If the worker crashes mid-batch, only the incomplete tasks are
+        #     re-dispatched, not the whole batch.
         # asyncio.gather would give you none of these guarantees.
         #
-        # Items are passed as positional values — each str URI maps directly
+        # Items are passed as positional values: each str URI maps directly
         # to analyze_photo's first (and only) parameter, photo_uri: str.
         # ------------------------------------------------------------------
         # execute_activities_in_parallel returns list[PhotoAnalysisResult] already
-        # validated via TypeAdapter — no second model_validate needed.
+        # validated via TypeAdapter, so no second model_validate is needed.
         photo_results: list[PhotoAnalysisResult] = await workflows.execute_activities_in_parallel(
             activity=analyze_photo,
-            items=claim.photos,  # list[str] — each element is one photo_uri
+            items=claim.photos,  # list[str]: each element is one photo_uri
             max_concurrent_scheduled_tasks=10,  # cap for API rate limits
         )
 
@@ -153,7 +157,7 @@ class InsuranceClaimsTriageWorkflow:
         #
         # This branch is NOT an LLM call.  The rationale is in _route() above.
         # Studio will show the value of `severity` in the workflow timeline
-        # without any model inference — pure, auditable Python.
+        # without any model inference: pure, auditable Python.
         # ------------------------------------------------------------------
         severity = _aggregate_severity(photo_results)
         routing_queue = _route(severity)

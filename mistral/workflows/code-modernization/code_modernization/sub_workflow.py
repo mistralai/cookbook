@@ -1,16 +1,16 @@
 """Sub-workflow: ModernizeFileWorkflow: one per source file.
 
 WHY SUB-WORKFLOWS INSTEAD OF ACTIVITIES?
-Each file modernization involves multiple steps (read → LLM → validate) that
+Each file modernization involves multiple steps (read -> LLM -> validate) that
 can fail independently and need isolated retry surfaces. If we put all three
 steps in a single activity, a syntax-validation failure would require re-running
 the file read AND the LLM call from scratch. Instead, each file is its own
 workflow:
 
   Parent workflow
-    ├── ModernizeFileWorkflow (file A)  ← own history, own retry budget
-    ├── ModernizeFileWorkflow (file B)  ← independent: B's retries don't block A
-    └── ModernizeFileWorkflow (file C)
+    +-- ModernizeFileWorkflow (file A)  <- own history, own retry budget
+    +-- ModernizeFileWorkflow (file B)  <- independent: B's retries don't block A
+    +-- ModernizeFileWorkflow (file C)
 
 This is the "Workflows of Workflows" pattern. Each child appears as a collapsed
 node in Studio's timeline, clickable for its own step-by-step drilldown.
@@ -37,22 +37,24 @@ class ModernizeFileWorkflow:
 
     Steps:
     1. Re-read the file (idempotent, safe to replay).
-    2. LLM modernization via mistralai_chat_parse with structured output.
+    2. LLM modernization via chat_parse_to_model with structured output.
     3. Syntax validation in a sandboxed subprocess.
     4. If validation fails, loop back to step 2 (up to MAX_VALIDATION_ATTEMPTS times).
     5. Return a FileModernizationResult.
 
     RETRY MECHANISM: HOW IT ACTUALLY WORKS
-    Temporal retries an activity when *that activity itself* raises. Once
-    modernize_file_llm returns successfully, its retry budget is spent: a
-    downstream SyntaxError from validate_python_syntax does not cause Temporal
-    to re-run the LLM call automatically.
+    validate_python_syntax does not raise on invalid code. It returns an
+    (ok, stderr) pair. An exception raised inside an activity reaches the
+    workflow as a Temporal ActivityError, not as the original exception type,
+    so an "except SyntaxError" here would never fire. Returning the result
+    keeps the decision in the workflow body.
 
-    Instead, the retry loop is explicit in this workflow body: we call
-    modernize_file_llm → validate_python_syntax in a for-loop. On SyntaxError
-    we continue to the next iteration (a fresh LLM call). This makes each
-    attempt visible as a distinct event pair in the Studio timeline, which
-    is a better demo than hidden automatic retries.
+    The retry loop is therefore explicit here: we call modernize_file_llm and
+    validate_python_syntax in a for-loop. While ok is False, we continue to
+    the next iteration with a fresh LLM call. This makes each attempt visible
+    as a distinct event pair in the Studio timeline, which is a better demo
+    than hidden automatic retries. Real infrastructure failures (for example
+    a subprocess timeout) still raise and surface as activity failures.
 
     modernize_file_llm still has retry_policy_max_attempts=2 on the activity
     decorator to handle transient LLM/network failures within a single attempt.
@@ -61,7 +63,7 @@ class ModernizeFileWorkflow:
 
     @workflows.workflow.entrypoint
     async def run(self, params: ModernizeFileParams) -> FileModernizationResult:
-        """Orchestrate read → (modernize → validate) loop for a single file.
+        """Orchestrate read -> (modernize -> validate) loop for a single file.
 
         The validation retry loop is explicit: up to MAX_VALIDATION_ATTEMPTS
         calls to modernize_file_llm, each followed by validate_python_syntax.
@@ -75,7 +77,7 @@ class ModernizeFileWorkflow:
         # Step 1: Read: idempotent, light I/O
         refreshed = await read_file(params.file)
 
-        # Steps 2-4: Explicit modernize → validate loop.
+        # Steps 2-4: Explicit modernize -> validate loop.
         # Each iteration is a fresh LLM call. All attempts appear as separate
         # activity events in the Studio timeline, making the retry behaviour
         # observable without needing to drill into Temporal internals.
@@ -88,22 +90,20 @@ class ModernizeFileWorkflow:
                 relative_path=refreshed.relative_path,
                 target=params.target,
             )
-            try:
-                await validate_python_syntax(
-                    source=modernized.modernized,
-                    relative_path=refreshed.relative_path,
-                )
+            ok, stderr = await validate_python_syntax(
+                source=modernized.modernized,
+                relative_path=refreshed.relative_path,
+            )
+            if ok:
                 # Validation passed: exit the loop
                 syntax_valid = True
                 break
-            except SyntaxError:
-                # Generated code is syntactically invalid. If we have attempts
-                # left, loop back for a fresh LLM call. On the final attempt,
-                # fall through with syntax_valid=False so the parent can still
-                # aggregate the result rather than losing the whole file.
-                if attempt < MAX_VALIDATION_ATTEMPTS - 1:
-                    continue
-                # Final attempt exhausted: syntax_valid stays False
+            # Generated code is syntactically invalid. If we have attempts
+            # left, loop back for a fresh LLM call. On the final attempt,
+            # fall through with syntax_valid=False so the parent can still
+            # aggregate the result rather than losing the whole file.
+            if stderr:
+                print(f"Syntax check failed for {refreshed.relative_path} (attempt {attempt + 1}): {stderr}")
 
         assert modernized is not None  # loop always runs at least once
 

@@ -12,7 +12,7 @@ RELIABILITY PRIMITIVES DEMONSTRATED
 
 2. Parallel sub-workflow execution via asyncio.gather
    All files are dispatched simultaneously. A 10-file repo runs in the time
-   of the slowest single file, not 10× that.
+   of the slowest single file, not 10x that.
 
 3. wait_for_input(): durable HITL pause
    After aggregation the workflow suspends at zero compute cost. The reviewer
@@ -60,7 +60,7 @@ class CodeModernizationWorkflow(workflows.InteractiveWorkflow):
         """Execute the full modernization pipeline.
 
         Args:
-            params: repo_path and target (e.g. "Python 2.7 → 3.12").
+            params: repo_path and target (e.g. "Python 2.7 to 3.12").
 
         Returns:
             WorkflowResult with status='approved' and a PR proposal path, or
@@ -88,8 +88,8 @@ class CodeModernizationWorkflow(workflows.InteractiveWorkflow):
         # Step 3: Fan out: one sub-workflow per file, run in parallel.
         #
         # Each file is its own sub-workflow (not just an activity) because:
-        #   - Sub-workflows have their own event history → independent retries.
-        #   - If the LLM produces invalid Python, that file retries up to 3×
+        #   - Sub-workflows have their own event history: independent retries.
+        #   - If the LLM produces invalid Python, that file retries up to 3 times
         #     without affecting other files in flight.
         #   - Studio shows each file as a collapsible child execution.
         #

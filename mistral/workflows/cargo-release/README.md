@@ -6,7 +6,7 @@ This workflow reads a shipping document with OCR, classifies the cargo, runs a d
 
 The workflow reads the shipping document, classifies the cargo, checks dangerous goods when they apply, and validates customs rules. A missed check means a detained shipment or a safety incident at port.
 
-When it finds an anomaly, such as a missing emergency contact on a UN 1203 shipment or a failed customs rule, it sends a review message and pauses on `wait_for_input`. The workflow holds no compute while it waits. A reviewer approves or blocks the shipment in Studio, and the workflow resumes from the approval step.
+When it finds an anomaly, such as a missing emergency contact on a UN 1203 shipment or a failed customs rule, it sends a review message and pauses on `wait_for_input`. No container stays busy while the workflow waits. A reviewer approves or blocks the shipment in Studio, and the workflow resumes from the approval step.
 
 ## Prerequisites
 
@@ -35,7 +35,7 @@ Create a new Workflows project with `mistral workflows init`. On a terminal, it 
 mistral workflows init cargo-release-cookbook
 ```
 
-From the cookbook repository root, copy the `cargo_release` folder into the worker's workflows directory. The worker discovers every workflow package under `apps/worker/src/worker/workflows/`, including subpackages.
+From the cookbook repository root, copy the `cargo_release` folder into the worker's workflows directory. The worker discovers every workflow package under `apps/worker/src/worker/workflows/`, including subpackages, module by module. Keep the package's `__init__.py` free of imports from the workflow module: importing the workflow classes there registers each workflow twice.
 
 ```bash
 cp -R mistral/workflows/cargo-release/cargo_release \
@@ -53,16 +53,9 @@ mistral apps dev
 
 ## Start the workflow in Studio
 
-Open [Workflows in Studio](https://console.mistral.ai/build/workflows?workflowSearch=cargo-release-compliance), select `cargo-release-compliance`, and click Start workflow. Paste this input, which uses the normal sample document:
+Start `cargo-release-compliance` twice, once with each sample document. The two runs cover the two outcomes of the workflow: a clean pass and a flagged shipment that waits for a reviewer.
 
-```json
-{
-  "document_uri": "src/worker/workflows/cargo_release/sample_data/shipping_doc_normal.png",
-  "shipment_id": "BL-2024-HAM-009371"
-}
-```
-
-To reach the review step, start it again with the anomaly sample document:
+The first run uses the anomaly document, a UN 1203 flammable shipment with no emergency contact. The dangerous goods sub-workflow flags the missing contact, the workflow pauses for review, and you approve or block it in Studio:
 
 ```json
 {
@@ -71,7 +64,18 @@ To reach the review step, start it again with the anomaly sample document:
 }
 ```
 
-`document_uri` accepts a path relative to `apps/worker`, which is the working directory of the local worker, a `file://` URI, an HTTPS URL, or a `data:` URI. The activity refuses to read files outside the worker directory.
+The second run uses the normal document, a cotton textile shipment with no dangerous goods. It passes the dangerous goods and customs checks, so there is no review step: the workflow goes straight to the release certificate and returns `status: "released"`:
+
+```json
+{
+  "document_uri": "src/worker/workflows/cargo_release/sample_data/shipping_doc_normal.png",
+  "shipment_id": "BL-2024-HAM-009371"
+}
+```
+
+The customs rules cover HS code, country of origin, consignee name and address, declared value, and gross weight, plus an emergency contact for dangerous goods. The normal sample has all of them, so it does not fail customs. A customs failure is the other way to reach the review pause.
+
+`document_uri` accepts an `https://` URL, a `data:` URI, a `file://` URI, or a path relative to `apps/worker`, which is the working directory of the local worker. `http://` URLs are not fetched, and local paths resolve against the worker directory: the activity refuses to read files outside it, and a path that does not exist fails with a raw `FileNotFoundError`.
 
 ## Inspect the execution
 
@@ -82,11 +86,11 @@ Open [the executions page](https://console.mistral.ai/build/workflows/executions
 - `dangerous-goods-validation` runs as a child workflow with its own events. Open it to see the `validate_dangerous_goods` activity and the `DangerousGoodsResult` it returns.
 - `validate_customs_compliance` returns a `ComplianceCheck` with `passed`, `failed_rules`, and `notes`.
 
-On the anomaly path, the workflow sends a review message and pauses at `wait_for_input`. The timeline stops there until you approve or block the shipment in Studio. Approving runs `generate_release_certificate` and returns a `CargoReleaseResult` with `status: "released"`. Blocking returns the same model with `status: "blocked"` and a `block_reason`, and the certificate step doesn't run.
+On the anomaly path, the workflow sends a review message and pauses at `wait_for_input`. The timeline stops there until you approve or block the shipment in Studio. Approving runs `generate_release_certificate` and returns a `CargoReleaseResult` with `status: "released"`. Blocking returns the same model with `status: "blocked"` and a `block_reason`, and the certificate step doesn't run. On the normal path, no review step appears: `generate_release_certificate` runs after `validate_customs_compliance` and the run ends with `status: "released"`.
 
 ## Summary
 
-This cookbook ran a cargo release workflow end to end and paused it for a human decision on a flagged shipment.
+This cookbook ran a cargo release workflow end to end, once as a clean pass and once paused for a human decision on a flagged shipment.
 
 **What you built:**
 - A workflow that extracts text from a shipping document with Mistral OCR

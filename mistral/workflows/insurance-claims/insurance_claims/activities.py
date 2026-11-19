@@ -2,10 +2,10 @@
 
 Each activity is a discrete, idempotent unit of work:
 
-- ``analyze_photo``        — Mistral Small vision call for photo damage assessment
-- ``check_consistency``    — LLM cross-reference of photo findings vs. description
-- ``score_fraud_risk``     — LLM fraud-risk scoring with structured output
-- ``generate_triage_report`` — LLM final report with cited evidence
+- ``analyze_photo``: Mistral Small vision call for photo damage assessment
+- ``check_consistency``: LLM cross-reference of photo findings vs. description
+- ``score_fraud_risk``: LLM fraud-risk scoring with structured output
+- ``generate_triage_report``: LLM final report with cited evidence
 
 All LLM activities use ``mistralai_chat_parse`` (structured output via
 Pydantic) so the response schema is always validated before the workflow
@@ -13,7 +13,7 @@ sees it.
 
 Why are these activities and not inline workflow code?
   Activities are the correct boundary for I/O: they get automatic retries,
-  distributed scheduling, and per-call observability in AI Studio.  Putting
+  distributed scheduling, and per-call observability in Studio.  Putting
   an API call directly in workflow code would break deterministic replay.
 """
 
@@ -65,12 +65,12 @@ def _confined_local_path(raw_path: str) -> Path:
 
 
 def _resolve_image_uri(photo_uri: str) -> str:
-    """Convert a ``file://`` URI to a base64 data URI for Pixtral.
+    """Convert a ``file://`` URI to a base64 data URI for the vision model.
 
     HTTP(S) URLs and existing data URIs are returned as-is. ``file://`` URIs and
     plain paths are read from disk (confined to the project directory, see
-    :func:`_confined_local_path`) and encoded as ``data:image/<ext>;base64,...``
-    so Pixtral can consume them without network access to the filesystem.
+    :func:`_confined_local_path`) and encoded as ``data:<mime>;base64,...``
+    so the vision model can consume them without network access to the filesystem.
     """
     if photo_uri.startswith(("http://", "https://", "data:")):
         return photo_uri
@@ -87,7 +87,7 @@ def _resolve_image_uri(photo_uri: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Vision analysis — Mistral Small vision call
+# Vision analysis: Mistral Small vision call
 # ---------------------------------------------------------------------------
 
 _VISION_PROMPT = (
@@ -96,7 +96,7 @@ _VISION_PROMPT = (
     "Classify the damage into one of these categories:\n"
     "- none: No visible damage\n"
     "- minor: Surface scratches, small paint chips\n"
-    "- moderate: Dents, cracked lights, cosmetic panel damage — vehicle is driveable\n"
+    "- moderate: Dents, cracked lights, cosmetic panel damage; vehicle is driveable\n"
     "- severe: Structural damage to panels, frame, or mechanical components\n"
     "- totaled: Vehicle is a total loss\n\n"
     "Return JSON with fields:\n"
@@ -139,7 +139,7 @@ async def analyze_photo(photo_uri: str) -> PhotoAnalysisResult:
 
 
 # ---------------------------------------------------------------------------
-# Consistency check — LLM with structured output
+# Consistency check: LLM with structured output
 # ---------------------------------------------------------------------------
 
 
@@ -161,7 +161,7 @@ async def check_consistency(
     prompt = (
         "You are an insurance claims analyst. "
         "Compare the following photo analysis findings with the claimant's written description. "
-        "Identify any inconsistencies — e.g. the claimant describes minor scratches but photos "
+        "Identify any inconsistencies, e.g. the claimant describes minor scratches but photos "
         "show total loss.\n\n"
         f"Photo findings (JSON):\n{photo_findings_json}\n\n"
         f"Claimant description:\n{claimant_description}\n\n"
@@ -176,7 +176,7 @@ async def check_consistency(
 
 
 # ---------------------------------------------------------------------------
-# Fraud-risk scoring — LLM with structured output
+# Fraud-risk scoring: LLM with structured output
 # ---------------------------------------------------------------------------
 
 
@@ -216,7 +216,7 @@ async def score_fraud_risk(
 
 
 # ---------------------------------------------------------------------------
-# Triage report generation — LLM with structured output
+# Triage report generation: LLM with structured output
 # ---------------------------------------------------------------------------
 
 

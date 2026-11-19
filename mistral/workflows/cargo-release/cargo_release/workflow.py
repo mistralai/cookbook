@@ -1,12 +1,12 @@
 """Cargo Release & Dangerous Goods Compliance workflow.
 
 Demonstrates Mistral Workflows' key primitives through a realistic maritime
-logistics use case: OCR extraction → cargo classification → dangerous-goods
-sub-workflow → customs compliance → HITL review (when anomaly detected) →
+logistics use case: OCR extraction -> cargo classification -> dangerous-goods
+sub-workflow -> customs compliance -> HITL review (when anomaly detected) ->
 release certificate generation.
 
 Key SDK concepts shown:
-  - InteractiveWorkflow + wait_for_input()  (AcceptDeclineConfirmation)
+  - InteractiveWorkflow + wait_for_input() (AcceptDeclineConfirmation)
   - Child / sub-workflows via workflow.execute_workflow()
   - Activity retry policies and typed timeouts
   - Deterministic branching in workflow code
@@ -44,7 +44,7 @@ class DangerousGoodsValidationWorkflow:
     """Sub-workflow that gives dangerous-goods validation its own retry surface.
 
     Keeping this as a separate @workflow.define class means:
-    - It has its own execution timeline in AI Studio.
+    - It has its own execution timeline in Studio.
     - If the validate_dangerous_goods activity fails exhaustively, only this
       sub-workflow is marked failed, so the parent can decide how to proceed.
     - The parent triggers it with execute_workflow(), which is a durable call:
@@ -72,8 +72,8 @@ class CargoReleaseWorkflow(workflows.InteractiveWorkflow):
     """Main cargo release workflow.
 
     Extends InteractiveWorkflow (not plain Workflow) because it may call
-    wait_for_input(), which suspends the workflow in Le Chat and Mistral AI
-    Studio, consuming zero compute while waiting for a human reviewer.
+    wait_for_input(), which suspends the workflow in Studio with no container
+    busy while waiting for a human reviewer.
 
     All branching in this method is deterministic: it depends only on the
     structured outputs of activities (which are recorded in event history),
@@ -89,19 +89,19 @@ class CargoReleaseWorkflow(workflows.InteractiveWorkflow):
         activity so Temporal can safely replay this function on worker restarts.
         """
 
-        # ── Step 1: OCR extraction ─────────────────────────────────────────
+        # Step 1: OCR extraction
         # retry_policy_max_attempts=3 is set on the activity decorator because
         # real OCR APIs are flaky (transient network errors, PDF parsing hiccups).
         # If all attempts fail, the exception propagates here and the workflow
-        # fails with a descriptive error visible in AI Studio.
+        # fails with a descriptive error visible in Studio.
         extracted_text: str = await ocr_extract_shipping_doc(params.document_uri)
 
-        # ── Step 2: Cargo classification ──────────────────────────────────
+        # Step 2: Cargo classification
         # mistralai_chat_parse returns a validated CargoClassification Pydantic
         # model: no raw JSON parsing in the workflow body.
         classification: CargoClassification = await classify_cargo_type(extracted_text)
 
-        # ── Step 3 (conditional): Dangerous goods sub-workflow ────────────
+        # Step 3 (conditional): Dangerous goods sub-workflow
         # Branching on classification.cargo_type is deterministic because the
         # value comes from a recorded activity result, not live data.
         dg_result: DangerousGoodsResult | None = None
@@ -118,18 +118,18 @@ class CargoReleaseWorkflow(workflows.InteractiveWorkflow):
                 execution_timeout=timedelta(minutes=10),
             )
 
-        # ── Step 4: Customs compliance validation ─────────────────────────
+        # Step 4: Customs compliance validation
         compliance = await validate_customs_compliance(
             extracted_text=extracted_text,
             cargo_type=classification.cargo_type,
             shipment_id=params.shipment_id,
         )
 
-        # ── Step 5 (conditional): HITL review ────────────────────────────
+        # Step 5 (conditional): HITL review
         # An anomaly is flagged when either:
         #   a) the dangerous-goods sub-workflow found something wrong, OR
         #   b) customs compliance failed.
-        # This boolean is computed from recorded activity results → deterministic.
+        # This boolean is computed from recorded activity results -> deterministic.
         anomaly_detected = (dg_result is not None and dg_result.has_anomaly) or (not compliance.passed)
 
         if anomaly_detected:
@@ -149,10 +149,9 @@ class CargoReleaseWorkflow(workflows.InteractiveWorkflow):
             )
 
             # wait_for_input() is the headline primitive.
-            # The workflow is durably suspended here: no polling, no compute,
-            # no heartbeats required. Temporal holds the state in its event log
-            # and resumes the workflow the instant the reviewer submits a decision
-            # in Le Chat or AI Studio.
+            # The workflow is durably suspended here: no activity is running
+            # while it waits. Temporal holds the state in its event log and
+            # resumes the workflow once the reviewer submits a decision in Studio.
             confirmation = await self.wait_for_input(
                 workflows_mistralai.AcceptDeclineConfirmation(
                     description=(
@@ -172,7 +171,7 @@ class CargoReleaseWorkflow(workflows.InteractiveWorkflow):
                     block_reason=f"Reviewer blocked shipment. Issues: {anomaly_summary}",
                 )
 
-        # ── Step 6: Generate release certificate ─────────────────────────
+        # Step 6: Generate release certificate
         # Reached either when no anomaly was detected, or after the reviewer
         # approved the flagged shipment.
         certificate = await generate_release_certificate(

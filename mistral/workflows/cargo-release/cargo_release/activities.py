@@ -24,7 +24,7 @@ def _confined_local_path(raw_path: str) -> Path:
     """Resolve a caller-supplied local path, confined to the project directory.
 
     ``document_uri`` comes from workflow input, which is untrusted. Reading an
-    arbitrary path (e.g. ``/etc/passwd`` or ``file:///…``) and shipping its
+    arbitrary path (e.g. ``/etc/passwd`` or ``file:///...``) and shipping its
     bytes to the OCR API would let a caller exfiltrate host files. We therefore
     resolve the path under the project working directory and reject anything
     that escapes it.
@@ -153,7 +153,8 @@ async def validate_customs_compliance(extracted_text: str, cargo_type: str, ship
     """Check the document against standard customs rules.
 
     Validates presence of: HS code, country of origin, consignee details,
-    declared value, and cargo weight. Returns a structured pass/fail result.
+    declared value, and cargo weight, plus an emergency contact for
+    dangerous_goods cargo. Returns a structured pass/fail result.
     """
     request = workflows_mistralai.ChatCompletionRequest(
         model="mistral-small-latest",
@@ -168,6 +169,7 @@ async def validate_customs_compliance(extracted_text: str, cargo_type: str, ship
                     "4. Declared value present\n"
                     "5. Gross weight declared\n"
                     "6. For dangerous_goods cargo: emergency contact present\n"
+                    "Rule 6 applies only when the cargo type is dangerous_goods.\n"
                     "Set passed=false and list failed_rules if any rule fails."
                 )
             ),
@@ -196,7 +198,7 @@ async def generate_release_certificate(
     """Generate a formal release certificate as a templated LLM string.
 
     Returns plain text: the certificate is stored in the workflow result
-    and can be emailed / archived downstream (email connector out of scope here).
+    and can be emailed or archived downstream (email connector out of scope here).
     """
     request = workflows_mistralai.ChatCompletionRequest(
         model="mistral-small-latest",

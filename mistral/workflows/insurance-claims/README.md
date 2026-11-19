@@ -51,17 +51,19 @@ mistral apps dev
 
 ## Start the workflow in Studio
 
-Open [Workflows in Studio](https://console.mistral.ai/build/workflows?workflowSearch=insurance-claims-triage), select `insurance-claims-triage`, and click Start workflow. Paste the contents of `insurance_claims/sample_data/claim_high_severity.json`, which analyzes two photos of a totaled car and sends the claim to the high severity path.
+Open [Workflows in Studio](https://console.mistral.ai/build/workflows?workflowSearch=insurance-claims-triage), select `insurance-claims-triage`, and click Start workflow. Paste the contents of `insurance_claims/sample_data/claim_high_severity.json`, which queues two photos of a wrecked car and, because the claimant's description says the car is a total loss, sets up the high severity path.
 
-The photo paths in the sample file point at the sample photos in your local project, so they work with `mistral apps dev`. In a deployed worker, pass HTTPS URLs for the photos.
+The photo paths in the sample file are relative to `apps/worker`, the working directory of the local worker, so they work with `mistral apps dev`. In a deployed worker, pass HTTPS URLs for the photos.
 
-The package ships three sample inputs in `insurance_claims/sample_data/`. Each one matches a routing outcome:
+The package ships three sample inputs in `insurance_claims/sample_data/`. Each pairs a claimant description with the photos listed below. The routing queue is set by the worst `damage_label` the vision model returns for the photos (see "Inspect the execution" below), so a sample lands on its listed queue when the model reads the photo the way the claimant's description does.
+
+The samples are illustrative, not fixtures: not every photo shows all the damage that its description reports, so read the vision findings when you compare them.
 
 | File | Photos | Routing queue |
 |---|---|---|
-| `claim_high_severity.json` | Two totaled vehicles | `full-investigation` |
-| `claim_medium_severity.json` | Rear dent and cracked tail light | `adjuster-review` |
-| `claim_low_severity.json` | A keyed door panel | `fast-track` |
+| `claim_high_severity.json` | Two photos of a wrecked car | `full-investigation` |
+| `claim_medium_severity.json` | The rear of a parked van | `adjuster-review` |
+| `claim_low_severity.json` | The driver-side door of a silver car | `fast-track` |
 
 To try the other routing outcomes, paste the contents of `claim_medium_severity.json` or `claim_low_severity.json`. To use your own claim, set `photos` to HTTPS URLs or to local paths inside the worker directory.
 
@@ -69,11 +71,11 @@ To try the other routing outcomes, paste the contents of `claim_medium_severity.
 
 Open [the executions page](https://console.mistral.ai/build/workflows/executions) and select the run. The timeline shows the steps below in order.
 
-The `analyze_photo` activities start together, one per photo, and each retries up to three times with a 2x backoff if the vision call fails. Then `check_consistency` compares the photo findings with the claimant's description, and `score_fraud_risk` returns a score with cited indicators.
+The `analyze_photo` activities start together, one per photo. Each retries up to 3 times with exponential backoff if the vision call fails, and a photo that exhausts its retries fails the run. Then `check_consistency` compares the photo findings with the claimant's description, and `score_fraud_risk` returns a score with cited indicators. Every LLM activity in this workflow uses the same retry policy.
 
 `_aggregate_severity` takes the worst damage label across all photos, and `_route` maps it to a queue. Both run in workflow code, so the routing decision shows as a value in the execution, not as a separate step.
 
-The run ends with `generate_triage_report`, which returns a `TriageReport` with the findings, the consistency check, the fraud score, and cited evidence.
+The run ends with `generate_triage_report`, which returns a `TriageReport` with the findings, the consistency check, the fraud score, and cited evidence. Open the activity's output in the execution to read it.
 
 ## Summary
 

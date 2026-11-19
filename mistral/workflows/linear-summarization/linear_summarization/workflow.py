@@ -48,7 +48,7 @@ _UUID_PATTERN = re.compile(
 @workflows.workflow.define(
     name="linear-weekly-summary",
     # Required so the Linear connector can resolve the executor's stored
-    # authentication at activity-execution time — without it, the connector
+    # authentication at activity-execution time: without it, the connector
     # has no user identity to look up credentials for.
     on_behalf_of=True,
 )
@@ -109,7 +109,7 @@ class LinearWeeklySummaryWorkflow(workflows.InteractiveWorkflow):
         )
 
         if needs_team_hitl:
-            # 3a. Pick a team via wait_for_input — the activity result drives the options.
+            # 3a. Pick a team via wait_for_input: the activity result drives the options.
             teams = await fetch_linear_teams()
             if not teams:
                 raise ValueError("No teams returned by Linear API.")

@@ -29,9 +29,9 @@ def _confined_path(raw_path: str) -> Path:
 
     ``repo_path`` and the file paths derived from it come from workflow input,
     which is untrusted. Walking or reading an arbitrary location (e.g. ``/etc``)
-    and sending its contents to the LLM: or writing ``PR_PROPOSAL.md`` outside
-    the project: would let a caller exfiltrate or clobber host files. We resolve
-    the path under the project working directory and reject anything that escapes
+    and sending its contents to the LLM, or writing ``PR_PROPOSAL.md`` outside
+    the project, would let a caller exfiltrate or clobber host files. We resolve
+    the path under the worker's working directory and reject anything that escapes
     it.
     """
     root = Path.cwd()
@@ -125,21 +125,27 @@ Source:
 @workflows.activity(
     name="validate_python_syntax",
     start_to_close_timeout=timedelta(seconds=15),
-    # No Temporal retry on this activity: SyntaxError is an expected signal
-    # that the caller (sub_workflow.py) uses to drive a fresh LLM call.
-    # Retrying the validator with the same broken source would always fail.
+    retry_policy_max_attempts=1,
 )
-async def validate_python_syntax(source: str, relative_path: str) -> bool:
+async def validate_python_syntax(source: str, relative_path: str) -> tuple[bool, str]:
     """Run syntax validation in a subprocess: sandboxed from the worker process.
 
-    Shells out to a fresh Python interpreter so a SyntaxError in the generated
+    Shells out to a fresh Python interpreter so a syntax error in the generated
     code cannot crash the worker. The subprocess timeout (10s) is explicit and
     independent of the Temporal activity timeout.
 
+    Invalid code is an expected outcome, not a failure: it is returned as
+    (False, stderr) so the workflow body can decide to call the LLM again.
+    Raising instead would surface as a Temporal ActivityError, which the
+    workflow cannot catch as a SyntaxError, and the activity would also be
+    retried with the same broken source. retry_policy_max_attempts=1 disables
+    that pointless retry.
+
+    Returns:
+        (ok, stderr): ok is True when the code compiles, stderr is the
+            interpreter error output when it does not.
+
     Raises:
-        SyntaxError: If the modernized source has invalid Python syntax. The
-            sub_workflow.py caller catches this and loops back for a fresh LLM
-            call (up to MAX_VALIDATION_ATTEMPTS times).
         subprocess.TimeoutExpired: If the subprocess hangs beyond 10s: an
             infrastructure problem that should not be silently swallowed.
     """
@@ -152,8 +158,8 @@ async def validate_python_syntax(source: str, relative_path: str) -> bool:
         timeout=10,  # Subprocess-level guard, independent of Temporal's timeout
     )
     if result.returncode != 0:
-        raise SyntaxError(f"Generated code for {relative_path} failed syntax check:\n{result.stderr}")
-    return True
+        return False, result.stderr
+    return True, ""
 
 
 @workflows.activity(
@@ -165,6 +171,11 @@ async def write_pr_proposal(repo_path: str, target: str, files: list[FileModerni
 
     In production this is `await open_github_pr(...)` using the GitHub Connector.
     For the demo we write a local markdown file that describes the proposed changes.
+
+    The file lands inside repo_path, i.e. in the sample repository the input
+    points at. That makes the sample tree dirty: delete the file before
+    re-running the cookbook from scratch, or commit it before a later
+    `mistral apps deploy`, which requires a clean directory.
     """
     lines = [
         f"# PR Proposal: {target}",

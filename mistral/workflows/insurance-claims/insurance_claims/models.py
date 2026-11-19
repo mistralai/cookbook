@@ -3,7 +3,7 @@
 Defines input/output shapes for the workflow entrypoint and every
 structured-output LLM call.  All intermediate types live here so
 activity signatures stay clean and the JSON schemas are easy to read
-in AI Studio.
+in Studio.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ class DamageLabel(str, Enum):
 
 
 class PhotoAnalysisResult(BaseModel):
-    """Structured result from analysing a single claim photo via Pixtral."""
+    """Structured result from analysing a single claim photo with ``mistral-small-latest``."""
 
     photo_uri: str
     damage_label: DamageLabel
@@ -80,25 +80,13 @@ class SeverityLevel(str, Enum):
     HIGH = "high"
 
 
-class SeverityClassification(BaseModel):
-    """Result of the deterministic branching step.
-
-    Routing is a hard rule, not an LLM call — see workflow.py for the
-    reasoning behind this design decision.
-    """
-
-    severity: SeverityLevel
-    routing_queue: str
-    rationale: str
-
-
 # ---------------------------------------------------------------------------
 # Fraud-risk activity output
 # ---------------------------------------------------------------------------
 
 
 class FraudRiskAssessment(BaseModel):
-    """Structured fraud-risk score from a Pixtral + text reasoning call."""
+    """Structured fraud-risk score from a ``mistral-small-latest`` reasoning call."""
 
     fraud_risk_score: float = Field(ge=0.0, le=1.0)
     fraud_indicators: list[str] = Field(default_factory=list)

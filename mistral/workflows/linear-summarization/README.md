@@ -6,17 +6,18 @@ This workflow reads the issues updated in the past week in a Linear team or proj
 
 The workflow takes a team and a project as input, either by name or by ID. It resolves both through the Linear Connector. If a team or project can't be resolved, the workflow pauses and asks you to pick one in Studio. It then fetches the issues updated in the last 7 days and passes them to `mistral-medium-latest` for summarization.
 
-The connector call runs with `on_behalf_of=True`, so Linear resolves the credentials stored for the person who starts the execution. This needs a hardened deployment, and the steps are in [Hardened deployments](https://docs.mistral.ai/studio/workflows/managing-workflows-in-production/hardened_deployments).
+The workflow declares `on_behalf_of=True` on `@workflow.define`. This is on-behalf-of mode: the Linear connector resolves the credentials stored for the person who starts the execution. On-behalf-of mode needs a hardened deployment, which is covered in [Deploy](#deploy). See [Hardened deployments](https://docs.mistral.ai/studio/deployments/self-hosted/hardened-workflows) for what hardening covers.
 
 ## Prerequisites
 
 To complete this cookbook, you will need:
+
 - macOS or Linux
 - git
 - The Mistral CLI, installed in the next step. `mistral apps dev` also needs Bun, which the installer offers to install.
 - A Mistral account
 - A Linear account, with a Linear Connector created in [Studio](https://console.mistral.ai/build/connectors) and named `linear`
-- An organization with access to hardened deployments, which the on-behalf-of mode requires
+- An organization with access to hardened deployments, which on-behalf-of mode requires
 
 ## Environment setup
 
@@ -52,9 +53,9 @@ The workflow reads Linear through the Connector, so no Linear token goes in the 
 
 ### Deploy
 
-The on-behalf-of call needs a managed deployment, so deploy the worker before you run it in Studio. The deploy builds the commit you pushed, so commit the copied `linear_summarization` package first.
+`mistral apps dev` runs the worker without a deployment. The workflow itself only works once it is deployed, because on-behalf-of mode needs a hardened deployment for the connector to act on behalf of the person who starts the execution.
 
-Run `mistral login`, commit the project, and push it to a GitHub `origin` with the Mistral GitHub app installed:
+The deploy builds the commit you pushed, so commit the copied `linear_summarization` package first. Run `mistral login`, commit the project, and push it to a GitHub `origin` with the Mistral GitHub app installed:
 
 ```bash
 git add .
@@ -68,7 +69,15 @@ Then deploy from the project root:
 mistral apps deploy
 ```
 
-The first deploy creates the workflows deployment hardened, so its workflows can act on behalf of the user who runs them. `mistral apps deploy` needs a per-org feature flag. If the command is missing, ask for it in `#project-mistral-apps-cli`. Off a terminal, the deploy fails with `No deploy target.` unless you pass `--organization`.
+The first deploy creates the workflows deployment hardened, so its workflows can act on behalf of the user who runs them. On a terminal, the first deploy asks for the organization and workspace and saves them as the deploy target. In CI or a script, pass them explicitly:
+
+```bash
+mistral apps deploy --organization <organization> --workspace <workspace>
+```
+
+Off a terminal, a deploy with no saved target fails with a message that starts `No deploy target.` and names `--organization`, `--workspace`, and `mistral context show`.
+
+`mistral apps deploy` is rolled out per organization. If your organization does not have it yet, ask your organization admin to enable it.
 
 ## Run the worker
 
@@ -81,7 +90,9 @@ mistral apps dev
 
 ## Start the workflow in Studio
 
-Open [Workflows in Studio](https://console.mistral.ai/build/workflows?workflowSearch=linear-weekly-summary), select `linear-weekly-summary`, and click Start workflow. Paste this input to summarize every project in the Engineering team:
+If `mistral apps dev` is still running, stop it before you continue. In Studio, start the workflow on the deployed workers deployment, not on the local `deployment-<your-user>` worker that `mistral apps dev` creates.
+
+Open [Workflows in Studio](https://console.mistral.ai/build/workflows?workflowSearch=linear-weekly-summary), select `linear-weekly-summary`, pick the deployed deployment for the run, and click Start workflow. Paste this input to summarize every project in the Engineering team:
 
 ```json
 {
@@ -90,7 +101,7 @@ Open [Workflows in Studio](https://console.mistral.ai/build/workflows?workflowSe
 }
 ```
 
-`team` and `project` accept a name or an ID. Use `"*"` for `project` to cover all projects in the team. To summarize a single project, pass its name or ID instead:
+`team` and `project` must be ones that your own Linear account can see, because the connector runs on your behalf. They accept a name or an ID. Use `"*"` for `project` to cover all projects in the team. To summarize a single project, pass its name or ID instead:
 
 ```json
 {
@@ -105,7 +116,9 @@ Start the workflow with `{}` to pick the team and project from prompts in Studio
 
 Open [the executions page](https://console.mistral.ai/build/workflows/executions) and select the run. `fetch_recent_issues` runs on the resolved team and project, then `generate_weekly_summary` writes the summary. When the team or project name doesn't resolve, the execution pauses at a `wait_for_input` step. Answer the prompt in Studio and the execution continues with the chosen values.
 
-The final output is the summary text. Check that it covers the issues updated in the last 7 days.
+`fetch_recent_issues` lists at most 50 projects per team: the Linear connector's `list_projects` tool rejects a higher `limit` with an HTTP 400, so a team with more than 50 projects summarizes only the first 50 the connector returns.
+
+The final output is the summary text. Check that it covers the issues updated in the last 7 days. On a deployed worker, the sample input paths do not exist: Studio runs on the deployed code, which ships without the sample data, so run this walkthrough against the local `mistral apps dev` worker.
 
 ## Summary
 

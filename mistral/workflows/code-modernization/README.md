@@ -60,17 +60,19 @@ Open [Workflows in Studio](https://console.mistral.ai/build/workflows?workflowSe
 }
 ```
 
-`repo_path` is an absolute path to a repository inside the worker directory, or a path relative to `apps/worker`, which is the working directory of the local worker. Paths outside the worker directory are rejected. `target` is optional and defaults to `Python 2.7 to 3.12`.
+`repo_path` is an absolute path to a repository inside the worker's working directory, or a path relative to it. Under `mistral apps dev` that working directory is `apps/worker`, so the sample path above starts with `src/worker/...`, not `apps/worker/src/worker/...`. Paths outside the working directory are rejected. `target` is optional and defaults to `Python 2.7 to 3.12`.
 
-To modernize a different repository, copy it into `apps/worker` and pass its absolute path. The scan skips `__init__.py` files, `__pycache__`, `.venv`, `.git`, and `node_modules`.
+To modernize a different repository, copy it into the worker's working directory (`apps/worker`) and pass its absolute path. The scan skips `__init__.py` files, `__pycache__`, `.venv`, `.git`, and `node_modules`.
 
 ## Inspect the execution
 
 Open [the executions page](https://console.mistral.ai/build/workflows/executions) and select the run. The `scan_files_to_modernize` activity returns the three sample files. Each file then appears as its own `code-modernization-file` child execution, and all three start at nearly the same timestamp because the parent dispatches them with `asyncio.gather`.
 
-Open a child execution to see its steps. `read_file` returns the file, `modernize_file_llm` calls `mistral-small-latest` and parses the answer into a `ModernizedFile`, and `validate_python_syntax` compiles the generated code in a subprocess. When the generated code fails to compile, the child runs `modernize_file_llm` again, up to three attempts. If all three fail, the child returns the file with `syntax_valid: false` and the parent lists it as WARN in the review summary.
+Open a child execution to see its steps. `read_file` returns the file, `modernize_file_llm` calls `mistral-small-latest` and parses the answer into a `ModernizedFile`, and `validate_python_syntax` compiles the generated code in a subprocess and returns whether it compiled. When the generated code fails to compile, the child runs `modernize_file_llm` again, up to three attempts. If all three fail, the child returns the file with `syntax_valid: false` and the parent lists it as WARN in the review summary.
 
 After the children finish, the parent sends a summary message and pauses at `wait_for_input` with the label `Change Set Review`. The workflow holds no compute while it waits. Click Open PR to run `write_pr_proposal`, which writes `PR_PROPOSAL.md` into the sample repository and returns a `WorkflowResult` with `status: "approved"`. Click Discard to return `status: "declined"` without writing the file.
+
+The proposal file lands inside the sample repository at `apps/worker/src/worker/workflows/code_modernization/sample_data/legacy_repo/PR_PROPOSAL.md`, and the activity returns that path in `pr_proposal_path`. This leaves the copied package tree dirty: `mistral apps deploy` requires a clean directory, including untracked files. Delete `PR_PROPOSAL.md` before re-running the flow from scratch, or commit it before you deploy.
 
 ## Summary
 
