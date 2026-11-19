@@ -28,6 +28,7 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
 | [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
+| [text2sql_mistral_bird.ipynb](mistral/evaluation/text2sql_mistral_bird.ipynb) | evaluation, text-to-SQL | Measure text-to-SQL execution accuracy of Mistral models on the BIRD benchmark |
 | [sts_demo.py](mistral/audio/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [online_evaluation.ipynb](mistral/observability/online_evaluation.ipynb) | observability, evaluation, LLM As a Judge | Score production traffic continuously with LLM judges (scorers and live evals) |
 | [build_evaluation_datasets.ipynb](mistral/observability/build_evaluation_datasets.ipynb) | observability, datasets, evaluation | Build evaluation datasets from records, JSONL files, and production spans, and run an offline evaluation on them |
