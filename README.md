@@ -95,6 +95,7 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [Mistral OCR with Gradio](third_party/gradio/MistralOCR.md)                                                           | OCR                             | Gradio     |
 | [prompt_optimization.ipynb](third_party/metagpt/prompt_optimization.ipynb))                                           | Prompting                       | MetaGPT.   |
 | [Use Mistral with Kong AI Gateway](third_party/Kong/mistral_with_kong_ai_gateway.ipynb)                               | AI gateway                      | Kong       |
+| [Call any connector's tools as each user from a Mistral agent](third_party/Scalekit/scalekit_mistral_per_user_tools.md) | Authentication, Tool calling    | Scalekit   |
 
 ## Submission Guidelines:
 
