@@ -24,7 +24,8 @@ sequenceDiagram
     Mistral-->>App: tool_calls: github_user_repos_list
     App->>Scalekit: execute_tool(identifier="user_a", ...)
     Scalekit->>GitHub: request with user_a's token
-    GitHub-->>App: user_a's repositories
+    GitHub-->>Scalekit: user_a's repositories
+    Scalekit-->>App: result.data
     App->>Mistral: tool result, then the final answer
 ```
 
