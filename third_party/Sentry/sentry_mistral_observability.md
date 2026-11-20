@@ -10,7 +10,7 @@ Screenshots show fictional orders and the native Mistral SDK tested through Open
 
 You need Node.js 24.12 or later, pnpm, a [Mistral API key](https://console.mistral.ai/) with access to a model that supports tool calling, and a [Sentry project](https://sentry.io/signup/) with its DSN.
 
-Clone the [Sentry agent tracing examples](https://github.com/getsentry/sentry-agent-tracing-examples/tree/main/mistral-support). The example pins `@sentry/node` to `11.0.0-rc.0` and `@mistralai/mistralai` to `2.7.0`. This Sentry release candidate includes the native Mistral integration.
+Clone the [Sentry agent tracing examples](https://github.com/getsentry/sentry-agent-tracing-examples/tree/main/mistral-support). The example's `package.json` and lockfile set the tested versions. Mistral SDK 3.x needs Sentry JavaScript SDK 11.11.0 or later. See [supported versions](https://docs.sentry.io/platforms/javascript/guides/node/configuration/integrations/mistral/#supported-versions).
 
 ```bash
 git clone https://github.com/getsentry/sentry-agent-tracing-examples.git
@@ -258,6 +258,7 @@ export function lookupOrder(call: ToolCall, failLookup: boolean): Promise<string
       op: "gen_ai.execute_tool",
       attributes: {
         "gen_ai.operation.name": "execute_tool",
+        "gen_ai.agent.name": "Order Support",
         "gen_ai.tool.name": "lookup_order",
         "gen_ai.tool.call.id": call.id,
         "gen_ai.tool.call.arguments": typeof call.function.arguments === "string"
