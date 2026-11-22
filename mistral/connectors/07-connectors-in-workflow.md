@@ -22,7 +22,7 @@ To complete this cookbook, you'll need:
 
 - macOS or Linux; the Mistral CLI has no Windows build.
 - [Git](https://git-scm.com/downloads), [uv](https://docs.astral.sh/uv/getting-started/installation/), and Python 3.12 or later.
-- A Mistral account, with the CLI signed in: run `mistral login` before you start. Signing in also enables the feature flags that gate `mistral apps dev`.
+- A Mistral account, with the CLI signed in: run `mistral login` before you start. `mistral apps dev` proxies Mistral API calls as the signed-in workspace.
 - A Mistral workspace to run your workflow.
 - For this walkthrough: a GitHub connector registered as `github_app` in Studio, with a personal-access-token credential stored. The client step creates an issue in a repository of your choice, so use a token that can write issues to it (replace `my-org`/`my-repo` in the client arguments when you run it).
 - At least one registered Connector. See [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one directly in [Studio](https://console.mistral.ai).
@@ -69,7 +69,7 @@ cd connectors-demo
 
 The project puts the worker in `apps/worker`. Workflow modules go in `apps/worker/src/worker/workflows/`, which the worker scans recursively.
 
-`mistral apps dev` reads `MISTRAL_API_KEY` from the project's `.env` and registers the workflow in that key's workspace. The CLI's signed-in context decides which organization the command runs against, so if you signed in to a different workspace than the key's, log out or switch with `mistral context set`: the login session wins, and the two then disagree. If `.env` has no key, set `MISTRAL_API_KEY` in it before you start the worker.
+`mistral apps dev` reads `MISTRAL_API_KEY` from the project's `.env` and registers the workflow in that key's workspace. The CLI's signed-in session decides which organization the command runs against, and a usable session wins over the key: if you signed in to a different workspace than the key's, the run targets the session's workspace while the workflow lands in the key's. To make them match, pick the key's workspace with `mistral context set`, or sign out so the key decides. If `.env` has no key, set `MISTRAL_API_KEY` in it before you start the worker.
 
 ---
 
@@ -412,11 +412,11 @@ uv run --env-file .env python client.py --workflow-name github-issue-creator --d
 
 ### The OAuth flow
 
-When a connector requires OAuth and the user has no stored credentials, the workflow pauses. Executed from the client script, the `on_auth_required` callback opens the browser on the OAuth URL and the terminal logs the flow:
+When an OAuth-authenticated connector like Notion has no stored credentials, the workflow pauses. Executed from the client script, the `on_auth_required` callback opens the browser on the OAuth URL and the terminal logs the flow:
 
 ```
-INFO:Auth required — opening browser (connector=github_app, auth_url=https://...)
 INFO:__main__:Running workflow with connector slots: [...]
+INFO:__main__:Auth required — opening browser (connector=notion, auth_url=https://...)
 ```
 
 While the browser flow completes, the worker's heartbeating activity polls for the new credentials and the workflow resumes automatically.
