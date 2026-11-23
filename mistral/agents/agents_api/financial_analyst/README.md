@@ -56,3 +56,5 @@ Open your browser and ask questions like:
 - "Show me Microsoft's analyst recommendations"
 
 The app will automatically use the appropriate MCP servers to fetch data and generate reports.
+
+Saved reports are written to the `reports/` directory next to `app.py`. The file name must be a bare name such as `msft_historical.md`; paths with directories or `..` are rejected.
