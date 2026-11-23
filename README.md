@@ -31,6 +31,7 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [sts_demo.py](mistral/audio/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [online_evaluation.ipynb](mistral/observability/online_evaluation.ipynb) | observability, evaluation, LLM As a Judge | Score production traffic continuously with LLM judges (scorers and live evals) |
 | [build_evaluation_datasets.ipynb](mistral/observability/build_evaluation_datasets.ipynb) | observability, datasets, evaluation | Build evaluation datasets from records, JSONL files, and production spans, and run an offline evaluation on them |
+| [offline_evaluation_and_optimization.ipynb](mistral/observability/offline_evaluation_and_optimization.ipynb) | observability, evaluation, LLM As a Judge, optimization | Evaluate an assistant offline with a code scorer and an LLM judge, compare runs, and optimize its system prompt with the Evaluation SDK |
 | [Custom MCP Server](mistral/lechat_custom_mcp_server/custom-mcp-server.md) | MCP, connectors | Build a custom MCP server (tic-tac-toe) and connect it to Vibe |
 | [Object Detection](mistral/image_understanding/bbox_getstarted.ipybn) | Vision | Object detection with mistral models. |
 | [01-build-a-database-advisor-agent.ipynb](mistral/connectors/01-build-a-database-advisor-agent.ipynb) | connectors, agents | Build an agent that compares databases using their source code via the DeepWiki connector |

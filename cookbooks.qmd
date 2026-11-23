@@ -53,7 +53,7 @@ Use Mistral API for function calling
 
 <div class="cookbook-path">mistral/function_calling/function_calling.ipynb</div>
 
-### [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)
+### evaluation.ipynb <span class="missing-cookbook">missing locally</span>
 
 **Category:** evaluation
 
@@ -165,7 +165,7 @@ Extracting structured outputs from documents.
 
 <div class="cookbook-path">mistral/ocr/structured_ocr.ipynb</div>
 
-### [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb)
+### RAG_evaluation.ipynb <span class="missing-cookbook">missing locally</span>
 
 **Category:** evaluation, structured outputs, LLM As a Judge
 
@@ -196,6 +196,14 @@ Score production traffic continuously with LLM judges (scorers and live evals)
 Build evaluation datasets from records, JSONL files, and production spans, and run an offline evaluation on them
 
 <div class="cookbook-path">mistral/observability/build_evaluation_datasets.ipynb</div>
+
+### [offline_evaluation_and_optimization.ipynb](mistral/observability/offline_evaluation_and_optimization.ipynb)
+
+**Category:** observability, evaluation, LLM As a Judge, optimization
+
+Evaluate an assistant offline with a code scorer and an LLM judge, compare runs, and optimize its system prompt with the Evaluation SDK
+
+<div class="cookbook-path">mistral/observability/offline_evaluation_and_optimization.ipynb</div>
 
 ### [Custom MCP Server](mistral/lechat_custom_mcp_server/custom-mcp-server.qmd)
 
