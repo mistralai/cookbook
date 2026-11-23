@@ -1,0 +1,8 @@
+{
+  "claim_id": "CLM-2024-003",
+  "claimant_name": "Sarah Thompson",
+  "description": "I came back to my parked silver car and found key scratches along the driver-side door panel. It looks like someone keyed it. About 30 cm long. No other damage and no note left.",
+  "photos": [
+    "src/worker/workflows/insurance_claims/sample_data/photos/claim_low_scratch_door.jpg"
+  ]
+}
