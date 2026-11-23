@@ -18,9 +18,13 @@ This cookbook covers two separate roles:
 
 ### What you need before starting
 
-To complete this cookbook, you'll need a Mistral API key. In [Studio](https://console.mistral.ai), navigate to the [API keys section](https://console.mistral.ai/home?profile_dialog=api-keys) and create a new API key.
+To complete this cookbook, you'll need:
 
-- Dedicate a Mistral workspace to run your workflow. Workflow execution must use the same workspace as the workflow definition.
+- macOS or Linux; the Mistral CLI has no Windows build.
+- [Git](https://git-scm.com/downloads), [uv](https://docs.astral.sh/uv/getting-started/installation/), and Python 3.12 or later.
+- A Mistral account, with the CLI signed in: run `mistral login` before you start. `mistral apps dev` proxies Mistral API calls as the signed-in workspace.
+- A Mistral workspace to run your workflow.
+- For this walkthrough: a GitHub connector registered as `github_app` in Studio, with a personal-access-token credential stored. The client step creates an issue in a repository of your choice, so use a token that can write issues to it (replace `my-org`/`my-repo` in the client arguments when you run it).
 - At least one registered Connector. See [Build a Database Advisor Agent](./01-build-a-database-advisor-agent.ipynb) for a full connector lifecycle example, or create one directly in [Studio](https://console.mistral.ai).
 - For OAuth-authenticated connectors like Notion and Gmail: no pre-existing credentials are needed — the auth flow is triggered automatically at workflow execution time; for bearer-authenticated connectors (e.g. GitHub PAT), credentials must be stored in the Mistral console before running the workflow.
 
@@ -41,23 +45,37 @@ A workflow that uses connectors has three building blocks:
 
 The `ConnectorAuthInterceptor` is automatically registered by the plugin when `run_worker` starts. It runs an auth preflight before every workflow execution: if valid credentials exist (matching `credentials_name` if specified, else if default credentials exist) the workflow proceeds immediately; if not, it triggers an OAuth flow and waits for the user to authenticate. Bearer on-the-fly authentication is not currently supported.
 
-### Worker and example client install
+### Worker install
 
-To set up a pre-built worker and workflow environment, run the following command:
+The Mistral CLI creates a project with the worker already configured. Install it on macOS or Linux:
 
 ```bash
-uvx mistralai-workflows-cli setup
+curl -fsSL https://mistral.ai/cli/install.sh | bash
 ```
 
-This scaffolds a ready-to-run Python project with the Workflows SDK already configured, a minimal example workflow, and helper commands to run your worker and trigger executions.
+The installer offers to install [Bun](https://bun.sh/docs/installation), which `mistral apps dev` needs. Accept it, or install Bun yourself beforehand.
 
-The command prompts you to [generate a Mistral API key in the Mistral Console](https://console.mistral.ai/home?profile_dialog=api-keys). Follow the prompts to generate the API key, and then pass it to the command when requested. API keys are only accessible once.
+Then create the project:
+
+```bash
+mistral workflows init connectors-demo
+```
+
+Then change into the project:
+
+```bash
+cd connectors-demo
+```
+
+The project puts the worker in `apps/worker`. Workflow modules go in `apps/worker/src/worker/workflows/`, which the worker scans recursively.
+
+`mistral apps dev` reads `MISTRAL_API_KEY` from the project's `.env` and registers the workflow in that key's workspace. The CLI's signed-in session decides which organization the command runs against, and a usable session wins over the key: if you signed in to a different workspace than the key's, the run targets the session's workspace while the workflow lands in the key's. To make them match, pick the key's workspace with `mistral context set`, or sign out so the key decides. If `.env` has no key, set `MISTRAL_API_KEY` in it before you start the worker.
 
 ---
 
 ### Step 1 — Declare connector slots
 
-Create a new Python file in the `workflows` directory (e.g. `workflows/connectors_example.py`).
+Create `apps/worker/src/worker/workflows/connectors_example.py`.
 
 Connector slots are declared at module level. Each slot holds the connector name and auth configuration:
 
@@ -231,15 +249,15 @@ if __name__ == "__main__":
     asyncio.run(workflows.run_worker([GitHubIssueCreatorWorkflow]))
 ```
 
-Start the worker:
+Start the worker from the project root:
 
 ```bash
-make start-worker
+mistral apps dev
 ```
 
 **How it works:**
 
-- The command starts the worker, connects to the Mistral API, and registers your workflow so it can wait for tasks. For details on this command, see the Makefile.
+- The command runs the worker locally with hot reload, connects to the Mistral API, and registers your workflow so it can wait for tasks.
 - The `ConnectorAuthInterceptor` is automatically loaded by the plugin system — no manual setup is needed
 - Before each workflow execution, the interceptor checks credentials for every `auto_auth=True` connector slot:
   - Valid credentials found → proceed immediately
@@ -259,14 +277,27 @@ make start-worker
 
 ## Execute a Workflow with Connectors
 
-Use `execute_with_connector_auth_async` from the `mistralai` SDK to trigger a workflow. This helper polls for events and — if the worker signals that connector authorization is required — prints the OAuth URL and waits for the user to complete the flow before the workflow resumes.
+Use `execute_with_connector_auth_async` from the `mistralai` SDK to trigger a workflow. This helper polls for events. If the worker signals that connector authorization is required, it prints the OAuth URL and waits for the user to complete the flow before the workflow resumes.
 
 ---
 ### Example client script
 
+Install the `mistralai` SDK in the project:
+
+```bash
+uv add mistralai
+```
+
+Save this script as `client.py`:
+
 ```python
 import asyncio
+import json
+import logging
 import os
+import webbrowser
+from argparse import ArgumentParser
+from collections.abc import Sequence
 
 import pydantic
 from mistralai import Mistral
@@ -275,6 +306,8 @@ from mistralai.extra.workflows.connector_auth import (
     execute_with_connector_auth_async,
 )
 from mistralai.extra.workflows.connector_slot import ConnectorSlot
+
+logger = logging.getLogger(__name__)
 
 
 class GitHubIssuePrompt(pydantic.BaseModel):
@@ -298,7 +331,6 @@ async def on_auth_required(state: ConnectorAuthTaskState) -> None:
             "Auth required — authenticate the connector manually (connector=%s)",
             state.connector_name,
         )
-    input("Press Enter after completing the OAuth flow...")
 
 
 
@@ -309,10 +341,10 @@ async def main(args) -> None:
     ]
 
     logger.info("Running workflow with connector slots: %s", connector_slots)
-    async with Mistral(api_key=args.api_key, server_url=args.server_url) as client:
+    async with Mistral(api_key=os.environ["MISTRAL_API_KEY"], server_url=args.server_url) as client:
         response = await execute_with_connector_auth_async(
             client=client,
-            workflow_identifier="github-issue-creator",
+            workflow_identifier=args.workflow_name,
             input_data=GitHubIssuePrompt(
                 owner="my-org",
                 repo="my-repo",
@@ -326,8 +358,8 @@ async def main(args) -> None:
         print(response)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Search meetings")
-    parser.add_argument("--api-key", required=True, help="Mistral API key")
+    logging.basicConfig(level=logging.INFO)
+    parser = ArgumentParser(description="Create a GitHub issue with a workflow")
     parser.add_argument(
         "--server_url",
         required=False,
@@ -335,31 +367,38 @@ if __name__ == "__main__":
         help="Mistral server URL",
     )
     parser.add_argument("--deployment-name", required=True, help="Deployment name")
-    parser.add_argument("--workflow_name", required=True, help="workflow to execute")
+    parser.add_argument("--workflow-name", required=True, help="workflow to execute")
     parser.add_argument(
         "--bindings",
         default=None,
-        help="dict containing connector bindings",
+        help="JSON list of connector bindings, e.g. '[{\"connector_name\": \"github_app\"}]'"
     )
     asyncio.run(main(parser.parse_args()))
-
 ```
+
+The script reads the API key from `MISTRAL_API_KEY`. `mistral workflows init` saves the key to the project's `.env` when you enter it at the prompt. Load it for the client with:
+
+```bash
+uv run --env-file .env python client.py ...
+```
+
+`mistral apps dev` registers the worker on the deployment named by `DEPLOYMENT_NAME` in the same `.env`, which is `deployment-<project-name>-<your-user>`. Pass that name with `--deployment-name`; the value is in your `.env`.
 
 ### Simple execution (pre-registered connectors)
 
-When the connector uses a bearer token that is already stored, execution is straightforward:
-Run it:
+When the connector already has stored credentials, run the client without `--bindings`:
 
 ```bash
-make execute workflow=github-issue-creator input='{"owner": "your-username", "repo": "your-repo", "title": "Hello World", "body": "Hello World"}'
+uv run --env-file .env python client.py --workflow-name github-issue-creator --deployment-name deployment-connectors-demo-$USER
 ```
 
 ---
 
 ### Oauth/Bearer execution with runtime connector binding
-To specify which credentials to use for each connector when executing the workflow, use the bindings parameter of the script. It will register workflow execution extensions and communicate to the worker which credentials to use for this user.
-```
-uv run python -m 09_workflow_executor_with_connectors --api-key <your_api_key> --query meeting  --bindings '[{"connector_name": "github_app", "credentials_name": "galilou"}]' --workflow_name github-issue-creator --deployment-name default
+To choose which credentials the worker uses for each connector, pass a `--bindings` JSON list to the client script:
+
+```bash
+uv run --env-file .env python client.py --workflow-name github-issue-creator --deployment-name deployment-connectors-demo-$USER --bindings '[{"connector_name": "github_app", "credentials_name": "your-credentials-name"}]'
 ```
 
 **Binding fields:**
@@ -373,18 +412,14 @@ uv run python -m 09_workflow_executor_with_connectors --api-key <your_api_key> -
 
 ### The OAuth flow
 
-When a connector requires OAuth and the user has no stored credentials, the workflow pauses. If the workflow is executed via cli, the `on_auth_required` callback prints the URL and waits:
+When an OAuth-authenticated connector like Notion has no stored credentials, the workflow pauses. Executed from the client script, the `on_auth_required` callback opens the browser on the OAuth URL and the terminal logs the flow:
 
 ```
-Connector 'Notion' requires authorization.
-Open this URL in your browser to authenticate:
-  https://api.notion.com/v1/oauth/authorize?client_id=...
-
-Waiting for authorization... (press Ctrl+C to cancel)
-✓ Authorization complete.
+INFO:__main__:Running workflow with connector slots: [...]
+INFO:__main__:Auth required — opening browser (connector=notion, auth_url=https://...)
 ```
 
-Once the user authenticates in their browser, the worker detects the new credentials and the workflow resumes automatically.
+While the browser flow completes, the worker's heartbeating activity polls for the new credentials and the workflow resumes automatically.
 
 ---
 
@@ -411,6 +446,12 @@ Once the user authenticates in their browser, the worker detects the new credent
 When credentials are not specified, the worker will use your default credentials.
 
 > To promote credentials to default, see the [Multiple Authentication Cookbook](./06-multiple-authentication.md).
+
+Open [Workflows](https://console.mistral.ai/build/workflows) in Studio, in the workspace of the key in the project's `.env`, and select the deployment named in the same `.env` (`deployment-<project-name>-<your-user>`). Select `github-issue-creator`, and start it with this input:
+
+```json
+{"owner": "your-username", "repo": "your-repo", "title": "Hello World", "body": "Hello World"}
+```
 
 ### OAuth flow in the execution panel
 
