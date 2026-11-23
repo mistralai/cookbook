@@ -3,6 +3,8 @@ import logging
 import json
 from datetime import datetime
 import os
+import sys
+import uuid
 from typing import List, Dict, Any
 from pydantic import BaseModel
 from mistralai.client import Mistral
@@ -29,7 +31,9 @@ client = Client(
         url=graphql_url,
         headers={'Authorization': linear_api_key},
         verify=True,
-        retries=3
+        # No transport-level retries: issueCreate is not idempotent. A retry after a 5xx or a dropped
+        # connection re-sends the mutation even when Linear already created the issue, producing a duplicate.
+        retries=0
     ),
     fetch_schema_from_transport=True
 )
@@ -38,6 +42,19 @@ class FeaturesList(BaseModel):
     """Pydantic model for structured feature data from PRD parsing"""
     Features: List[str]
     DescriptionOfFeatures: List[str]
+
+# Upper bound on the number of tickets a single create_tickets_from_prd call may create
+MAX_TICKETS_PER_CALL = 20
+
+def ticket_id(title: str, description: str) -> str:
+    """
+    Deterministic client-side issue id for Linear's IssueCreateInput.id (UUID v4 format).
+
+    The same team, title and description always map to the same id, so creating the same ticket
+    twice is rejected by Linear instead of producing a duplicate issue.
+    """
+    seed = uuid.uuid5(uuid.NAMESPACE_URL, f"linear-issue:{team_id}:{title}\n{description}")
+    return str(uuid.UUID(bytes=seed.bytes, version=4))
 
 def parse_prd(prd_text: str) -> Dict[str, List[str]]:
     """
@@ -87,9 +104,10 @@ def create_ticket(title: str, description: str) -> Dict[str, Any]:
     """
     # GraphQL mutation to create a new issue in Linear
     mutation = gql("""
-    mutation CreateIssue($title: String!, $description: String!, $teamId: String!) {
+    mutation CreateIssue($id: String!, $title: String!, $description: String!, $teamId: String!) {
         issueCreate(
             input: {
+                id: $id,
                 title: $title,
                 description: $description,
                 teamId: $teamId
@@ -105,6 +123,7 @@ def create_ticket(title: str, description: str) -> Dict[str, Any]:
     """)
 
     variables = {
+        "id": ticket_id(title, description),
         "title": title,
         "description": description,
         "teamId": team_id
@@ -112,7 +131,8 @@ def create_ticket(title: str, description: str) -> Dict[str, Any]:
 
     # Execute the mutation and return result
     result = client.execute(mutation, variable_values=variables)
-    print(f"Created ticket: {result['issueCreate']['issue']['url']}")
+    # stdout carries the stdio MCP protocol, so status messages go to stderr
+    print(f"Created ticket: {result['issueCreate']['issue']['url']}", file=sys.stderr)
     return result
 
 @mcp.tool()
@@ -128,13 +148,24 @@ def create_tickets_from_prd(prd: str) -> List[Dict[str, Any]]:
     """
     # Parse the PRD into structured feature data
     parsed_items = parse_prd(prd)
-    results = []
+    features = parsed_items['Features']
+    descriptions = parsed_items['DescriptionOfFeatures']
 
+    # zip() would silently drop features (or descriptions) if the model returned lists of different lengths
+    if len(features) != len(descriptions):
+        raise ValueError(
+            f"PRD parsing returned {len(features)} features but {len(descriptions)} descriptions; "
+            "cannot pair them, please retry"
+        )
+    if len(features) > MAX_TICKETS_PER_CALL:
+        raise ValueError(
+            f"PRD parsing returned {len(features)} features; at most {MAX_TICKETS_PER_CALL} tickets "
+            "are created per call. Split the PRD or narrow its scope."
+        )
+
+    results = []
     # Create a Linear ticket for each feature
-    for title, description in zip(
-        parsed_items['Features'],
-        parsed_items['DescriptionOfFeatures']
-    ):
+    for title, description in zip(features, descriptions):
         result = create_ticket(title, description)
         results.append(result)
     return results
