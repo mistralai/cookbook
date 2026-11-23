@@ -42,6 +42,7 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [insurance-claims/README.md](mistral/workflows/insurance-claims/README.md) | workflows, vision, structured outputs | Triage insurance claims with a workflow that analyses photos in parallel and routes each claim by severity |
 | [code-modernization/README.md](mistral/workflows/code-modernization/README.md) | workflows, agents, code generation | Modernize legacy files with a workflow that runs per-file sub-workflows and pauses for human review |
 | [linear-summarization/README.md](mistral/workflows/linear-summarization/README.md) | workflows, connectors, summarization | Summarize a week of Linear issues with a workflow that reads Linear and writes a weekly summary |
+| [Reasoning Modes](mistral/reasoning/reasoning_modes.ipynb) | reasoning | Exploring reasoning efforts. |
 
 ## Third Party Tools
 
