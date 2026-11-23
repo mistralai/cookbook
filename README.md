@@ -13,7 +13,6 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [basic_RAG.ipynb](mistral/rag/basic_RAG.ipynb)                                 | RAG                          | RAG from scratch with Mistral AI API                                             |
 | [embeddings.ipynb](mistral/embeddings/embeddings.ipynb)                        | embeddings                   | Use Mistral embeddings API for classification and clustering                     |
 | [function_calling.ipynb](mistral/function_calling/function_calling.ipynb)      | function calling             | Use Mistral API for function calling                                             |
-| [evaluation.ipynb](mistral/evaluation/evaluation.ipynb)                        | evaluation                   | Evaluate models with Mistral API                                                 |
 | [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)         | RAG, function calling        | Search engine built with Mistral API, function calling and RAG                   |
 | [rag_via_function_calling.ipynb](mistral/rag/RAG_via_function_calling.ipynb)         | RAG, function calling        | Use function calling as a router for a RAG based on multiple data sources                   |
 | [prefix_use_cases.ipynb](mistral/prompting/prefix_use_cases.ipynb)             | prefix, prompting            | Cool examples with Mistral's prefix feature                                      |
@@ -27,7 +26,6 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [document_understanding.ipynb](mistral/ocr/document_understanding.ipynb) | OCR, function calling | Document Understanding and Tool Usage with OCR |
 | [batch_ocr.ipynb](mistral/ocr/batch_ocr.ipynb) | OCR, batch | Using OCR to extract text data from datasets. |
 | [structured_ocr.ipynb](mistral/ocr/structured_ocr.ipynb) | OCR, structured outputs | Extracting structured outputs from documents. |
-| [RAG_evaluation.ipynb](mistral/evaluation/RAG_evaluation.ipynb) | evaluation, structured outputs, LLM As a Judge | Evaluate RAG with LLM as a Judge and structured outputs |
 | [sts_demo.py](mistral/audio/sts_demo.py) | chat, tts | STT -> LLM -> TTS Demo. |
 | [online_evaluation.ipynb](mistral/observability/online_evaluation.ipynb) | observability, evaluation, LLM As a Judge | Score production traffic continuously with LLM judges (scorers and live evals) |
 | [build_evaluation_datasets.ipynb](mistral/observability/build_evaluation_datasets.ipynb) | observability, datasets, evaluation | Build evaluation datasets from records, JSONL files, and production spans, and run an offline evaluation on them |

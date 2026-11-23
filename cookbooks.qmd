@@ -53,14 +53,6 @@ Use Mistral API for function calling
 
 <div class="cookbook-path">mistral/function_calling/function_calling.ipynb</div>
 
-### evaluation.ipynb <span class="missing-cookbook">missing locally</span>
-
-**Category:** evaluation
-
-Evaluate models with Mistral API
-
-<div class="cookbook-path">mistral/evaluation/evaluation.ipynb</div>
-
 ### [mistral-search-engine.ipynb](mistral/rag/mistral-search-engine.ipynb)
 
 **Category:** RAG, function calling
@@ -164,14 +156,6 @@ Using OCR to extract text data from datasets.
 Extracting structured outputs from documents.
 
 <div class="cookbook-path">mistral/ocr/structured_ocr.ipynb</div>
-
-### RAG_evaluation.ipynb <span class="missing-cookbook">missing locally</span>
-
-**Category:** evaluation, structured outputs, LLM As a Judge
-
-Evaluate RAG with LLM as a Judge and structured outputs
-
-<div class="cookbook-path">mistral/evaluation/RAG_evaluation.ipynb</div>
 
 ### sts_demo.py <span class="missing-cookbook">not rendered by preview</span>
 
