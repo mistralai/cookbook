@@ -42,6 +42,7 @@ For the full Mistral documentation, visit [docs.mistral.ai](https://docs.mistral
 | [code-modernization/README.md](mistral/workflows/code-modernization/README.md) | workflows, agents, code generation | Modernize legacy files with a workflow that runs per-file sub-workflows and pauses for human review |
 | [linear-summarization/README.md](mistral/workflows/linear-summarization/README.md) | workflows, connectors, summarization | Summarize a week of Linear issues with a workflow that reads Linear and writes a weekly summary |
 | [Reasoning Modes](mistral/reasoning/reasoning_modes.ipynb) | reasoning | Exploring reasoning efforts. |
+| [timestral_demand_forecasting.ipynb](mistral/forecasting/timestral_demand_forecasting.ipynb) | forecasting, time series | Forecast daily demand with Timestral, using the promotion calendar and prices as covariates |
 
 ## Third Party Tools
 
